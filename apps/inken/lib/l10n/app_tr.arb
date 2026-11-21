@@ -445,7 +445,6 @@
     }
   },
   "printSent": "Yazıcıya gönderildi",
-  "printHandedOff": "Yazdırma, varsayılan PDF uygulamasında açılıyor",
   "printFailed": "Yazdırılamadı: {error}",
   "@printFailed": {
     "placeholders": {

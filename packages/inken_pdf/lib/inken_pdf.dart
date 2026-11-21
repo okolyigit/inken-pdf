@@ -26,6 +26,7 @@ export 'src/pdf_io.dart'
         readPdfInfo,
         writeFlattenedPdf,
         writeInkenPdf;
+export 'src/print_raster.dart';
 export 'src/thumbnail.dart';
 export 'src/versions.dart';
 export 'src/viewer.dart';

@@ -980,11 +980,6 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       switch (outcome) {
         case PrintOutcome.printed:
           messenger.showSnackBar(SnackBar(content: Text(l10n.printSent)));
-        case PrintOutcome.handedOff:
-          // Dış uygulama dosyayı sonra okur; eski çıktılar sonraki
-          // yazdırmada temizlenir.
-          keep = true;
-          messenger.showSnackBar(SnackBar(content: Text(l10n.printHandedOff)));
         case PrintOutcome.started:
           keep = true; // Android: iş bitince sistem tarafı siler.
         case PrintOutcome.cancelled:

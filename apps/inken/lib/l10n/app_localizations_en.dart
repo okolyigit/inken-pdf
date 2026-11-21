@@ -828,9 +828,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get printSent => 'Sent to the printer';
 
   @override
-  String get printHandedOff => 'Printing through your default PDF app';
-
-  @override
   String printFailed(String error) {
     return 'Couldn\'t print: $error';
   }

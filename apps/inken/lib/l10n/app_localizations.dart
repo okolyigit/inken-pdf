@@ -1466,12 +1466,6 @@ abstract class AppLocalizations {
   /// **'Yazıcıya gönderildi'**
   String get printSent;
 
-  /// No description provided for @printHandedOff.
-  ///
-  /// In tr, this message translates to:
-  /// **'Yazdırma, varsayılan PDF uygulamasında açılıyor'**
-  String get printHandedOff;
-
   /// No description provided for @printFailed.
   ///
   /// In tr, this message translates to:

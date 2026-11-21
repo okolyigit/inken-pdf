@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include "print_job.h"
 #include "win32_window.h"
 
 // A window that does nothing but host a Flutter view.
@@ -34,10 +35,12 @@ class FlutterWindow : public Win32Window {
   // Dart'tan pencere başlığı: "inken/window" kanalı, "setTitle".
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>>
       window_channel_;
-  // Yazdırma: "inken/print" kanalı, "print" {path, title}. Dosya Windows'un
-  // "print" komutuyla varsayılan PDF uygulamasına verilir.
+  // Yazdırma: "inken/print" kanalı. "begin" {title, pageCount} yazdırma
+  // penceresini açar → {pages, width, height, dpi} ya da null (vazgeçildi);
+  // "page" {bgra, width, height} bir sayfa; "end" / "abort".
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>>
       print_channel_;
+  PrintJob print_job_;
   // Pano: "inken/clipboard" kanalı, "readImage" → görsel baytları (PNG ya da
   // BMP) ya da null.
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>>

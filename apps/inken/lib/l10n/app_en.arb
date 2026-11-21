@@ -228,7 +228,6 @@
   "pageDeleted": "Page {page} deleted",
   "pageLayoutFailed": "Couldn't prepare pages: {error}",
   "printSent": "Sent to the printer",
-  "printHandedOff": "Printing through your default PDF app",
   "printFailed": "Couldn't print: {error}",
   "printUnsupported": "This printer doesn't accept PDF. Choose another printer, or export and print from a PDF reader.",
   "shareDocument": "Share…",

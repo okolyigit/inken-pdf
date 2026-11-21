@@ -785,10 +785,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get printSent => 'Yazıcıya gönderildi';
 
   @override
-  String get printHandedOff =>
-      'Yazdırma, varsayılan PDF uygulamasında açılıyor';
-
-  @override
   String printFailed(String error) {
     return 'Yazdırılamadı: $error';
   }

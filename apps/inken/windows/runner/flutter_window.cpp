@@ -9,8 +9,20 @@
 #include <string>
 
 #include "flutter/generated_plugin_registrant.h"
+#include "print_job.h"
 
 namespace {
+
+// UTF-8 → UTF-16 (sondaki boş karakter olmadan).
+std::wstring Utf8ToWide(const std::string& text) {
+  if (text.empty()) return std::wstring();
+  const int length = MultiByteToWideChar(
+      CP_UTF8, 0, text.data(), static_cast<int>(text.size()), nullptr, 0);
+  std::wstring wide(length, L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, text.data(), static_cast<int>(text.size()),
+                      wide.data(), length);
+  return wide;
+}
 
 // Panodaki görsel. Önce tarayıcıların ve Ekran Alıntısı Aracı'nın koyduğu
 // "PNG" biçimi (saydamlık korunur); yoksa CF_DIB, başına BMP dosya başlığı
@@ -113,36 +125,84 @@ bool FlutterWindow::OnCreate() {
       [this](const flutter::MethodCall<flutter::EncodableValue>& call,
              std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>
                  result) {
-        if (call.method_name() != "print") {
-          result->NotImplemented();
-          return;
-        }
         const auto* args =
             std::get_if<flutter::EncodableMap>(call.arguments());
-        const std::string* path = nullptr;
-        if (args != nullptr) {
-          auto it = args->find(flutter::EncodableValue("path"));
-          if (it != args->end()) path = std::get_if<std::string>(&it->second);
-        }
-        if (path == nullptr) {
-          result->Error("bad_args", "path gerekli");
-          return;
-        }
-        int length =
-            MultiByteToWideChar(CP_UTF8, 0, path->c_str(), -1, nullptr, 0);
-        std::wstring wide(length, L'\0');
-        MultiByteToWideChar(CP_UTF8, 0, path->c_str(), -1, wide.data(),
-                            length);
-        // Windows'ta yerleşik PDF yazdırma yok: dosya varsayılan PDF
-        // uygulamasının "yazdır" komutuna verilir (yazdırma penceresi o
-        // uygulamanınkidir). 32'den büyük dönüş başarıdır.
-        HINSTANCE r = ShellExecuteW(GetHandle(), L"print", wide.c_str(),
-                                    nullptr, nullptr, SW_SHOWNORMAL);
-        if (reinterpret_cast<INT_PTR>(r) > 32) {
-          result->Success(flutter::EncodableValue("handedOff"));
+        auto arg = [args](const char* key) -> const flutter::EncodableValue* {
+          if (args == nullptr) return nullptr;
+          auto it = args->find(flutter::EncodableValue(key));
+          return it == args->end() ? nullptr : &it->second;
+        };
+        auto int_arg = [&arg](const char* key) -> std::optional<int64_t> {
+          const auto* v = arg(key);
+          if (v == nullptr) return std::nullopt;
+          if (const auto* i = std::get_if<int32_t>(v)) return *i;
+          if (const auto* l = std::get_if<int64_t>(v)) return *l;
+          return std::nullopt;
+        };
+        const std::string& method = call.method_name();
+        if (method == "begin") {
+          const auto* title_value = arg("title");
+          const auto* title = title_value == nullptr
+                                  ? nullptr
+                                  : std::get_if<std::string>(title_value);
+          const auto count = int_arg("pageCount");
+          if (title == nullptr || !count || *count < 1) {
+            result->Error("bad_args", "title ve pageCount gerekli");
+            return;
+          }
+          PrintJob::Started job;
+          switch (print_job_.Begin(GetHandle(), Utf8ToWide(*title),
+                                   static_cast<int>(*count), &job)) {
+            case PrintJob::BeginResult::kCancelled:
+              result->Success();
+              return;
+            case PrintJob::BeginResult::kFailed:
+              result->Error("print_failed", "Yazdırma başlatılamadı");
+              return;
+            case PrintJob::BeginResult::kStarted:
+              break;
+          }
+          flutter::EncodableList pages;
+          for (int32_t p : job.pages) pages.emplace_back(p);
+          result->Success(flutter::EncodableValue(flutter::EncodableMap{
+              {flutter::EncodableValue("pages"), flutter::EncodableValue(pages)},
+              {flutter::EncodableValue("width"),
+               flutter::EncodableValue(job.width)},
+              {flutter::EncodableValue("height"),
+               flutter::EncodableValue(job.height)},
+              {flutter::EncodableValue("dpi"), flutter::EncodableValue(job.dpi)},
+          }));
+        } else if (method == "page") {
+          const auto* bytes_value = arg("bgra");
+          const auto* bytes =
+              bytes_value == nullptr
+                  ? nullptr
+                  : std::get_if<std::vector<uint8_t>>(bytes_value);
+          const auto width = int_arg("width");
+          const auto height = int_arg("height");
+          if (bytes == nullptr || !width || !height) {
+            result->Error("bad_args", "bgra, width ve height gerekli");
+            return;
+          }
+          if (print_job_.AddPage(bytes->data(), bytes->size(),
+                                 static_cast<int>(*width),
+                                 static_cast<int>(*height))) {
+            result->Success();
+          } else {
+            print_job_.Abort();
+            result->Error("print_failed", "Sayfa yazıcıya gönderilemedi");
+          }
+        } else if (method == "end") {
+          if (print_job_.End()) {
+            result->Success();
+          } else {
+            result->Error("print_failed", "Yazdırma tamamlanamadı");
+          }
+        } else if (method == "abort") {
+          print_job_.Abort();
+          result->Success();
         } else {
-          result->Error("print_failed",
-                        "Varsayılan PDF uygulaması yazdıramadı");
+          result->NotImplemented();
         }
       });
   clipboard_channel_ =
