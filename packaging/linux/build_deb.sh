@@ -41,19 +41,16 @@ trap 'rm -rf "$WORK"' EXIT
 STAGE="$WORK/data"
 CTRL="$WORK/control"
 mkdir -p "$STAGE/opt/inken-pdf" "$STAGE/usr/bin" \
-  "$STAGE/usr/share/applications" \
-  "$STAGE/usr/share/icons/hicolor/256x256/apps" \
-  "$STAGE/usr/share/icons/hicolor/scalable/apps" \
+  "$STAGE/usr/share/applications" "$STAGE/usr/share/icons" \
   "$STAGE/usr/share/doc/inken-pdf" "$CTRL"
 
 cp -a "$BUNDLE/." "$STAGE/opt/inken-pdf/"
 ln -s /opt/inken-pdf/inken "$STAGE/usr/bin/inken-pdf"
 install -m 644 "$ROOT/packaging/linux/com.inkenpdf.app.desktop" \
   "$STAGE/usr/share/applications/"
-install -m 644 "$APP/assets/brand/inken-icon-256.png" \
-  "$STAGE/usr/share/icons/hicolor/256x256/apps/inken-pdf.png"
-install -m 644 "$APP/assets/brand/inken-app-icon.svg" \
-  "$STAGE/usr/share/icons/hicolor/scalable/apps/inken-pdf.svg"
+# Uygulama ikonu ve .pdf dosya ikonu (application-pdf), bütün boylar
+# (packaging/icons/generate.sh üretir).
+cp -r "$ROOT/packaging/linux/icons/hicolor" "$STAGE/usr/share/icons/"
 install -m 644 "$ROOT/LICENSE" "$STAGE/usr/share/doc/inken-pdf/copyright"
 for f in LICENSE-DejaVu.txt OFL-Figtree.txt OFL-Fraunces.txt OFL-JetBrainsMono.txt; do
   install -m 644 "$APP/assets/fonts/$f" "$STAGE/usr/share/doc/inken-pdf/"

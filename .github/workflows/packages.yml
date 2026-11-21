@@ -60,10 +60,12 @@ jobs:
           name: inken-pdf-windows
           path: dist/*
       - name: MSIX (Microsoft Store ve deneme)
-        # Store paketi imzasızdır; Store kendisi imzalar. Deneme paketi her
-        # çalıştırmada üretilen, yayıncısı Store kimliğiyle aynı geçici
-        # sertifikayla imzalanır; Windows'ta denemeden önce .cer kurulur
+        # Store paketi imzasızdır; Store kendisi imzalar. Deneme paketi aynı
+        # paketin, yayıncısı Store kimliğiyle aynı geçici sertifikayla
+        # imzalanmış kopyasıdır; Windows'ta denemeden önce .cer kurulur
         # (packaging/windows/README.md). İkisi de GitHub sürümüne girmez.
+        # msix paketi dosya ilişkisine ikon koyamadığından paket açılır,
+        # manifeste .pdf dosya ikonu (<uap:Logo>) eklenip yeniden kapatılır.
         shell: pwsh
         working-directory: apps/inken
         run: |
@@ -72,7 +74,26 @@ jobs:
           $msix = "$([int]$m.Groups[1].Value + 1).$($m.Groups[2].Value).$($m.Groups[3].Value).0"
           $out = "$env:GITHUB_WORKSPACE\msix"
           New-Item -ItemType Directory -Force $out | Out-Null
+          $store = "$out\InkenPDF-Store-$msix.msix"
           dart run msix:create --version $msix --store --output-path $out --output-name "InkenPDF-Store-$msix"
+
+          $kit = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.*\x64" -Directory | Sort-Object Name | Select-Object -Last 1
+          $makeappx = Join-Path $kit.FullName 'makeappx.exe'
+          $signtool = Join-Path $kit.FullName 'signtool.exe'
+          $dir = "$env:RUNNER_TEMP\msix-icerik"
+          & $makeappx unpack /p $store /d $dir /o
+          foreach ($f in 'AppxBlockMap.xml', '[Content_Types].xml', 'AppxSignature.p7x') {
+            Remove-Item -LiteralPath (Join-Path $dir $f) -ErrorAction SilentlyContinue
+          }
+          New-Item -ItemType Directory -Force "$dir\Images" | Out-Null
+          Copy-Item windows\msix\pdf-file.png "$dir\Images\PdfFile.png"
+          $manifest = Join-Path $dir 'AppxManifest.xml'
+          $xml = Get-Content -Raw $manifest
+          $patched = $xml -replace '(<uap:FileTypeAssociation Name="fileassociations">)', '$1<uap:Logo>Images\PdfFile.png</uap:Logo>'
+          if ($patched -eq $xml) { throw 'Manifestte FileTypeAssociation bulunamadı' }
+          Set-Content -LiteralPath $manifest -Value $patched -NoNewline
+          & $makeappx pack /d $dir /p $store /o
+
           $publisher = (Select-String -Path pubspec.yaml -Pattern '^\s*publisher:\s*(.+)$').Matches[0].Groups[1].Value.Trim()
           $cert = New-SelfSignedCertificate -Type Custom -Subject $publisher -KeyUsage DigitalSignature `
             -FriendlyName 'Inken PDF deneme' -CertStoreLocation Cert:\CurrentUser\My `
@@ -81,7 +102,9 @@ jobs:
           $pfx = "$env:RUNNER_TEMP\deneme.pfx"
           Export-PfxCertificate -Cert $cert -FilePath $pfx -Password (ConvertTo-SecureString $pw -AsPlainText -Force) | Out-Null
           Export-Certificate -Cert $cert -FilePath "$out\InkenPDF-Deneme-sertifika.cer" | Out-Null
-          dart run msix:create --version $msix --certificate-path $pfx --certificate-password $pw --output-path $out --output-name "InkenPDF-Deneme-$msix"
+          $test = "$out\InkenPDF-Deneme-$msix.msix"
+          Copy-Item $store $test
+          & $signtool sign /fd SHA256 /f $pfx /p $pw $test
           Get-ChildItem $out
       - uses: actions/upload-artifact@v4
         with:

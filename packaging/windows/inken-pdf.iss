@@ -50,6 +50,12 @@ Root: HKA; Subkey: "Software\Classes\Applications\inken.exe"; ValueType: string;
 Root: HKA; Subkey: "Software\Classes\Applications\inken.exe\SupportedTypes"; ValueType: string; ValueName: ".pdf"; ValueData: ""
 Root: HKA; Subkey: "Software\Classes\Applications\inken.exe\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\inken.exe"" ""%1"""
 Root: HKA; Subkey: "Software\Classes\.pdf\OpenWithList\inken.exe"; ValueType: none; Flags: uninsdeletekey
+; Inken varsayılan PDF uygulaması seçilince PDF'ler bu ProgID'yle açılır ve
+; dosya ikonu (inken.exe içindeki IDI_PDF_FILE, kaynak kimliği 102) görünür.
+Root: HKA; Subkey: "Software\Classes\InkenPDF.Document"; ValueType: string; ValueName: ""; ValueData: "PDF"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\InkenPDF.Document\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: """{app}\inken.exe"",-102"
+Root: HKA; Subkey: "Software\Classes\InkenPDF.Document\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\inken.exe"" ""%1"""
+Root: HKA; Subkey: "Software\Classes\.pdf\OpenWithProgids"; ValueType: string; ValueName: "InkenPDF.Document"; ValueData: ""; Flags: uninsdeletevalue
 
 [Run]
 Filename: "{app}\inken.exe"; Description: "{cm:LaunchProgram,Inken PDF}"; Flags: nowait postinstall skipifsilent

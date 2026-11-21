@@ -51,3 +51,7 @@ Partner Center → Inken PDF → **Start submission**:
 - **Store listings** (Türkçe ve İngilizce): açıklama için `README.md`'nin giriş ve "Neler yapabilirsin" / "Features" bölümleri; ekran görüntüleri `docs/screenshots/` (en az 1366×768: `ders.png`, `olcme.png`, `sayfalar.png`, `spot.png`, `gece.png`, İngilizce için `lesson.png`).
 
 Sertifikasyon genellikle birkaç gün sürer. Güncellemede yeni sürüm numaralı Store paketi aynı ürüne yeni gönderimle yüklenir.
+
+## İkonlar
+
+Uygulama ikonu (`app_icon.ico`) ve .pdf dosya ikonu (`pdf_file.ico`, `inken.exe` içinde kaynak kimliği 102) `packaging/icons/generate.sh` ile tasarım sisteminin SVG'lerinden üretilir. Inno kurulumu `InkenPDF.Document` ProgID'sini kaydeder; Inken varsayılan PDF uygulaması seçilince PDF'ler bu ikonla görünür. MSIX'te aynı ikon CI'da manifestin dosya ilişkisine (`<uap:Logo>`) eklenir.
