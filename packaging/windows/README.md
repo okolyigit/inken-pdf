@@ -46,7 +46,7 @@ Partner Center → Inken PDF → **Start submission**:
 - **Age ratings:** IARC anketi; içerik yok, kullanıcılar arası iletişim yok → "3+ / Herkes".
 - **Submission options → Restricted capabilities:** `runFullTrust` için gerekçe:
 
-  > Inken PDF is a desktop app built with Flutter (Win32). runFullTrust is required to run as a desktop app: it opens PDF files the user chooses, saves annotations back to the same file or a new file in the user's folders, and prints through the system's default PDF application.
+  > Inken PDF is a desktop app built with Flutter (Win32). runFullTrust is required to run as a desktop app: it opens PDF files the user chooses, saves annotations back to the same file or a new file in the user's folders, and prints through the Windows print dialog.
 
 - **Store listings** (Türkçe ve İngilizce): açıklama için `README.md`'nin giriş ve "Neler yapabilirsin" / "Features" bölümleri; ekran görüntüleri `docs/screenshots/` (en az 1366×768: `ders.png`, `olcme.png`, `sayfalar.png`, `spot.png`, `gece.png`, İngilizce için `lesson.png`).
 
