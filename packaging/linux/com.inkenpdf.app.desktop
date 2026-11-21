@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Inken PDF
+GenericName=PDF ile ders anlatma
+GenericName[en]=Teach on PDFs
+Comment=PDF üzerinde kalemle ders anlatın; çizimler PDF'in içine kaydedilir
+Comment[en]=Teach with a pen on PDFs; drawings are saved inside the PDF
+Exec=inken-pdf %f
+Icon=inken-pdf
+Terminal=false
+Categories=Education;
+MimeType=application/pdf;
+Keywords=pdf;kalem;ders;akıllı tahta;öğretmen;pen;teacher;whiteboard;
+StartupWMClass=com.inkenpdf.app
+StartupNotify=true

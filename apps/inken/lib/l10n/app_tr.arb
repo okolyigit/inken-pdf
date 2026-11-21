@@ -1,0 +1,638 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Inken PDF",
+  "homeTagline": "PDF'i aç, kalemini seç, dersini anlat.",
+  "openPdf": "PDF aç",
+  "openPdfFailed": "Dosya açılamadı: {error}",
+  "@openPdfFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "passwordTitle": "Parola gerekli",
+  "passwordPrompt": "“{name}” parolayla korunuyor. Açmak için parolayı yazın.",
+  "@passwordPrompt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "passwordLabel": "Parola",
+  "passwordWrong": "Parola yanlış. Yeniden deneyin.",
+  "passwordShow": "Parolayı göster",
+  "passwordHide": "Parolayı gizle",
+  "passwordOpen": "Aç",
+  "passwordNeeded": "Dosya parolayla korunuyor; parola girilmeden açılamaz.",
+  "pdfFileType": "PDF dosyaları",
+  "closeDocument": "Belgeyi kapat",
+  "pageCount": "{count} sayfa",
+  "@pageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "toolHand": "Kaydır",
+  "toolPen": "Kalem",
+  "toolHighlighter": "Fosforlu",
+  "toolEraser": "Silgi",
+  "undo": "Geri al",
+  "redo": "Yinele",
+  "thicknessThin": "İnce",
+  "thicknessMedium": "Orta",
+  "thicknessThick": "Kalın",
+  "inputMode": "Dokunma davranışı",
+  "inputModeAuto": "Otomatik (kalem görülünce parmak kaydırır)",
+  "inputModePen": "Kalem çizer, parmak kaydırır",
+  "inputModeTouch": "Parmak çizer, iki parmak kaydırır",
+  "save": "Kaydet",
+  "savedTo": "Kaydedildi: {name}",
+  "@savedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "savedWithSkipped": "Kaydedildi: {name}. {count} öğe PDF'e yazılamadı; Inken'de duruyor ama başka okuyucularda görünmez.",
+  "@savedWithSkipped": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "saveFailed": "Kaydedilemedi: {error}",
+  "@saveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "unsavedChangesTitle": "Kaydedilmemiş değişiklikler",
+  "unsavedChangesBody": "Çizimleriniz kaydedilmedi. Kapatmadan önce kaydedilsin mi?",
+  "discardChanges": "Kaydetme",
+  "cancel": "Vazgeç",
+  "protectedFileWarning": "Bu dosya şifreli ya da imzalı. Çizimler ayrı bir kopyaya kaydedilecek.",
+  "openNewerFormat": "Bu dosya Inken'in daha yeni bir sürümüyle kaydedilmiş. Açmak için uygulamayı güncelleyin.",
+  "openCorruptData": "Dosyadaki Inken çizim verisi bozuk; çizimleri kaybetmemek için dosya açılmadı.",
+  "openPageMismatch": "Dosyanın sayfaları başka bir programla değiştirilmiş; Inken çizimleri eşleştirilemediği için dosya açılmadı.",
+  "recoveryTitle": "Kaydedilmemiş çizimler bulundu",
+  "recoveryBody": "{name} dosyasındaki çizimler {time} tarihinde yedeklendi ama kaydedilmedi. Geri yüklensin mi?",
+  "@recoveryBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recoveryFileChanged": "Dosya bu yedekten sonra değiştirilmiş. Geri yüklerseniz yedekteki çizimler dosyadakilerin yerine geçer (geri al ile dönülebilir).",
+  "recoveryFileMissing": "{path} bulunamadı; dosya taşınmış ya da silinmiş olabilir. Yedek geri yüklenemiyor.",
+  "@recoveryFileMissing": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "recoveryRestore": "Geri yükle",
+  "recoveryDelete": "Yedeği sil",
+  "recoveryLater": "Sonra",
+  "exportFlattened": "Çizimleri gömerek dışa aktar…",
+  "exportFileName": "{base} (çizimli).pdf",
+  "@exportFileName": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      }
+    }
+  },
+  "exportedTo": "Dışa aktarıldı: {name}",
+  "@exportedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exportedWithSkipped": "Dışa aktarıldı: {name}. {count} öğe yazılamadı; kopyada eksik.",
+  "@exportedWithSkipped": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exportFailed": "Dışa aktarılamadı: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exportOntoOpenFile": "Açık dosyanın üzerine dışa aktarılamaz; başka bir ad seçin.",
+  "overwriteTitle": "Dosya zaten var",
+  "overwriteBody": "{name} zaten var. Üzerine yazılsın mı?",
+  "@overwriteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "overwrite": "Üzerine yaz",
+  "saveAs": "Farklı kaydet…",
+  "saveAsOntoOriginal": "Orijinal PDF'in üzerine kaydedilmez; başka bir ad seçin.",
+  "pickerUnavailable": "Bu cihazda kayıt yeri seçmek henüz desteklenmiyor.",
+  "menuFile": "Dosya",
+  "menuEdit": "Düzen",
+  "menuTools": "Araçlar",
+  "openPdfMenu": "Aç…",
+  "newDocument": "Yeni",
+  "@newDocument": {
+    "description": "Dosya menüsü: tek boş sayfalık yeni PDF oluşturur."
+  },
+  "untitledDocument": "Adsız.pdf",
+  "@untitledDocument": {
+    "description": "Yeni belgenin adı (ilk kayıtta önerilen dosya adı)."
+  },
+  "menuView": "Görünüm",
+  "menuPage": "Sayfa",
+  "menu": "Menü",
+  "more": "Daha fazla",
+  "close": "Kapat",
+  "zoom": "Yakınlaştırma",
+  "zoomIn": "Yakınlaştır",
+  "zoomOut": "Uzaklaştır",
+  "fitPage": "Sayfaya sığdır",
+  "fitWidth": "Genişliğe sığdır",
+  "actualSize": "Gerçek boyut (%100)",
+  "zoomOptions": "Yakınlaştırma seçenekleri",
+  "previousPage": "Önceki sayfa",
+  "nextPage": "Sonraki sayfa",
+  "statusSaved": "Kaydedildi",
+  "statusSaving": "Kaydediliyor…",
+  "statusUnsaved": "Kaydedilmedi",
+  "sectionColor": "Renk",
+  "sectionThickness": "Kalınlık",
+  "thicknessVeryThick": "Çok kalın",
+  "toolOptions": "{tool} seçenekleri",
+  "colorBlack": "Siyah",
+  "colorBlue": "Mavi",
+  "colorRed": "Kırmızı",
+  "colorGreen": "Yeşil",
+  "colorOrange": "Turuncu",
+  "colorPurple": "Mor",
+  "colorYellow": "Sarı",
+  "colorPink": "Pembe",
+  "@toolOptions": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
+  "toolLaser": "Geçici kalem",
+  "sectionEraserMode": "Silgi türü",
+  "eraserStroke": "Çizgi",
+  "eraserPixel": "Piksel",
+  "sectionSize": "Boyut",
+  "sizeSmall": "Küçük",
+  "sizeMedium": "Orta",
+  "sizeLarge": "Büyük",
+  "theme": "Tema",
+  "themeLight": "Açık",
+  "themeDark": "Koyu",
+  "themeSystem": "Sistem",
+  "goToPage": "Sayfaya git…",
+  "find": "Bul…",
+  "searchHint": "Belgede ara",
+  "searchNoResults": "Sonuç yok",
+  "searchCount": "{current} / {total}",
+  "@searchCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "searchNext": "Sonraki",
+  "searchPrevious": "Önceki",
+  "searchClose": "Aramayı kapat",
+  "searchSearching": "Aranıyor…",
+  "goToPageLabel": "Sayfa numarası (1–{count})",
+  "go": "Git",
+  "windowTitle": "{name} – Inken PDF",
+  "@goToPageLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@windowTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "goToPageTitle": "Sayfaya git",
+  "colorBrick": "Kiremit",
+  "toolDock": "Araç kutusu",
+  "dockTop": "Üstte",
+  "dockLeft": "Solda",
+  "fullscreen": "Tam ekran",
+  "exitFullscreen": "Tam ekrandan çık (Esc)",
+  "toolSelect": "Seç",
+  "deleteSelection": "Seçileni sil",
+  "fadeFloating": "Kullanılmayan kutuları soldur",
+  "pageScrollbar": "Sayfa kaydırma çubuğu",
+  "toolShape": "Şekil",
+  "sectionShape": "Şekil",
+  "shapeLine": "Çizgi",
+  "shapeArrow": "Ok",
+  "shapeRectangle": "Dikdörtgen",
+  "shapeEllipse": "Elips",
+  "shapeCoordinate": "Koordinat düzlemi",
+  "sectionInstruments": "Ölçme araçları",
+  "instrumentRuler": "Cetvel",
+  "instrumentSetSquare": "Gönye",
+  "instrumentProtractor": "İletki",
+  "instrumentCompass": "Pergel",
+  "instrumentClose": "{name} kapat",
+  "@instrumentClose": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "instrumentCentimeters": "{value} cm",
+  "@instrumentCentimeters": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "recentTitle": "Son açılanlar",
+  "recentRemove": "Listeden kaldır",
+  "recentMissing": "Dosya bulunamadı",
+  "recentUnsaved": "Kaydedilmemiş değişiklik",
+  "recentOpenFailed": "\"{name}\" açılamadı. Dosya taşınmış ya da silinmiş olabilir.",
+  "recentToday": "Bugün {time}",
+  "recentYesterday": "Dün {time}",
+  "recentPages": "{count} sayfa",
+  "@recentOpenFailed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@recentToday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "@recentYesterday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "@recentPages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "introTitle": "Neler yapabilirsin",
+  "introSubtitle": "Araç kutusu bir PDF açınca etkinleşir.",
+  "introHide": "Gizle",
+  "introShowSetting": "Açılışta tanıtımı göster",
+  "introToolsHeading": "Araçlar",
+  "introLessonHeading": "Ders sırasında",
+  "keySpace": "Boşluk",
+  "introPen": "Kalemle yaz; basınç algılayan kalemde çizgi bastıkça kalınlaşır. Renk ve kalınlık için araca ikinci kez dokun.",
+  "introHighlighter": "Metnin üzerinden geç; alttaki yazı okunur kalır.",
+  "introShape": "Çizgi, ok, dikdörtgen, elips, koordinat düzlemi. Shift ile kare ve daire. Panelde cetvel, gönye, iletki ve pergel: kalem kenarlarına yaslanır.",
+  "introEraser": "Dokunduğun çizgiyi ya da yalnızca üzerinden geçtiğin kısmı siler. Kalemin silgi ucu da çalışır.",
+  "introLaser": "Göstererek anlat: yazdığın birkaç saniyede kaybolur, belgeye girmez.",
+  "introSelect": "Dokunarak ya da dikdörtgen çizerek seç; sürükleyerek taşı, köşeden büyüt, Delete ile sil.",
+  "introHand": "Sayfayı sürükleyerek kaydır. Başka araçtayken boşluğu basılı tut: geçici olarak kaydırır.",
+  "introUndo": "Her adım geri alınır; kaydettikten sonra da.",
+  "introSave": "Çizimler PDF'in içine kaydedilir ve her PDF okuyucuda görünür. Orijinal dosyanın üzerine yazılmaz.",
+  "introExport": "Çizimleri sayfaya gömülü bir kopya oluşturur; öğrencilerle paylaşmak ve yazdırmak için.",
+  "introBackupTitle": "Otomatik yedek",
+  "introBackup": "Kaydedilmemiş çizimler dakikada bir yedeklenir; uygulama kapanırsa açılışta geri yüklenir.",
+  "introFullscreen": "Menüler gizlenir, yalnızca sayfa ve araç kutusu kalır. Esc ile çıkılır.",
+  "introPagesTitle": "Sayfalar arasında",
+  "introPages": "Sayfa sayfa ilerle, sağdaki çubukla hızlıca git ya da sayfa numarasına dokunup yaz.",
+  "toolText": "Metin",
+  "introText": "Sayfaya dokun ve yaz; Enter yeni satır. Var olan metne dokununca düzenlenir. Türkçe harfler ve matematik işaretleri (√ π ≤ ∞) eksiksiz.",
+  "customColor": "Özel renk",
+  "customColorNew": "Yeni renk",
+  "colorHue": "Ton",
+  "colorSaturationValue": "Doygunluk ve parlaklık",
+  "colorHex": "Renk kodu",
+  "colorHexInvalid": "Geçersiz kod",
+  "colorChoose": "Seç",
+  "quickBar": "Hızlı erişim çubuğu",
+  "settings": "Ayarlar",
+  "settingsMenu": "Ayarlar…",
+  "printDocument": "Yazdır…",
+  "insertPage": "Sayfa ekle",
+  "deletePage": "Sayfayı sil",
+  "rotatePage": "Sayfayı döndür",
+  "rotateRight": "Sağa döndür",
+  "rotateLeft": "Sola döndür",
+  "pageOrientation": "Sayfa yönü",
+  "orientationPortrait": "Dikey",
+  "orientationLandscape": "Yatay",
+  "insertPageBefore": "Önüne sayfa ekle",
+  "insertPageAfter": "Arkasına sayfa ekle",
+  "insertPageHere": "Buraya sayfa ekle",
+  "pageActions": "Sayfa işlemleri",
+  "pagesSelected": "{count} sayfa seçili",
+  "@pagesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearPageSelection": "Seçimi kaldır",
+  "deletePages": "{count, plural, =1{Sayfayı sil} other{{count} sayfayı sil}}",
+  "@deletePages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pagesDeleted": "{count} sayfa silindi",
+  "@pagesDeleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exportShort": "Dışa aktar",
+  "settingsInput": "Kalem ve dokunma",
+  "settingsShortcuts": "Kısayollar",
+  "settingsAbout": "Hakkında",
+  "shortcutSpaceHold": "Basılı tut: geçici olarak kaydır",
+  "shortcutShiftShape": "Şekil çizerken basılı tut: kare, daire, 15° adımlar",
+  "shortcutTextEnter": "Metin yazarken: yeni satır",
+  "shortcutPagesView": "Sayfa ve görünüm",
+  "shortcutFirstPage": "İlk sayfa",
+  "shortcutLastPage": "Son sayfa",
+  "keyWheel": "Tekerlek",
+  "shortcutZoomWheel": "Yakınlaştır / uzaklaştır",
+  "shortcutEscape": "Paneli kapat, seçimi bırak, spot ışığını / perdeyi kapat, tam ekrandan çık",
+  "shortcutsNote": "Çoğu kısayol belge açıkken çalışır (Ctrl+O ve Ctrl+, her yerde). Metin yazarken tek harfli kısayollar devre dışıdır.",
+  "aboutDescription": "Öğretmenler için PDF üzerinde ders anlatma uygulaması. Çizimler PDF'in içine, her okuyucuda görünecek biçimde kaydedilir.",
+  "aboutFonts": "Yazı tipleri: Figtree, Fraunces, JetBrains Mono (SIL Open Font License) ve DejaVu Sans (Bitstream Vera lisansı).",
+  "aboutAppLicense": "Inken PDF özgür yazılımdır: GNU Genel Kamu Lisansı sürüm 3 ya da sonraki sürümleri (GPL-3.0-or-later) koşullarıyla kullanabilir, değiştirebilir ve dağıtabilirsin. Hiçbir garanti verilmez.",
+  "@aboutAppLicense": {
+    "description": "Hakkında: uygulamanın kendi lisansı."
+  },
+  "aboutLicenses": "Lisanslar",
+  "templateBlank": "Boş",
+  "templateGrid": "Kareli",
+  "templateDotted": "Noktalı",
+  "templateLined": "Çizgili",
+  "templateCoordinate": "Koordinat düzlemi",
+  "pageDeleted": "{page}. sayfa silindi",
+  "@pageDeleted": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "pageLayoutFailed": "Sayfalar hazırlanamadı: {error}",
+  "@pageLayoutFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "printSent": "Yazıcıya gönderildi",
+  "printHandedOff": "Yazdırma, varsayılan PDF uygulamasında açılıyor",
+  "printFailed": "Yazdırılamadı: {error}",
+  "@printFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "printUnsupported": "Bu yazıcı PDF kabul etmiyor. Başka bir yazıcı seç ya da dışa aktarıp bir PDF okuyucudan yazdır.",
+  "shareDocument": "Paylaş…",
+  "@shareDocument": {
+    "description": "Belgeyi (çizimleriyle, düzenlenebilir PDF) sistemin paylaşma yoluna verir."
+  },
+  "shareMailed": "Dosya yeni e-postaya eklendi",
+  "shareShown": "E-posta uygulaması bulunamadı; dosya klasöründe gösteriliyor",
+  "shareFailed": "Paylaşılamadı: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "shareUnsupported": "Bu sistemde dosya paylaşılamıyor. Kaydedip dosyayı kendin gönderebilirsin.",
+  "phoneToolsShow": "Çizim araçlarını göster",
+  "phoneToolsHide": "Çizim araçlarını gizle",
+  "dropPdfHere": "PDF'i açmak için bırak",
+  "dropOnlyPdf": "Yalnızca PDF dosyaları açılabilir",
+  "dockBottom": "Altta",
+  "dockRight": "Sağda",
+  "dockMove": "Araç kutusunu taşı (sürükle ya da dokun)",
+  "spotlight": "Spot ışığı",
+  "curtain": "Perde",
+  "spotlightResize": "Büyüt / küçült (sürükle; tekerlek ya da iki parmak da olur)",
+  "spotlightClose": "Spot ışığını kapat (Esc)",
+  "curtainClose": "Perdeyi kapat (Esc)",
+  "curtainHint": "Aşağı çekerek aç",
+  "introSpotlight": "Sayfanın bir yerini aydınlat, gerisini karart. Karartıyı sürükleyerek ışığı gezdir; ışığın içinde yazmaya devam et.",
+  "introCurtain": "Sayfayı örtüp aşağı çektikçe satır satır göster; yanıtı sona sakla.",
+  "paste": "Yapıştır",
+  "insertImage": "Görsel ekle…",
+  "imageFileType": "Görseller",
+  "clipboardNoImage": "Panoda görsel yok. Bir görseli ya da ekran görüntüsünü kopyalayıp yeniden dene.",
+  "imageUnreadable": "Görsel açılamadı",
+  "dropOnlyPdfOrImage": "Yalnızca PDF ve görsel dosyaları bırakılabilir",
+  "dropPdfOrImageHere": "PDF'i ya da görseli bırak",
+  "introImageTitle": "Görsel",
+  "introImage": "Kopyaladığın görseli ya da ekran görüntüsünü Ctrl+V ile yapıştır; seçili gelir, köşesinden büyütüp küçült. Dosyadan da eklenir, pencereye sürüklenir.",
+  "stageCover": "Spot ışığı / perde",
+  "menuHelp": "Yardım",
+  "aboutApp": "Hakkında Inken PDF",
+  "settingsInfo": "Uygulama bilgileri",
+  "keyboardShortcuts": "Klavye kısayolları",
+  "versionWithBuild": "{version} (derleme {build})",
+  "@versionWithBuild": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutVersion": "Sürüm {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutRepository": "GitHub'da Inken PDF",
+  "aboutRepositoryHint": "Kaynak, sürümler ve geri bildirim",
+  "shareApp": "Inken PDF'i paylaş",
+  "shareAppText": "Inken PDF: öğretmenler için PDF üzerinde ders anlatma uygulaması. Ücretsiz ve açık kaynak: {url}",
+  "@shareAppText": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "shareAppCopied": "Tanıtım metni ve bağlantı panoya kopyalandı",
+  "linkOpenFailed": "Bağlantı açılamadı: {url}",
+  "@linkOpenFailed": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "linkOpenTitle": "Bağlantı açılsın mı?",
+  "linkOpenBody": "{url} adresi tarayıcıda açılacak.",
+  "@linkOpenBody": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "linkOpen": "Aç",
+  "infoIntro": "Bir sorun bildirirken bu bilgileri ekle; neyin nerede olduğunu bulmayı kolaylaştırır.",
+  "infoCopy": "Kopyala",
+  "infoCopied": "Uygulama bilgileri panoya kopyalandı",
+  "infoVersion": "Sürüm",
+  "infoPlatform": "İşletim sistemi",
+  "infoDart": "Dart",
+  "infoPdfEngine": "PDF motoru",
+  "infoFormat": "Kayıt formatı (inken.json)",
+  "infoLanguage": "Dil",
+  "infoScreen": "Ekran",
+  "infoStylusSeen": "Kalem algılandı",
+  "infoDataFolder": "Veri klasörü (ayarlar, yedekler)",
+  "yes": "Evet",
+  "no": "Hayır",
+  "language": "Dil",
+  "languageSystem": "Sistem",
+  "languageTurkish": "Türkçe",
+  "languageEnglish": "English",
+  "settingsAppearance": "Görünüm",
+  "toolHighlighterShort": "Fosforlu",
+  "toolLaserShort": "Geçici",
+  "copy": "Kopyala",
+  "cut": "Kes",
+  "selectAll": "Tümünü seç",
+  "recolorSelection": "Seçilenin rengi: {color}",
+  "clipboardMarker": "Inken PDF öğeleri",
+  "selectionBar": "Seçim",
+  "@recolorSelection": {
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "pagePanel": "Sayfa küçük resimleri",
+  "pagePanelTitle": "Sayfalar",
+  "pagePanelPages": "Sayfalar",
+  "outline": "İçindekiler",
+  "outlineEmpty": "Bu belgede içindekiler yok.",
+  "outlineExpand": "Alt başlıkları göster",
+  "outlineCollapse": "Alt başlıkları gizle",
+  "pageThumbnail": "Sayfa {page}",
+  "@pageThumbnail": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "uiScale": "Arayüz boyutu",
+  "uiScaleNormal": "Normal",
+  "uiScaleLarge": "Büyük",
+  "uiScaleLarger": "Akıllı tahta",
+  "pagePanelClose": "Sayfa panelini kapat",
+  "pagePanelOpen": "Sayfa panelini aç",
+  "documentProperties": "Belge özellikleri…",
+  "propertiesTitle": "Belge özellikleri",
+  "propFile": "Dosya",
+  "propLocation": "Konum",
+  "propNotSaved": "Henüz kaydedilmedi",
+  "propFileSize": "Dosya boyutu",
+  "propTitle": "Başlık",
+  "propAuthor": "Yazar",
+  "propSubject": "Konu",
+  "propKeywords": "Anahtar sözcükler",
+  "propCreator": "Oluşturan uygulama",
+  "propProducer": "PDF üreticisi",
+  "propCreated": "Oluşturulma",
+  "propModified": "Değiştirilme",
+  "propVersion": "PDF sürümü",
+  "propPages": "Sayfa sayısı",
+  "propPageSize": "Sayfa boyutu (bu sayfa)",
+  "propSecurity": "Güvenlik",
+  "propPasswordProtected": "Parolalı",
+  "propSigned": "Dijital imzalı",
+  "propNoSecurity": "Yok",
+  "propUnreadable": "Bilgiler okunamadı.",
+  "propSectionDocument": "Belge",
+  "propSectionFile": "Dosya ve sayfalar",
+  "nightMode": "Gece modu",
+  "pageColorWhite": "Beyaz",
+  "pageColorBlack": "Siyah",
+  "pageColorStraw": "Saman kâğıdı",
+  "toolTextSelect": "Metin seç",
+  "textCopied": "Metin kopyalandı",
+  "textCopyNotAllowed": "Bu belge metin kopyalamaya izin vermiyor.",
+  "copyText": "Metni kopyala"
+}

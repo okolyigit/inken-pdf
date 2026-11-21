@@ -1,0 +1,95 @@
+%PDF-1.7
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R /Outlines 13 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 12 0 R /Annots [9 0 R 10 0 R 11 0 R] >>
+endobj
+5 0 obj
+<< /Length 80 >>
+stream
+BT /F1 24 Tf 72 760 Td (Bolum 2) Tj ET
+BT /F1 18 Tf 72 500 Td (Alt baslik) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R  >>
+endobj
+7 0 obj
+<< /Length 38 >>
+stream
+BT /F1 24 Tf 72 760 Td (Bolum 3) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R  >>
+endobj
+9 0 obj
+<< /Type /Annot /Subtype /Link /Rect [72 690 200 714] /Border [0 0 0] /Dest [6 0 R /XYZ 0 842 0] >>
+endobj
+10 0 obj
+<< /Type /Annot /Subtype /Link /Rect [72 650 200 674] /Border [0 0 0] /Dest [8 0 R /XYZ 0 842 0] >>
+endobj
+11 0 obj
+<< /Type /Annot /Subtype /Link /Rect [72 610 260 634] /Border [0 0 0] /A << /S /URI /URI (https://example.org) >> >>
+endobj
+12 0 obj
+<< /Length 162 >>
+stream
+BT /F1 24 Tf 72 760 Td (Icindekiler) Tj ET
+BT /F1 18 Tf 72 696 Td (Bolum 2) Tj ET
+BT /F1 18 Tf 72 656 Td (Bolum 3) Tj ET
+BT /F1 18 Tf 72 616 Td (Web sitesi) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Outlines /First 14 0 R /Last 16 0 R /Count 4 >>
+endobj
+14 0 obj
+<< /Title (Bolum 1) /Parent 13 0 R /Dest [4 0 R /XYZ 0 842 0] /Next 15 0 R >>
+endobj
+15 0 obj
+<< /Title (Bolum 2) /Parent 13 0 R /Dest [6 0 R /XYZ 0 842 0] /Prev 14 0 R /Next 16 0 R /First 17 0 R /Last 17 0 R /Count 1 >>
+endobj
+16 0 obj
+<< /Title (Bolum 3) /Parent 13 0 R /Dest [8 0 R /XYZ 0 842 0] /Prev 15 0 R >>
+endobj
+17 0 obj
+<< /Title (Alt baslik) /Parent 15 0 R /Dest [6 0 R /XYZ 0 530 0] >>
+endobj
+18 0 obj
+<< /Title <FEFF0049015F0131006B0020007600650020004700F6006C00670065> /Author (Inken Test) /Subject (Baglantilar) /Creator (make_fixtures.py) /CreationDate (D:20261119093000+03'00') >>
+endobj
+xref
+0 19
+0000000000 65535 f 
+0000000015 00000 n 
+0000000081 00000 n 
+0000000150 00000 n 
+0000000220 00000 n 
+0000000377 00000 n 
+0000000507 00000 n 
+0000000634 00000 n 
+0000000722 00000 n 
+0000000849 00000 n 
+0000000964 00000 n 
+0000001080 00000 n 
+0000001213 00000 n 
+0000001427 00000 n 
+0000001501 00000 n 
+0000001595 00000 n 
+0000001738 00000 n 
+0000001832 00000 n 
+0000001916 00000 n 
+trailer
+<< /Size 19 /Root 1 0 R /Info 18 0 R >>
+startxref
+2116
+%%EOF

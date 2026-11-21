@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Inken PDF küçük boy ikon (16–32px: yarık ve delik yok, çizgi kalın)</title>
+  <rect width="512" height="512" rx="96" fill="#233f8f"></rect>
+  <path d="M118 372C178 418 248 396 292 378S370 356 404 386" fill="none" stroke="#f2905c" stroke-width="52" stroke-linecap="round"></path>
+  <g transform="translate(-6 -44) rotate(40 256 256) translate(256 300) scale(1.3) translate(-256 -300)"><path d="M206 196H306L324 262C326 290 312 312 296 330L256 412L216 330C200 312 186 290 188 262Z" fill="#fbf8f2"></path></g>
+</svg>

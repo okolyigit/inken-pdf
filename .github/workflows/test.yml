@@ -1,0 +1,48 @@
+# Testler: her push'ta (main, faz-1) ve PR'da çekirdek, PDF ve uygulama
+# birim testleri, analiz ve Poppler ile görsel kontrol (pdftoppm). Uygulama
+# içi (integration_test) testleri ekran istediği için yerelde çalıştırılır.
+name: Testler
+
+on:
+  push:
+    branches: [main, faz-1]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.47.4'
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sistem paketleri
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev poppler-utils
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: inken_core
+        working-directory: packages/inken_core
+        run: |
+          dart pub get
+          dart analyze --fatal-infos
+          dart test
+      - name: Uygulama
+        # PDFium'u da derler (native assets): inken_pdf testleri onu kullanır.
+        working-directory: apps/inken
+        run: |
+          flutter pub get
+          flutter analyze --fatal-infos
+          flutter test
+      - name: inken_pdf (Poppler kontrolü dahil)
+        working-directory: packages/inken_pdf
+        run: |
+          flutter pub get
+          flutter analyze --fatal-infos
+          flutter test

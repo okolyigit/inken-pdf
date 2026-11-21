@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Inken PDF Android uyarlanabilir ikon — ön plan (66/108 güvenli alan içinde; zemin #233f8f)</title>
+  <g transform="translate(256 256) scale(0.7) translate(-256 -250)">
+    <path d="M136 360C186 400 246 386 286 370S356 352 384 378" fill="none" stroke="#f2905c" stroke-width="30" stroke-linecap="round"></path>
+    <g transform="translate(-1 -40) rotate(40 256 256) translate(256 300) scale(1.2) translate(-256 -300)">
+      <path d="M206 196H306L324 262C326 290 312 312 296 330L256 412L216 330C200 312 186 290 188 262Z" fill="#fbf8f2"></path>
+      <path d="M256 292V398" stroke="#233f8f" stroke-width="12" stroke-linecap="round"></path>
+      <circle cx="256" cy="280" r="17" fill="#233f8f"></circle>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Inken PDF tek renk işaret (Android temalı ikon, bildirim, gravür)</title>
+  <path d="M136 360C186 400 246 386 286 370S356 352 384 378" fill="none" stroke="#1b2233" stroke-width="30" stroke-linecap="round"></path>
+  <g transform="translate(-1 -40) rotate(40 256 256) translate(256 300) scale(1.2) translate(-256 -300)"><path fill="#1b2233" fill-rule="evenodd" d="M206 196H306L324 262C326 290 312 312 296 330L256 412L216 330C200 312 186 290 188 262Z M250 292H262V392H250Z M256 263A17 17 0 1 0 256 297A17 17 0 1 0 256 263Z"></path></g>
+</svg>

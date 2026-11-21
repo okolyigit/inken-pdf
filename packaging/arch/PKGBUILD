@@ -1,0 +1,49 @@
+# Arch / CachyOS / Manjaro paketi. Doğrudan değil, build_pkg.sh ile çalıştırın:
+#   packaging/arch/build_pkg.sh [--no-build]
+# Betik Flutter derlemesini yapar, INKEN_ROOT / INKEN_PKGVER / INKEN_PKGREL
+# değişkenlerini verip makepkg'yi çağırır. Paket, .deb ile aynı düzeni kurar:
+# /opt/inken-pdf, /usr/bin/inken-pdf, menü girdisi ve ikonlar.
+
+pkgname=inken-pdf
+pkgver=${INKEN_PKGVER:-0.0.0}
+pkgrel=${INKEN_PKGREL:-1}
+pkgdesc="PDF üzerinde ders anlatma uygulaması (Inken PDF)"
+arch=('x86_64')
+url="https://github.com/"
+license=('GPL-3.0-or-later' 'OFL-1.1' 'Bitstream-Vera')
+depends=('glibc' 'gcc-libs' 'gtk3' 'glib2' 'libepoxy' 'fontconfig'
+         'hicolor-icon-theme' 'desktop-file-utils')
+# Flutter ikilileri (libapp.so AOT görüntüsü dahil) olduğu gibi kalır.
+options=('!strip' '!debug')
+
+_root="${INKEN_ROOT:-$startdir/../..}"
+_app="$_root/apps/inken"
+_bundle="$_app/build/linux/x64/release/bundle"
+
+package() {
+  [[ -x "$_bundle/inken" ]] || { echo "Derleme yok: $_bundle" >&2; return 1; }
+
+  install -dm755 "$pkgdir/opt/inken-pdf" "$pkgdir/usr/bin"
+  # Sahiplik korunmaz: dosyalar fakeroot altında root:root olur.
+  cp -r --no-preserve=ownership "$_bundle/." "$pkgdir/opt/inken-pdf/"
+  ln -s /opt/inken-pdf/inken "$pkgdir/usr/bin/inken-pdf"
+
+  install -Dm644 "$_root/packaging/linux/com.inkenpdf.app.desktop" \
+    "$pkgdir/usr/share/applications/com.inkenpdf.app.desktop"
+  install -Dm644 "$_app/assets/brand/inken-icon-256.png" \
+    "$pkgdir/usr/share/icons/hicolor/256x256/apps/inken-pdf.png"
+  install -Dm644 "$_app/assets/brand/inken-app-icon.svg" \
+    "$pkgdir/usr/share/icons/hicolor/scalable/apps/inken-pdf.svg"
+
+  install -Dm644 "$_root/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  local f
+  for f in LICENSE-DejaVu.txt OFL-Figtree.txt OFL-Fraunces.txt OFL-JetBrainsMono.txt; do
+    install -Dm644 "$_app/assets/fonts/$f" "$pkgdir/usr/share/licenses/$pkgname/$f"
+  done
+
+  # İzinler: klasörler 755, dosyalar 644, çalıştırılabilir ve .so 755.
+  find "$pkgdir/opt/inken-pdf" -type d -exec chmod 755 {} +
+  find "$pkgdir/opt/inken-pdf" -type f -exec chmod 644 {} +
+  chmod 755 "$pkgdir/opt/inken-pdf/inken"
+  find "$pkgdir/opt/inken-pdf/lib" -name '*.so' -exec chmod 755 {} +
+}
