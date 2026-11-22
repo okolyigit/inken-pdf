@@ -20,6 +20,7 @@ export 'src/pdf_io.dart'
         a4Portrait,
         arrangeDisplayPdf,
         createBlankPdf,
+        extractPdfPages,
         listAnnotations,
         parsePdfDate,
         readInkenPdf,

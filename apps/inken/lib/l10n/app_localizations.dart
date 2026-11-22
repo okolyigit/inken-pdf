@@ -2395,6 +2395,264 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Uygula'**
   String get applyEdits;
+
+  /// No description provided for @printTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yazdır'**
+  String get printTitle;
+
+  /// No description provided for @printPrinter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yazıcı'**
+  String get printPrinter;
+
+  /// No description provided for @printNoPrinter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yazıcı bulunamadı'**
+  String get printNoPrinter;
+
+  /// No description provided for @printDefaultPrinter.
+  ///
+  /// In tr, this message translates to:
+  /// **'varsayılan yazıcı'**
+  String get printDefaultPrinter;
+
+  /// No description provided for @printCopies.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kopya'**
+  String get printCopies;
+
+  /// No description provided for @printPages.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayfalar'**
+  String get printPages;
+
+  /// No description provided for @printPagesAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümü'**
+  String get printPagesAll;
+
+  /// No description provided for @printPagesCurrent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli sayfa'**
+  String get printPagesCurrent;
+
+  /// No description provided for @printPagesCurrentShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli'**
+  String get printPagesCurrentShort;
+
+  /// No description provided for @printPagesRange.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aralık'**
+  String get printPagesRange;
+
+  /// No description provided for @printRangeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'ör. 1-3, 5'**
+  String get printRangeHint;
+
+  /// No description provided for @printRangeInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçersiz aralık (1–{count})'**
+  String printRangeInvalid(int count);
+
+  /// No description provided for @printSize.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boyut'**
+  String get printSize;
+
+  /// No description provided for @printFit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayfaya sığdır'**
+  String get printFit;
+
+  /// No description provided for @printActual.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gerçek boyut'**
+  String get printActual;
+
+  /// No description provided for @printDrawings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çizimleri yazdır'**
+  String get printDrawings;
+
+  /// No description provided for @printMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer seçenekler'**
+  String get printMore;
+
+  /// No description provided for @printColor.
+  ///
+  /// In tr, this message translates to:
+  /// **'Renk'**
+  String get printColor;
+
+  /// No description provided for @printColorOn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Renkli'**
+  String get printColorOn;
+
+  /// No description provided for @printGray.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gri tonlamalı'**
+  String get printGray;
+
+  /// No description provided for @printDuplex.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çift taraflı'**
+  String get printDuplex;
+
+  /// No description provided for @printDuplexOff.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapalı'**
+  String get printDuplexOff;
+
+  /// No description provided for @printDuplexLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uzun kenardan çevir'**
+  String get printDuplexLong;
+
+  /// No description provided for @printDuplexShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kısa kenardan çevir'**
+  String get printDuplexShort;
+
+  /// No description provided for @printPaper.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kâğıt'**
+  String get printPaper;
+
+  /// No description provided for @printOrientation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yönlendirme'**
+  String get printOrientation;
+
+  /// No description provided for @printOrientationAuto.
+  ///
+  /// In tr, this message translates to:
+  /// **'Otomatik'**
+  String get printOrientationAuto;
+
+  /// No description provided for @printPortrait.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dikey'**
+  String get printPortrait;
+
+  /// No description provided for @printLandscape.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yatay'**
+  String get printLandscape;
+
+  /// No description provided for @printOrientationHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Otomatik: yatay sayfalar kâğıda sığacak şekilde döndürülür.'**
+  String get printOrientationHint;
+
+  /// No description provided for @printCollate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kopyaları harmanla'**
+  String get printCollate;
+
+  /// No description provided for @printReverse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayfaları ters sırala'**
+  String get printReverse;
+
+  /// No description provided for @printProperties.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yazıcı özellikleri…'**
+  String get printProperties;
+
+  /// No description provided for @printPropertiesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yazıcının kendi ayar penceresi: baskı kalitesi, kâğıt türü.'**
+  String get printPropertiesHint;
+
+  /// No description provided for @printSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'{pages} sayfa · {copies} kopya'**
+  String printSummary(int pages, int copies);
+
+  /// No description provided for @printContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam'**
+  String get printContinue;
+
+  /// No description provided for @printAndroidHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yazıcı, kopya sayısı ve renk bir sonraki ekranda seçilir.'**
+  String get printAndroidHint;
+
+  /// No description provided for @printPreparing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazırlanıyor…'**
+  String get printPreparing;
+
+  /// No description provided for @printPreviewLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayfa {page} önizlemesi'**
+  String printPreviewLabel(int page);
+
+  /// No description provided for @printDecrease.
+  ///
+  /// In tr, this message translates to:
+  /// **'Azalt'**
+  String get printDecrease;
+
+  /// No description provided for @printIncrease.
+  ///
+  /// In tr, this message translates to:
+  /// **'Artır'**
+  String get printIncrease;
+
+  /// No description provided for @printPrevPage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki sayfa'**
+  String get printPrevPage;
+
+  /// No description provided for @printNextPage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki sayfa'**
+  String get printNextPage;
 }
 
 class _AppLocalizationsDelegate

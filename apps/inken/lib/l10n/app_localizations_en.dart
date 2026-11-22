@@ -1328,4 +1328,142 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get applyEdits => 'Apply';
+
+  @override
+  String get printTitle => 'Print';
+
+  @override
+  String get printPrinter => 'Printer';
+
+  @override
+  String get printNoPrinter => 'No printer found';
+
+  @override
+  String get printDefaultPrinter => 'default printer';
+
+  @override
+  String get printCopies => 'Copies';
+
+  @override
+  String get printPages => 'Pages';
+
+  @override
+  String get printPagesAll => 'All';
+
+  @override
+  String get printPagesCurrent => 'Current page';
+
+  @override
+  String get printPagesCurrentShort => 'Current';
+
+  @override
+  String get printPagesRange => 'Range';
+
+  @override
+  String get printRangeHint => 'e.g. 1-3, 5';
+
+  @override
+  String printRangeInvalid(int count) {
+    return 'Invalid range (1–$count)';
+  }
+
+  @override
+  String get printSize => 'Size';
+
+  @override
+  String get printFit => 'Fit to page';
+
+  @override
+  String get printActual => 'Actual size';
+
+  @override
+  String get printDrawings => 'Print drawings';
+
+  @override
+  String get printMore => 'More options';
+
+  @override
+  String get printColor => 'Color';
+
+  @override
+  String get printColorOn => 'Color';
+
+  @override
+  String get printGray => 'Grayscale';
+
+  @override
+  String get printDuplex => 'Two-sided';
+
+  @override
+  String get printDuplexOff => 'Off';
+
+  @override
+  String get printDuplexLong => 'Flip on long edge';
+
+  @override
+  String get printDuplexShort => 'Flip on short edge';
+
+  @override
+  String get printPaper => 'Paper';
+
+  @override
+  String get printOrientation => 'Orientation';
+
+  @override
+  String get printOrientationAuto => 'Automatic';
+
+  @override
+  String get printPortrait => 'Portrait';
+
+  @override
+  String get printLandscape => 'Landscape';
+
+  @override
+  String get printOrientationHint =>
+      'Automatic: landscape pages are rotated to fit the paper.';
+
+  @override
+  String get printCollate => 'Collate copies';
+
+  @override
+  String get printReverse => 'Reverse page order';
+
+  @override
+  String get printProperties => 'Printer properties…';
+
+  @override
+  String get printPropertiesHint =>
+      'The printer\'s own settings: print quality, paper type.';
+
+  @override
+  String printSummary(int pages, int copies) {
+    return '$pages pages · $copies copies';
+  }
+
+  @override
+  String get printContinue => 'Continue';
+
+  @override
+  String get printAndroidHint =>
+      'Printer, copies and color are chosen on the next screen.';
+
+  @override
+  String get printPreparing => 'Preparing…';
+
+  @override
+  String printPreviewLabel(int page) {
+    return 'Page $page preview';
+  }
+
+  @override
+  String get printDecrease => 'Decrease';
+
+  @override
+  String get printIncrease => 'Increase';
+
+  @override
+  String get printPrevPage => 'Previous page';
+
+  @override
+  String get printNextPage => 'Next page';
 }

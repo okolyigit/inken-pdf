@@ -32,10 +32,12 @@ import '../ink/tool_state.dart';
 import '../presentation/stage_cover.dart';
 import '../../platform/window_title.dart';
 import '../../theme/dialog_actions.dart';
+import '../print/print_dialog.dart';
 import '../../theme/logo.dart';
 import '../../theme/theme_mode.dart';
 import '../../theme/tokens.dart';
 import '../settings/settings_page.dart';
+import '../settings/settings_store.dart';
 import '../settings/share_app.dart';
 import '../settings/shortcuts.dart';
 import 'go_to_page.dart';
@@ -952,8 +954,9 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
 
   bool _printing = false;
 
-  /// Yazdırır: çizimleri gömülü kopya geçici klasöre yazılır ve sistemin
-  /// yazdırma yoluna verilir ([PrintService]). Açık belge değişmez.
+  /// Yazdırır: Inken'in yazdırma penceresi açılır (önizleme, yazıcı ve
+  /// ayarlar). Yazdırılan, çizimleri gömülü (ya da çizimsiz) bir kopyadır;
+  /// geçici klasöre yazılır, açık belge değişmez.
   Future<void> _print() async {
     final session = _session;
     final printer = ref.read(printServiceProvider);
@@ -962,24 +965,52 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     final messenger = ScaffoldMessenger.of(context);
     final notifier = ref.read(openDocumentProvider.notifier);
     setState(() => _printing = true);
-    File? file;
+    Directory? folder;
     var keep = false;
     try {
       final root = Directory('${Directory.systemTemp.path}/inken-print');
       _cleanOldPrints(root);
-      final folder = Directory(
+      final dir = folder = Directory(
         '${root.path}/${DateTime.now().microsecondsSinceEpoch}',
       )..createSync(recursive: true);
-      file = File('${folder.path}/${safeFileName(widget.document.name)}');
       final document = session.document;
-      await notifier.exportFlattened(
-        document,
-        file.path,
-        images: await _imagesFor(session, document),
+      final images = await _imagesFor(session, document);
+      final name = safeFileName(widget.document.name);
+      Future<String> prepare({required bool drawings}) async {
+        final file = File('${dir.path}/${drawings ? '' : 'cizimsiz-'}$name');
+        await notifier.exportFlattened(
+          drawings
+              ? document
+              : document.copyWith(
+                  pages: [
+                    for (final p in document.pages) p.copyWith(items: const []),
+                  ],
+                ),
+          file.path,
+          images: drawings ? images : const {},
+        );
+        return file.path;
+      }
+
+      final prepared = <bool, Future<String>>{};
+      if (!mounted) return;
+      final choice = await showPrintDialog(
+        context,
+        pageCount: document.pages.length,
+        currentPage: _controller.currentPage ?? 0,
+        preparePdf: ({required bool drawings}) =>
+            prepared[drawings] ??= prepare(drawings: drawings),
+        service: printer,
+        settings: ref.read(settingsStoreProvider),
       );
+      if (choice == null) return;
+      final path = await (prepared[choice.drawings] ??= prepare(
+        drawings: choice.drawings,
+      ));
       final outcome = await printer.printPdf(
-        file.path,
+        path,
         title: widget.document.name,
+        request: choice.request,
       );
       switch (outcome) {
         case PrintOutcome.printed:
@@ -996,9 +1027,9 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
         SnackBar(content: Text(l10n.printFailed(e.toString()))),
       );
     } finally {
-      if (!keep && file != null) {
+      if (!keep && folder != null) {
         try {
-          file.parent.deleteSync(recursive: true);
+          folder.deleteSync(recursive: true);
         } on Object catch (e) {
           debugPrint('Yazdırma dosyası silinemedi: $e');
         }

@@ -10,6 +10,7 @@
 
 #include "flutter/generated_plugin_registrant.h"
 #include "print_job.h"
+#include "utils.h"
 
 namespace {
 
@@ -139,38 +140,73 @@ bool FlutterWindow::OnCreate() {
           if (const auto* l = std::get_if<int64_t>(v)) return *l;
           return std::nullopt;
         };
+        auto string_arg = [&arg](const char* key) -> const std::string* {
+          const auto* v = arg(key);
+          return v == nullptr ? nullptr : std::get_if<std::string>(v);
+        };
+        auto bool_arg = [&arg](const char* key, bool fallback) {
+          const auto* v = arg(key);
+          const bool* b = v == nullptr ? nullptr : std::get_if<bool>(v);
+          return b == nullptr ? fallback : *b;
+        };
         const std::string& method = call.method_name();
-        if (method == "begin") {
-          const auto* title_value = arg("title");
-          const auto* title = title_value == nullptr
-                                  ? nullptr
-                                  : std::get_if<std::string>(title_value);
-          const auto count = int_arg("pageCount");
-          if (title == nullptr || !count || *count < 1) {
-            result->Error("bad_args", "title ve pageCount gerekli");
+        if (method == "printers") {
+          flutter::EncodableList list;
+          for (const auto& p : PrintJob::ListPrinters()) {
+            list.emplace_back(flutter::EncodableMap{
+                {flutter::EncodableValue("name"),
+                 flutter::EncodableValue(Utf8FromUtf16(p.name.c_str()))},
+                {flutter::EncodableValue("default"),
+                 flutter::EncodableValue(p.is_default)},
+            });
+          }
+          result->Success(flutter::EncodableValue(list));
+        } else if (method == "properties") {
+          const auto* printer = string_arg("printer");
+          if (printer == nullptr) {
+            result->Error("bad_args", "printer gerekli");
             return;
           }
-          PrintJob::Started job;
-          switch (print_job_.Begin(GetHandle(), Utf8ToWide(*title),
-                                   static_cast<int>(*count), &job)) {
-            case PrintJob::BeginResult::kCancelled:
-              result->Success();
-              return;
-            case PrintJob::BeginResult::kFailed:
-              result->Error("print_failed", "Yazdırma başlatılamadı");
-              return;
-            case PrintJob::BeginResult::kStarted:
-              break;
+          result->Success(flutter::EncodableValue(
+              print_job_.ShowProperties(GetHandle(), Utf8ToWide(*printer))));
+        } else if (method == "begin") {
+          const auto* title = string_arg("title");
+          const auto* printer = string_arg("printer");
+          if (title == nullptr || printer == nullptr) {
+            result->Error("bad_args", "title ve printer gerekli");
+            return;
           }
-          flutter::EncodableList pages;
-          for (int32_t p : job.pages) pages.emplace_back(p);
+          PrintJob::Settings settings;
+          settings.printer = Utf8ToWide(*printer);
+          settings.color = bool_arg("color", true);
+          if (const auto* d = string_arg("duplex")) {
+            settings.duplex = *d == "longEdge" ? 1 : *d == "shortEdge" ? 2 : 0;
+          }
+          if (const auto* paper = string_arg("paper")) {
+            settings.paper = *paper == "a3"       ? DMPAPER_A3
+                             : *paper == "a5"     ? DMPAPER_A5
+                             : *paper == "letter" ? DMPAPER_LETTER
+                             : *paper == "legal"  ? DMPAPER_LEGAL
+                                                  : DMPAPER_A4;
+          }
+          if (const auto* o = string_arg("orientation")) {
+            settings.landscape = *o == "landscape";
+          }
+          PrintJob::Started job;
+          if (!print_job_.Begin(Utf8ToWide(*title), settings, &job)) {
+            result->Error("print_failed", "Yazdırma başlatılamadı");
+            return;
+          }
+          auto v = [](int32_t n) { return flutter::EncodableValue(n); };
           result->Success(flutter::EncodableValue(flutter::EncodableMap{
-              {flutter::EncodableValue("pages"), flutter::EncodableValue(pages)},
-              {flutter::EncodableValue("width"),
-               flutter::EncodableValue(job.width)},
-              {flutter::EncodableValue("height"),
-               flutter::EncodableValue(job.height)},
-              {flutter::EncodableValue("dpi"), flutter::EncodableValue(job.dpi)},
+              {flutter::EncodableValue("width"), v(job.width)},
+              {flutter::EncodableValue("height"), v(job.height)},
+              {flutter::EncodableValue("physicalWidth"), v(job.physical_width)},
+              {flutter::EncodableValue("physicalHeight"),
+               v(job.physical_height)},
+              {flutter::EncodableValue("offsetX"), v(job.offset_x)},
+              {flutter::EncodableValue("offsetY"), v(job.offset_y)},
+              {flutter::EncodableValue("dpi"), v(job.dpi)},
           }));
         } else if (method == "page") {
           const auto* bytes_value = arg("bgra");
@@ -180,13 +216,21 @@ bool FlutterWindow::OnCreate() {
                   : std::get_if<std::vector<uint8_t>>(bytes_value);
           const auto width = int_arg("width");
           const auto height = int_arg("height");
-          if (bytes == nullptr || !width || !height) {
-            result->Error("bad_args", "bgra, width ve height gerekli");
+          const auto x = int_arg("x");
+          const auto y = int_arg("y");
+          const auto dest_w = int_arg("destWidth");
+          const auto dest_h = int_arg("destHeight");
+          if (bytes == nullptr || !width || !height || !x || !y || !dest_w ||
+              !dest_h) {
+            result->Error("bad_args", "bgra, boyut ve hedef gerekli");
             return;
           }
           if (print_job_.AddPage(bytes->data(), bytes->size(),
                                  static_cast<int>(*width),
-                                 static_cast<int>(*height))) {
+                                 static_cast<int>(*height),
+                                 static_cast<int>(*x), static_cast<int>(*y),
+                                 static_cast<int>(*dest_w),
+                                 static_cast<int>(*dest_h))) {
             result->Success();
           } else {
             print_job_.Abort();

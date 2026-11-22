@@ -804,6 +804,40 @@ const ({double width, double height}) a4Portrait = (
 
 /// Tek boş sayfalık yeni PDF ("Dosya → Yeni"). [size] pt cinsindendir.
 /// Sayfa, eklenen boş sayfalarla aynı kodla (`_insertTemplatePage`) üretilir.
+/// [pdf]'in yalnızca [pages] sayfalarını (0'dan, verilen sırayla; tekrar
+/// olabilir) içeren yeni bir PDF. Yazdırırken seçilen aralık için
+/// (Android'in yazdırma ekranı belgenin tamamını gösterir).
+Uint8List extractPdfPages(Uint8List pdf, List<int> pages) {
+  if (pages.isEmpty) throw ArgumentError.value(pages, 'pages', 'boş');
+  final p = _p;
+  final src = _Doc.open(pdf);
+  try {
+    final count = p.FPDF_GetPageCount(src.doc);
+    if (pages.any((i) => i < 0 || i >= count)) {
+      throw RangeError('Sayfa sırası 0..${count - 1} dışında: $pages');
+    }
+    final dest = p.FPDF_CreateNewDocument();
+    if (dest == nullptr) throw StateError('PDF oluşturulamadı');
+    try {
+      using((a) {
+        final ids = a<Int>(pages.length);
+        for (final (i, page) in pages.indexed) {
+          ids[i] = page;
+        }
+        _check(
+          p.FPDF_ImportPagesByIndex(dest, src.doc, ids, pages.length, 0),
+          'ImportPagesByIndex',
+        );
+      });
+      return _save(dest);
+    } finally {
+      p.FPDF_CloseDocument(dest);
+    }
+  } finally {
+    src.close();
+  }
+}
+
 Uint8List createBlankPdf(({double width, double height}) size) {
   if (size.width <= 0 || size.height <= 0) {
     throw ArgumentError.value(size, 'size', 'sayfa boyutu pozitif olmalı');

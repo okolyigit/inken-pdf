@@ -114,3 +114,9 @@ Future<PdfInfo> loadPdfInfo(Uint8List pdf, {String? password}) =>
     PdfrxEntryFunctions.instance.compute(_info, (pdf, password));
 
 PdfInfo _info((Uint8List, String?) r) => readPdfInfo(r.$1, password: r.$2);
+
+/// [extractPdfPages], PDFium'un iş parçacığında.
+Future<Uint8List> extractPages(Uint8List pdf, List<int> pages) =>
+    PdfrxEntryFunctions.instance.compute(_extract, (pdf, pages));
+
+Uint8List _extract((Uint8List, List<int>) r) => extractPdfPages(r.$1, r.$2);

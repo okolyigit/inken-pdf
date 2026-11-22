@@ -64,27 +64,72 @@ static void clipboard_method_cb(FlMethodChannel* channel, FlMethodCall* call,
 
 // ---- yazdırma
 //
-// Çizimleri gömülü PDF (Dart üretir) sistemin yazdırma penceresinden
-// doğrudan CUPS'a gönderilir: GtkPrintUnixDialog yazıcı / sayfa aralığı /
-// kopya seçtirir, GtkPrintJob dosyayı olduğu gibi yollar (CUPS PDF'i kendisi
-// işler). Sayfaları yeniden çizmeye ve ikinci bir PDF kitaplığına gerek
-// kalmaz. Yanıt: "printed", "cancelled" ya da hata.
-
-typedef struct {
-  FlMethodCall* call;
-  gchar* path;
-  gchar* title;
-} PrintRequest;
-
-static void print_request_free(PrintRequest* r) {
-  g_object_unref(r->call);
-  g_free(r->path);
-  g_free(r->title);
-  g_free(r);
-}
+// Yazıcı ve ayarlar Inken'in penceresinde seçilir; burada pencere açılmaz.
+// "printers": kurulu (sanal olmayan) yazıcılar. "print": seçilen sayfaları
+// içeren PDF'i (Dart hazırlar) GtkPrintJob ile doğrudan CUPS'a gönderir;
+// kopya, renk, çift taraf, kâğıt, yön ve ölçek CUPS seçenekleri olarak
+// gider ("cups-" önekli ayarlar CUPS'a geçer). Yanıt: "printed" ya da hata.
 
 static void respond_string(FlMethodCall* call, const gchar* value) {
   g_autoptr(FlValue) result = fl_value_new_string(value);
+  fl_method_call_respond_success(call, result, nullptr);
+}
+
+static gboolean collect_printer_cb(GtkPrinter* printer, gpointer data) {
+  if (!gtk_printer_is_virtual(printer)) {
+    GList** list = static_cast<GList**>(data);
+    *list = g_list_append(*list, g_object_ref(printer));
+  }
+  return FALSE;  // devam
+}
+
+// Sanal olmayan yazıcılar (sahibi çağıran; g_list_free_full + unref).
+static GList* list_printers() {
+  GList* list = nullptr;
+  gtk_enumerate_printers(collect_printer_cb, &list, nullptr, TRUE);
+  return list;
+}
+
+static FlValue* lookup(FlValue* args, const gchar* key, FlValueType type) {
+  if (args == nullptr || fl_value_get_type(args) != FL_VALUE_TYPE_MAP) {
+    return nullptr;
+  }
+  FlValue* v = fl_value_lookup_string(args, key);
+  return v != nullptr && fl_value_get_type(v) == type ? v : nullptr;
+}
+
+static const gchar* string_arg(FlValue* args, const gchar* key,
+                               const gchar* fallback) {
+  FlValue* v = lookup(args, key, FL_VALUE_TYPE_STRING);
+  return v == nullptr ? fallback : fl_value_get_string(v);
+}
+
+static gboolean bool_arg(FlValue* args, const gchar* key, gboolean fallback) {
+  FlValue* v = lookup(args, key, FL_VALUE_TYPE_BOOL);
+  return v == nullptr ? fallback : fl_value_get_bool(v);
+}
+
+static int64_t int_arg(FlValue* args, const gchar* key, int64_t fallback) {
+  FlValue* v = lookup(args, key, FL_VALUE_TYPE_INT);
+  return v == nullptr ? fallback : fl_value_get_int(v);
+}
+
+static void respond_printers(FlMethodCall* call) {
+  GList* printers = list_printers();
+  g_autoptr(FlValue) result = fl_value_new_list();
+  for (GList* l = printers; l != nullptr; l = l->next) {
+    GtkPrinter* printer = GTK_PRINTER(l->data);
+    FlValue* item = fl_value_new_map();
+    fl_value_set_string_take(item, "name",
+                             fl_value_new_string(gtk_printer_get_name(printer)));
+    fl_value_set_string_take(item, "default",
+                             fl_value_new_bool(gtk_printer_is_default(printer)));
+    const gchar* state = gtk_printer_get_state_message(printer);
+    fl_value_set_string_take(item, "status",
+                             fl_value_new_string(state == nullptr ? "" : state));
+    fl_value_append_take(result, item);
+  }
+  g_list_free_full(printers, g_object_unref);
   fl_method_call_respond_success(call, result, nullptr);
 }
 
@@ -92,7 +137,7 @@ static void respond_string(FlMethodCall* call, const gchar* value) {
 static void print_job_done_cb(GtkPrintJob* job, gpointer user_data,
                               const GError* error) {
   FlMethodCall* call = FL_METHOD_CALL(user_data);
-  g_object_unref(job);
+  g_object_unref(job);  // gönderirken tutulan referans
   if (error != nullptr) {
     fl_method_call_respond_error(call, "print_failed", error->message,
                                  nullptr, nullptr);
@@ -101,78 +146,108 @@ static void print_job_done_cb(GtkPrintJob* job, gpointer user_data,
   }
 }
 
-static void print_dialog_response_cb(GtkDialog* dialog, gint response,
-                                     gpointer user_data) {
-  PrintRequest* r = static_cast<PrintRequest*>(user_data);
-  GtkPrintUnixDialog* unix_dialog = GTK_PRINT_UNIX_DIALOG(dialog);
-  if (response != GTK_RESPONSE_OK) {
-    respond_string(r->call, "cancelled");
-  } else {
-    GtkPrinter* printer = gtk_print_unix_dialog_get_selected_printer(
-        unix_dialog);
-    if (printer == nullptr || !gtk_printer_accepts_pdf(printer)) {
-      fl_method_call_respond_error(r->call, "printer_unsupported",
-                                   "Yazıcı PDF kabul etmiyor", nullptr,
-                                   nullptr);
-    } else {
-      g_autoptr(GtkPrintSettings) settings =
-          gtk_print_unix_dialog_get_settings(unix_dialog);
-      GtkPageSetup* page_setup =
-          gtk_print_unix_dialog_get_page_setup(unix_dialog);
-      GtkPrintJob* job =
-          gtk_print_job_new(r->title, printer, settings, page_setup);
-      g_autoptr(GError) error = nullptr;
-      if (!gtk_print_job_set_source_file(job, r->path, &error)) {
-        g_object_unref(job);
-        fl_method_call_respond_error(r->call, "print_failed", error->message,
-                                     nullptr, nullptr);
-      } else {
-        gtk_print_job_send(job, print_job_done_cb, g_object_ref(r->call),
-                           g_object_unref);
-      }
+static const gchar* gtk_paper_name(const gchar* paper) {
+  if (g_strcmp0(paper, "a3") == 0) return GTK_PAPER_NAME_A3;
+  if (g_strcmp0(paper, "a5") == 0) return GTK_PAPER_NAME_A5;
+  if (g_strcmp0(paper, "letter") == 0) return GTK_PAPER_NAME_LETTER;
+  if (g_strcmp0(paper, "legal") == 0) return GTK_PAPER_NAME_LEGAL;
+  return GTK_PAPER_NAME_A4;
+}
+
+static void print_file(FlMethodCall* call) {
+  FlValue* args = fl_method_call_get_args(call);
+  const gchar* path = string_arg(args, "path", nullptr);
+  const gchar* name = string_arg(args, "printer", nullptr);
+  if (path == nullptr || name == nullptr) {
+    fl_method_call_respond_error(call, "bad_args", "path ve printer gerekli",
+                                 nullptr, nullptr);
+    return;
+  }
+  GList* printers = list_printers();
+  GtkPrinter* printer = nullptr;
+  for (GList* l = printers; l != nullptr; l = l->next) {
+    if (g_strcmp0(gtk_printer_get_name(GTK_PRINTER(l->data)), name) == 0) {
+      printer = GTK_PRINTER(g_object_ref(l->data));
+      break;
     }
   }
-  gtk_widget_destroy(GTK_WIDGET(dialog));
-  print_request_free(r);
+  g_list_free_full(printers, g_object_unref);
+  if (printer == nullptr) {
+    fl_method_call_respond_error(call, "print_failed", "Yazıcı bulunamadı",
+                                 nullptr, nullptr);
+    return;
+  }
+  if (!gtk_printer_accepts_pdf(printer)) {
+    g_object_unref(printer);
+    fl_method_call_respond_error(call, "printer_unsupported",
+                                 "Yazıcı PDF kabul etmiyor", nullptr, nullptr);
+    return;
+  }
+
+  g_autoptr(GtkPrintSettings) settings = gtk_print_settings_new();
+  gtk_print_settings_set_printer(settings, name);
+  gtk_print_settings_set_n_copies(
+      settings, static_cast<gint>(CLAMP(int_arg(args, "copies", 1), 1, 999)));
+  gtk_print_settings_set_collate(settings, bool_arg(args, "collate", TRUE));
+  gtk_print_settings_set_reverse(settings, bool_arg(args, "reverse", FALSE));
+  const gboolean color = bool_arg(args, "color", TRUE);
+  gtk_print_settings_set_use_color(settings, color);
+  gtk_print_settings_set(settings, "cups-print-color-mode",
+                         color ? "color" : "monochrome");
+  const gchar* duplex = string_arg(args, "duplex", "off");
+  gtk_print_settings_set_duplex(
+      settings, g_strcmp0(duplex, "longEdge") == 0
+                    ? GTK_PRINT_DUPLEX_HORIZONTAL
+                    : g_strcmp0(duplex, "shortEdge") == 0
+                          ? GTK_PRINT_DUPLEX_VERTICAL
+                          : GTK_PRINT_DUPLEX_SIMPLEX);
+  const gboolean fit = bool_arg(args, "fit", TRUE);
+  gtk_print_settings_set(settings, "cups-print-scaling", fit ? "fit" : "none");
+  gtk_print_settings_set(settings, "cups-fit-to-page", fit ? "true" : "false");
+
+  g_autoptr(GtkPageSetup) setup = gtk_page_setup_new();
+  GtkPaperSize* paper =
+      gtk_paper_size_new(gtk_paper_name(string_arg(args, "paper", "a4")));
+  gtk_page_setup_set_paper_size(setup, paper);
+  gtk_print_settings_set_paper_size(settings, paper);
+  gtk_paper_size_free(paper);
+  // Otomatik yönde CUPS sayfayı kâğıda göre kendisi döndürür.
+  const gchar* orientation = string_arg(args, "orientation", "auto");
+  if (g_strcmp0(orientation, "auto") != 0) {
+    const GtkPageOrientation o = g_strcmp0(orientation, "landscape") == 0
+                                     ? GTK_PAGE_ORIENTATION_LANDSCAPE
+                                     : GTK_PAGE_ORIENTATION_PORTRAIT;
+    gtk_page_setup_set_orientation(setup, o);
+    gtk_print_settings_set_orientation(settings, o);
+  }
+
+  GtkPrintJob* job = gtk_print_job_new(
+      string_arg(args, "title", "Inken PDF"), printer, settings, setup);
+  g_object_unref(printer);
+  g_autoptr(GError) error = nullptr;
+  if (!gtk_print_job_set_source_file(job, path, &error)) {
+    g_object_unref(job);
+    fl_method_call_respond_error(call, "print_failed", error->message, nullptr,
+                                 nullptr);
+    return;
+  }
+  // İşin referansı gönderim bitince geri çağrıda bırakılır.
+  gtk_print_job_send(job, print_job_done_cb, g_object_ref(call),
+                     g_object_unref);
 }
 
 static void print_method_cb(FlMethodChannel* channel, FlMethodCall* call,
                             gpointer user_data) {
-  GtkWindow* window = GTK_WINDOW(user_data);
-  if (g_strcmp0(fl_method_call_get_name(call), "print") != 0) {
+  const gchar* method = fl_method_call_get_name(call);
+  if (g_strcmp0(method, "printers") == 0) {
+    respond_printers(call);
+  } else if (g_strcmp0(method, "print") == 0) {
+    print_file(call);
+  } else {
     g_autoptr(FlMethodResponse) response =
         FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
     fl_method_call_respond(call, response, nullptr);
-    return;
   }
-  FlValue* args = fl_method_call_get_args(call);
-  FlValue* path = args == nullptr || fl_value_get_type(args) != FL_VALUE_TYPE_MAP
-                      ? nullptr
-                      : fl_value_lookup_string(args, "path");
-  FlValue* title = path == nullptr ? nullptr
-                                   : fl_value_lookup_string(args, "title");
-  if (path == nullptr || fl_value_get_type(path) != FL_VALUE_TYPE_STRING) {
-    fl_method_call_respond_error(call, "bad_args", "path gerekli", nullptr,
-                                 nullptr);
-    return;
-  }
-  PrintRequest* r = g_new0(PrintRequest, 1);
-  r->call = FL_METHOD_CALL(g_object_ref(call));
-  r->path = g_strdup(fl_value_get_string(path));
-  r->title = g_strdup(title != nullptr &&
-                              fl_value_get_type(title) == FL_VALUE_TYPE_STRING
-                          ? fl_value_get_string(title)
-                          : "Inken PDF");
-  GtkWidget* dialog = gtk_print_unix_dialog_new(nullptr, window);
-  // Sayfa aralığı ve kopyalar CUPS'ta; uygulama kendisi bir şey yapmaz.
-  gtk_print_unix_dialog_set_manual_capabilities(
-      GTK_PRINT_UNIX_DIALOG(dialog), static_cast<GtkPrintCapabilities>(0));
-  gtk_print_unix_dialog_set_embed_page_setup(GTK_PRINT_UNIX_DIALOG(dialog),
-                                             TRUE);
-  g_signal_connect(dialog, "response", G_CALLBACK(print_dialog_response_cb),
-                   r);
-  gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
-  gtk_widget_show(dialog);
 }
 
 static void window_method_cb(FlMethodChannel* channel, FlMethodCall* call,

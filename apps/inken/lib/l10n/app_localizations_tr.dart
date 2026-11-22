@@ -1287,4 +1287,142 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get applyEdits => 'Uygula';
+
+  @override
+  String get printTitle => 'Yazdır';
+
+  @override
+  String get printPrinter => 'Yazıcı';
+
+  @override
+  String get printNoPrinter => 'Yazıcı bulunamadı';
+
+  @override
+  String get printDefaultPrinter => 'varsayılan yazıcı';
+
+  @override
+  String get printCopies => 'Kopya';
+
+  @override
+  String get printPages => 'Sayfalar';
+
+  @override
+  String get printPagesAll => 'Tümü';
+
+  @override
+  String get printPagesCurrent => 'Geçerli sayfa';
+
+  @override
+  String get printPagesCurrentShort => 'Geçerli';
+
+  @override
+  String get printPagesRange => 'Aralık';
+
+  @override
+  String get printRangeHint => 'ör. 1-3, 5';
+
+  @override
+  String printRangeInvalid(int count) {
+    return 'Geçersiz aralık (1–$count)';
+  }
+
+  @override
+  String get printSize => 'Boyut';
+
+  @override
+  String get printFit => 'Sayfaya sığdır';
+
+  @override
+  String get printActual => 'Gerçek boyut';
+
+  @override
+  String get printDrawings => 'Çizimleri yazdır';
+
+  @override
+  String get printMore => 'Diğer seçenekler';
+
+  @override
+  String get printColor => 'Renk';
+
+  @override
+  String get printColorOn => 'Renkli';
+
+  @override
+  String get printGray => 'Gri tonlamalı';
+
+  @override
+  String get printDuplex => 'Çift taraflı';
+
+  @override
+  String get printDuplexOff => 'Kapalı';
+
+  @override
+  String get printDuplexLong => 'Uzun kenardan çevir';
+
+  @override
+  String get printDuplexShort => 'Kısa kenardan çevir';
+
+  @override
+  String get printPaper => 'Kâğıt';
+
+  @override
+  String get printOrientation => 'Yönlendirme';
+
+  @override
+  String get printOrientationAuto => 'Otomatik';
+
+  @override
+  String get printPortrait => 'Dikey';
+
+  @override
+  String get printLandscape => 'Yatay';
+
+  @override
+  String get printOrientationHint =>
+      'Otomatik: yatay sayfalar kâğıda sığacak şekilde döndürülür.';
+
+  @override
+  String get printCollate => 'Kopyaları harmanla';
+
+  @override
+  String get printReverse => 'Sayfaları ters sırala';
+
+  @override
+  String get printProperties => 'Yazıcı özellikleri…';
+
+  @override
+  String get printPropertiesHint =>
+      'Yazıcının kendi ayar penceresi: baskı kalitesi, kâğıt türü.';
+
+  @override
+  String printSummary(int pages, int copies) {
+    return '$pages sayfa · $copies kopya';
+  }
+
+  @override
+  String get printContinue => 'Devam';
+
+  @override
+  String get printAndroidHint =>
+      'Yazıcı, kopya sayısı ve renk bir sonraki ekranda seçilir.';
+
+  @override
+  String get printPreparing => 'Hazırlanıyor…';
+
+  @override
+  String printPreviewLabel(int page) {
+    return 'Sayfa $page önizlemesi';
+  }
+
+  @override
+  String get printDecrease => 'Azalt';
+
+  @override
+  String get printIncrease => 'Artır';
+
+  @override
+  String get printPrevPage => 'Önceki sayfa';
+
+  @override
+  String get printNextPage => 'Sonraki sayfa';
 }

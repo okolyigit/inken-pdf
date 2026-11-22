@@ -696,5 +696,72 @@
         "type": "int"
       }
     }
-  }
+  },
+  "printTitle": "Yazdır",
+  "printPrinter": "Yazıcı",
+  "printNoPrinter": "Yazıcı bulunamadı",
+  "printDefaultPrinter": "varsayılan yazıcı",
+  "printCopies": "Kopya",
+  "printPages": "Sayfalar",
+  "printPagesAll": "Tümü",
+  "printPagesCurrent": "Geçerli sayfa",
+  "printPagesCurrentShort": "Geçerli",
+  "printPagesRange": "Aralık",
+  "printRangeHint": "ör. 1-3, 5",
+  "printRangeInvalid": "Geçersiz aralık (1–{count})",
+  "@printRangeInvalid": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "printSize": "Boyut",
+  "printFit": "Sayfaya sığdır",
+  "printActual": "Gerçek boyut",
+  "printDrawings": "Çizimleri yazdır",
+  "printMore": "Diğer seçenekler",
+  "printColor": "Renk",
+  "printColorOn": "Renkli",
+  "printGray": "Gri tonlamalı",
+  "printDuplex": "Çift taraflı",
+  "printDuplexOff": "Kapalı",
+  "printDuplexLong": "Uzun kenardan çevir",
+  "printDuplexShort": "Kısa kenardan çevir",
+  "printPaper": "Kâğıt",
+  "printOrientation": "Yönlendirme",
+  "printOrientationAuto": "Otomatik",
+  "printPortrait": "Dikey",
+  "printLandscape": "Yatay",
+  "printOrientationHint": "Otomatik: yatay sayfalar kâğıda sığacak şekilde döndürülür.",
+  "printCollate": "Kopyaları harmanla",
+  "printReverse": "Sayfaları ters sırala",
+  "printProperties": "Yazıcı özellikleri…",
+  "printPropertiesHint": "Yazıcının kendi ayar penceresi: baskı kalitesi, kâğıt türü.",
+  "printSummary": "{pages} sayfa · {copies} kopya",
+  "@printSummary": {
+    "placeholders": {
+      "pages": {
+        "type": "int"
+      },
+      "copies": {
+        "type": "int"
+      }
+    }
+  },
+  "printContinue": "Devam",
+  "printAndroidHint": "Yazıcı, kopya sayısı ve renk bir sonraki ekranda seçilir.",
+  "printPreparing": "Hazırlanıyor…",
+  "printPreviewLabel": "Sayfa {page} önizlemesi",
+  "@printPreviewLabel": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "printDecrease": "Azalt",
+  "printIncrease": "Artır",
+  "printPrevPage": "Önceki sayfa",
+  "printNextPage": "Sonraki sayfa"
 }

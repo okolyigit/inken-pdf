@@ -17,6 +17,7 @@ export 'src/image_edit.dart';
 export 'src/inken_core_base.dart';
 export 'src/model.dart';
 export 'src/pages.dart';
+export 'src/print_layout.dart';
 export 'src/serialization.dart';
 export 'src/stroke_builder.dart';
 export 'src/text_font.dart';

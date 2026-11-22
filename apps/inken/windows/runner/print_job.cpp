@@ -1,107 +1,145 @@
 #include "print_job.h"
 
-#include <commdlg.h>
+#include <winspool.h>
 
 #include <algorithm>
-#include <cmath>
 #include <iterator>
 #include <utility>
 
 PrintJob::~PrintJob() { Abort(); }
 
-PrintJob::BeginResult PrintJob::Begin(HWND owner, const std::wstring& title,
-                                      int page_count, Started* out) {
+std::vector<PrintJob::Printer> PrintJob::ListPrinters() {
+  std::vector<Printer> printers;
+  DWORD needed = 0, count = 0;
+  const DWORD flags = PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS;
+  EnumPrintersW(flags, nullptr, 4, nullptr, 0, &needed, &count);
+  if (needed == 0) return printers;
+  std::vector<BYTE> buffer(needed);
+  if (!EnumPrintersW(flags, nullptr, 4, buffer.data(), needed, &needed,
+                     &count)) {
+    return printers;
+  }
+  wchar_t default_name[512] = {};
+  DWORD default_size = static_cast<DWORD>(std::size(default_name));
+  const bool has_default =
+      GetDefaultPrinterW(default_name, &default_size) != FALSE;
+  const auto* info = reinterpret_cast<const PRINTER_INFO_4W*>(buffer.data());
+  for (DWORD i = 0; i < count; i++) {
+    if (info[i].pPrinterName == nullptr) continue;
+    Printer p;
+    p.name = info[i].pPrinterName;
+    p.is_default = has_default && p.name == default_name;
+    printers.push_back(std::move(p));
+  }
+  return printers;
+}
+
+std::vector<BYTE> PrintJob::DevMode(HANDLE handle,
+                                    const std::wstring& printer) {
+  auto saved = devmodes_.find(printer);
+  if (saved != devmodes_.end()) return saved->second;
+  auto* name = const_cast<LPWSTR>(printer.c_str());
+  const LONG size = DocumentPropertiesW(nullptr, handle, name, nullptr,
+                                        nullptr, 0);
+  if (size <= 0) return {};
+  std::vector<BYTE> buffer(static_cast<size_t>(size));
+  if (DocumentPropertiesW(nullptr, handle, name,
+                          reinterpret_cast<DEVMODEW*>(buffer.data()), nullptr,
+                          DM_OUT_BUFFER) != IDOK) {
+    return {};
+  }
+  return buffer;
+}
+
+bool PrintJob::ShowProperties(HWND owner, const std::wstring& printer) {
+  HANDLE handle = nullptr;
+  if (!OpenPrinterW(const_cast<LPWSTR>(printer.c_str()), &handle, nullptr)) {
+    return false;
+  }
+  bool ok = false;
+  std::vector<BYTE> in = DevMode(handle, printer);
+  auto* name = const_cast<LPWSTR>(printer.c_str());
+  const LONG size = DocumentPropertiesW(owner, handle, name, nullptr, nullptr,
+                                        0);
+  if (!in.empty() && size > 0) {
+    std::vector<BYTE> out(static_cast<size_t>(size));
+    const LONG r = DocumentPropertiesW(
+        owner, handle, name, reinterpret_cast<DEVMODEW*>(out.data()),
+        reinterpret_cast<DEVMODEW*>(in.data()),
+        DM_IN_BUFFER | DM_OUT_BUFFER | DM_IN_PROMPT);
+    if (r == IDOK) {
+      devmodes_[printer] = std::move(out);
+      ok = true;
+    }
+  }
+  ClosePrinter(handle);
+  return ok;
+}
+
+bool PrintJob::Begin(const std::wstring& title, const Settings& settings,
+                     Started* out) {
   Abort();  // yarım kalmış iş varsa
-  if (page_count < 1) return BeginResult::kFailed;
-
-  PRINTPAGERANGE ranges[32] = {};
-  PRINTDLGEXW pd = {};
-  pd.lStructSize = sizeof(pd);
-  pd.hwndOwner = owner;
-  // Kopya ve harmanlama sürücüde (DEVMODE); sürücü yapamıyorsa nCopies'te
-  // döner ve sayfalar burada tekrarlanır.
-  pd.Flags = PD_RETURNDC | PD_NOSELECTION | PD_NOCURRENTPAGE |
-             PD_USEDEVMODECOPIESANDCOLLATE;
-  pd.nPageRanges = 0;
-  pd.nMaxPageRanges = static_cast<DWORD>(std::size(ranges));
-  pd.lpPageRanges = ranges;
-  pd.nMinPage = 1;
-  pd.nMaxPage = static_cast<DWORD>(page_count);
-  pd.nCopies = 1;
-  pd.nStartPage = START_PAGE_GENERAL;
-
-  const HRESULT hr = PrintDlgExW(&pd);
-  if (pd.hDevMode) GlobalFree(pd.hDevMode);
-  if (pd.hDevNames) GlobalFree(pd.hDevNames);
-  if (FAILED(hr)) {
-    if (pd.hDC) DeleteDC(pd.hDC);
-    return BeginResult::kFailed;
-  }
-  if (pd.dwResultAction != PD_RESULT_PRINT || pd.hDC == nullptr) {
-    if (pd.hDC) DeleteDC(pd.hDC);
-    return BeginResult::kCancelled;
-  }
-
-  std::vector<int32_t> pages;
-  if (pd.Flags & PD_PAGENUMS) {
-    for (DWORD i = 0; i < pd.nPageRanges; i++) {
-      DWORD from = ranges[i].nFromPage, to = ranges[i].nToPage;
-      if (from > to) std::swap(from, to);  // "5-3" → 3..5
-      from = std::max<DWORD>(1, from);
-      to = std::min<DWORD>(static_cast<DWORD>(page_count), to);
-      for (DWORD p = from; p <= to; p++) pages.push_back(p - 1);
+  HANDLE handle = nullptr;
+  auto* name = const_cast<LPWSTR>(settings.printer.c_str());
+  if (!OpenPrinterW(name, &handle, nullptr)) return false;
+  std::vector<BYTE> buffer = DevMode(handle, settings.printer);
+  DEVMODEW* dm = buffer.empty() ? nullptr
+                                : reinterpret_cast<DEVMODEW*>(buffer.data());
+  if (dm != nullptr) {
+    dm->dmFields |= DM_ORIENTATION | DM_PAPERSIZE | DM_COLOR | DM_DUPLEX |
+                    DM_COPIES | DM_COLLATE;
+    dm->dmFields &= ~static_cast<DWORD>(DM_PAPERLENGTH | DM_PAPERWIDTH);
+    dm->dmOrientation = static_cast<short>(
+        settings.landscape ? DMORIENT_LANDSCAPE : DMORIENT_PORTRAIT);
+    dm->dmPaperSize = settings.paper;
+    dm->dmColor = static_cast<short>(settings.color ? DMCOLOR_COLOR
+                                                    : DMCOLOR_MONOCHROME);
+    // Dikey kâğıtta uzun kenar DMDUP_VERTICAL'dır; yatayda tersi.
+    short duplex = DMDUP_SIMPLEX;
+    if (settings.duplex == 1) {
+      duplex = settings.landscape ? DMDUP_HORIZONTAL : DMDUP_VERTICAL;
+    } else if (settings.duplex == 2) {
+      duplex = settings.landscape ? DMDUP_VERTICAL : DMDUP_HORIZONTAL;
     }
-  } else {
-    for (int p = 0; p < page_count; p++) pages.push_back(p);
+    dm->dmDuplex = duplex;
+    // Kopyalar ve sıra Dart'ta: sayfalar istenen sırayla gelir.
+    dm->dmCopies = 1;
+    dm->dmCollate = DMCOLLATE_FALSE;
+    // Sürücü ayarları birleştirsin ve doğrulasın.
+    DocumentPropertiesW(nullptr, handle, name, dm, dm,
+                        DM_IN_BUFFER | DM_OUT_BUFFER);
   }
-  if (pages.empty()) {
-    DeleteDC(pd.hDC);
-    return BeginResult::kCancelled;
-  }
+  ClosePrinter(handle);
 
-  const DWORD copies = std::max<DWORD>(1, pd.nCopies);
-  std::vector<int32_t> sequence;
-  if (copies > 1 && (pd.Flags & PD_COLLATE)) {
-    for (DWORD c = 0; c < copies; c++) {
-      sequence.insert(sequence.end(), pages.begin(), pages.end());
-    }
-  } else if (copies > 1) {
-    for (int32_t p : pages) sequence.insert(sequence.end(), copies, p);
-  } else {
-    sequence = std::move(pages);
-  }
-
+  HDC dc = CreateDCW(L"WINSPOOL", settings.printer.c_str(), nullptr, dm);
+  if (dc == nullptr) return false;
   DOCINFOW doc = {};
   doc.cbSize = sizeof(doc);
   doc.lpszDocName = title.c_str();
-  if (StartDocW(pd.hDC, &doc) <= 0) {
-    DeleteDC(pd.hDC);
-    return BeginResult::kFailed;
+  if (StartDocW(dc, &doc) <= 0) {
+    DeleteDC(dc);
+    return false;
   }
-  dc_ = pd.hDC;
-  out->pages = std::move(sequence);
+  dc_ = dc;
   out->width = GetDeviceCaps(dc_, HORZRES);
   out->height = GetDeviceCaps(dc_, VERTRES);
+  out->physical_width = GetDeviceCaps(dc_, PHYSICALWIDTH);
+  out->physical_height = GetDeviceCaps(dc_, PHYSICALHEIGHT);
+  out->offset_x = GetDeviceCaps(dc_, PHYSICALOFFSETX);
+  out->offset_y = GetDeviceCaps(dc_, PHYSICALOFFSETY);
   out->dpi = std::max(GetDeviceCaps(dc_, LOGPIXELSX),
                       GetDeviceCaps(dc_, LOGPIXELSY));
-  return BeginResult::kStarted;
+  return true;
 }
 
 bool PrintJob::AddPage(const uint8_t* bgra, size_t size, int width,
-                       int height) {
-  if (dc_ == nullptr || width <= 0 || height <= 0 ||
+                       int height, int x, int y, int dest_w, int dest_h) {
+  if (dc_ == nullptr || width <= 0 || height <= 0 || dest_w <= 0 ||
+      dest_h <= 0 ||
       size < static_cast<size_t>(width) * static_cast<size_t>(height) * 4) {
     return false;
   }
   if (StartPage(dc_) <= 0) return false;
-  const int area_w = GetDeviceCaps(dc_, HORZRES);
-  const int area_h = GetDeviceCaps(dc_, VERTRES);
-  const double scale = std::min(static_cast<double>(area_w) / width,
-                                static_cast<double>(area_h) / height);
-  const int dest_w = static_cast<int>(std::lround(width * scale));
-  const int dest_h = static_cast<int>(std::lround(height * scale));
-  const int x = (area_w - dest_w) / 2;
-  const int y = (area_h - dest_h) / 2;
 
   BITMAPINFO info = {};
   info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
