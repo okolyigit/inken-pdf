@@ -98,6 +98,39 @@ void tapTool(WidgetRef ref, Tool tool) {
   }
 }
 
+/// Seçme araçları: araç kutusunda ve telefon rafında tek "Seç" düğmesi;
+/// türü (çizimler / PDF metni) düğmenin seçenek panelinden seçilir.
+const selectTools = {Tool.select, Tool.textSelect};
+
+/// Birleşik "Seç" düğmesinin gösterdiği tür: en son kullanılan seçme aracı.
+final selectKindProvider = NotifierProvider<SelectKindNotifier, Tool>(
+  SelectKindNotifier.new,
+);
+
+class SelectKindNotifier extends Notifier<Tool> {
+  @override
+  Tool build() {
+    ref.listen(toolProvider.select((s) => s.tool), (_, tool) {
+      if (selectTools.contains(tool)) state = tool;
+    });
+    final tool = ref.read(toolProvider).tool;
+    return selectTools.contains(tool) ? tool : Tool.select;
+  }
+}
+
+/// Birleşik "Seç" düğmesi: seçme aracı seçili değilse son kullanılan tür
+/// seçilir; seçiliyse tür paneli açılır / kapanır (panel [Tool.select]'e
+/// bağlıdır).
+void tapSelect(WidgetRef ref) {
+  final options = ref.read(toolOptionsProvider.notifier);
+  if (selectTools.contains(ref.read(toolProvider).tool)) {
+    options.toggle(Tool.select);
+  } else {
+    ref.read(toolProvider.notifier).select(ref.read(selectKindProvider));
+    options.close();
+  }
+}
+
 /// Aracın ikonu; şekil aracında seçili şeklin ikonu ([shape]).
 IconData toolIcon(Tool tool, [ShapeKind shape = ShapeKind.rectangle]) =>
     switch (tool) {
@@ -289,6 +322,7 @@ class ToolOptions extends ConsumerWidget {
     if (tool == Tool.laser) return const _LaserOptions();
     if (tool == Tool.shape) return const _ShapeOptions();
     if (tool == Tool.text) return const _TextOptions();
+    if (selectTools.contains(tool)) return const _SelectOptions();
     final l10n = AppLocalizations.of(context);
     final s = ref.watch(toolProvider);
     final n = ref.read(toolProvider.notifier);
@@ -335,6 +369,34 @@ class ToolOptions extends ConsumerWidget {
 }
 
 /// Şekil: Şekil → Renk → Kalınlık (kalemin paletleri, ayrı seçim).
+/// "Seç" düğmesinin paneli: çizimleri mi, PDF metnini mi seçeceği.
+class _SelectOptions extends ConsumerWidget {
+  const _SelectOptions();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return _Section(
+      label: l10n.sectionSelect,
+      child: Segmented<Tool>(
+        value: ref.watch(selectKindProvider),
+        // Tek seçim, iş biter: panel (telefonda alt sayfa) kapanır.
+        onChanged: (tool) {
+          ref.read(toolProvider.notifier).select(tool);
+          ref.read(toolOptionsProvider.notifier).close();
+          if (ModalRoute.of(context) is ModalBottomSheetRoute) {
+            Navigator.pop(context);
+          }
+        },
+        options: [
+          (Tool.select, toolIcon(Tool.select), l10n.selectDrawings),
+          (Tool.textSelect, toolIcon(Tool.textSelect), l10n.selectText),
+        ],
+      ),
+    );
+  }
+}
+
 class _ShapeOptions extends ConsumerWidget {
   const _ShapeOptions();
 

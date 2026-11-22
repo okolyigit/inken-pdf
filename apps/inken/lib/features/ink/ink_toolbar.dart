@@ -57,7 +57,8 @@ class InkToolbar extends StatelessWidget {
 
 /// Belgenin üzerinde yüzen araç kutusu; sayfada yapılan her şey burada:
 /// geri al / yinele, kaydır / seç, kalem, fosforlu, geçici kalem, silgi,
-/// şekil, metin, spot ışığı / perde. Tam ekranda da görünür. Üstte yatay ya da solda dikey
+/// şekil, metin, spot ışığı / perde. Tam ekranda da görünür. Üstte / altta tek
+/// sıra; solda / sağda iki sütun (kalem grubu ve silgi iç sütunda)
 /// ([toolDockProvider]); ekrana sığmazsa kaydırılır.
 /// Araç seçenekleri kutudan dışarı açılır: yatayda aşağı, dikeyde sağa.
 class ToolDock extends ConsumerStatefulWidget {
@@ -74,6 +75,21 @@ class _ToolDockState extends ConsumerState<ToolDock> {
   final _portal = OverlayPortalController();
   final _links = {for (final t in Tool.values) t: LayerLink()};
   final _keys = {for (final t in Tool.values) t: GlobalKey()};
+  final _dockKey = GlobalKey(debugLabel: 'tool-dock');
+
+  /// Kenardaki kutuda panelin kutunun iç kenarından açılması için yatay
+  /// kayma: dış sütundaki düğmenin paneli iç sütunun üstüne binmesin.
+  double _panelShiftSide(Tool t, DockEdge edge) {
+    final button = _keys[t]!.currentContext?.findRenderObject();
+    final dock = _dockKey.currentContext?.findRenderObject();
+    if (button is! RenderBox || dock is! RenderBox || !button.attached) {
+      return 0;
+    }
+    final b = button.localToGlobal(Offset.zero, ancestor: dock);
+    return edge == DockEdge.left
+        ? dock.size.width - (b.dx + button.size.width)
+        : -b.dx;
+  }
 
   /// Yatay kutuda panelin ekranın sağından taşmaması için sola kayması
   /// (panel genişliği sabit; çentik düğmeyi göstermeye devam eder).
@@ -136,6 +152,26 @@ class _ToolDockState extends ConsumerState<ToolDock> {
       );
     }
 
+    // Seç ve Metin seç tek düğme: son kullanılan türün ikonu; seçiliyken
+    // dokunmak tür panelini açar.
+    Widget selectButton() {
+      final kind = ref.watch(selectKindProvider);
+      return CompositedTransformTarget(
+        key: _keys[Tool.select],
+        link: _links[Tool.select]!,
+        child: TapRegion(
+          groupId: _region,
+          child: ToolButton(
+            key: const ValueKey('tool-select'),
+            icon: toolIcon(kind),
+            tooltip: toolTooltip(l10n, kind),
+            selected: selectTools.contains(tools.tool),
+            onTap: () => tapSelect(ref),
+          ),
+        ),
+      );
+    }
+
     // Spot ışığı ve perde araç değil, açılıp kapanan örtü: tek düğme.
     final covering = ref.watch(stageCoverProvider.select((s) => s.mode));
 
@@ -143,8 +179,8 @@ class _ToolDockState extends ConsumerState<ToolDock> {
     final session = widget.session;
     final history = ListenableBuilder(
       listenable: session ?? const AlwaysStoppedAnimation(0),
-      builder: (context, _) => Flex(
-        direction: axis,
+      // Kenardaki kutuda da yan yana: iki sütunun üstünde tek sıra.
+      builder: (context, _) => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
@@ -162,63 +198,104 @@ class _ToolDockState extends ConsumerState<ToolDock> {
         ],
       ),
     );
-    final frames = [
-      history,
-      gap,
-      ToolFrame(
-        axis: axis,
-        children: [tool(Tool.hand), tool(Tool.select), tool(Tool.textSelect)],
-      ),
-      gap,
-      // Yazan araçlar tek çerçevede; hızlı renk yuvaları seçili olanın
-      // (yuva sayısı eşit, kutu genişliği araç değişince oynamaz). Hemen
-      // sağında silgi.
-      ToolFrame(
-        axis: axis,
+    final selectFrame = ToolFrame(
+      axis: axis,
+      children: [tool(Tool.hand), selectButton()],
+    );
+    // Yazan araçlar tek çerçevede; hızlı renk yuvaları seçili olanın
+    // (yuva sayısı eşit, kutu boyu araç değişince oynamaz).
+    final inkFrame = ToolFrame(
+      axis: axis,
+      children: [
+        tool(Tool.pen),
+        tool(Tool.highlighter),
+        tool(Tool.laser),
+        QuickColors(
+          key: ValueKey('quick-colors-${_inkTool.name}'),
+          tool: _inkTool,
+          axis: axis,
+        ),
+      ],
+    );
+    final eraserFrame = ToolFrame(axis: axis, children: [tool(Tool.eraser)]);
+    final shapeFrame = ToolFrame(axis: axis, children: [tool(Tool.shape)]);
+    final textFrame = ToolFrame(axis: axis, children: [tool(Tool.text)]);
+    final coverFrame = ToolFrame(
+      axis: axis,
+      children: [_CoverButton(active: covering)],
+    );
+    final grip = _DockGrip(
+      vertical: vertical,
+      onDragStart: () {
+        ref.read(toolOptionsProvider.notifier).close();
+        setState(() => _dragging = true);
+      },
+      onDrag: (delta) => setState(() => _drag += delta),
+      onDrop: (global) {
+        final size = MediaQuery.sizeOf(context);
+        setState(() {
+          _drag = Offset.zero;
+          _dragging = false;
+        });
+        ref.read(toolDockProvider.notifier).set(nearestEdge(global, size));
+      },
+      onPick: (e) {
+        ref.read(toolOptionsProvider.notifier).close();
+        ref.read(toolDockProvider.notifier).set(e);
+      },
+    );
+
+    Widget column(List<Widget> items) => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final (i, w) in items.indexed) ...[if (i > 0) gap, w],
+      ],
+    );
+
+    // Yatayda tek sıra. Kenarda iki sütun: kalem grubu ve silgi sayfaya
+    // bakan iç sütunda, geri kalanı ekran kenarındaki dış sütunda.
+    final Widget content;
+    if (vertical) {
+      const columnGap = SizedBox(width: Space.s1);
+      final outer = column([selectFrame, shapeFrame, textFrame, coverFrame]);
+      final inner = column([inkFrame, eraserFrame]);
+      // Üstte geri al / yinele, altında aynı hizadan başlayan iki sütun,
+      // en altta tutamak.
+      content = Column(
+        key: const ValueKey('tool-dock-columns'),
+        mainAxisSize: MainAxisSize.min,
         children: [
-          tool(Tool.pen),
-          tool(Tool.highlighter),
-          tool(Tool.laser),
-          QuickColors(
-            key: ValueKey('quick-colors-${_inkTool.name}'),
-            tool: _inkTool,
-            axis: axis,
+          history,
+          gap,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            // Sütunlar arası dar: çerçevelerin kenar çizgisi zaten ayırır.
+            children: edge == DockEdge.right
+                ? [inner, columnGap, outer]
+                : [outer, columnGap, inner],
           ),
+          gap,
+          grip,
         ],
-      ),
-      gap,
-      ToolFrame(axis: axis, children: [tool(Tool.eraser)]),
-      gap,
-      ToolFrame(axis: axis, children: [tool(Tool.shape)]),
-      gap,
-      ToolFrame(axis: axis, children: [tool(Tool.text)]),
-      gap,
-      ToolFrame(
-        axis: axis,
-        children: [_CoverButton(active: covering)],
-      ),
-      gap,
-      _DockGrip(
-        vertical: vertical,
-        onDragStart: () {
-          ref.read(toolOptionsProvider.notifier).close();
-          setState(() => _dragging = true);
-        },
-        onDrag: (delta) => setState(() => _drag += delta),
-        onDrop: (global) {
-          final size = MediaQuery.sizeOf(context);
-          setState(() {
-            _drag = Offset.zero;
-            _dragging = false;
-          });
-          ref.read(toolDockProvider.notifier).set(nearestEdge(global, size));
-        },
-        onPick: (e) {
-          ref.read(toolOptionsProvider.notifier).close();
-          ref.read(toolDockProvider.notifier).set(e);
-        },
-      ),
-    ];
+      );
+    } else {
+      content = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final (i, w) in [
+            history,
+            selectFrame,
+            inkFrame,
+            eraserFrame,
+            shapeFrame,
+            textFrame,
+            coverFrame,
+            grip,
+          ].indexed) ...[if (i > 0) gap, w],
+        ],
+      );
+    }
 
     return OverlayPortal(
       controller: _portal,
@@ -226,7 +303,9 @@ class _ToolDockState extends ConsumerState<ToolDock> {
         final t = ref.watch(toolOptionsProvider);
         if (t == null) return const SizedBox.shrink();
         MediaQuery.sizeOf(context); // pencere değişince yeniden hesapla
-        final shift = vertical ? 0.0 : _panelShift(context, t);
+        final shift = vertical
+            ? _panelShiftSide(t, edge)
+            : _panelShift(context, t);
         // Panel ekranın içine doğru açılır: üstteki kutuda aşağı, alttakinde
         // yukarı, soldakinde sağa, sağdakinde sola.
         final (target, follower, offset) = switch (edge) {
@@ -243,12 +322,12 @@ class _ToolDockState extends ConsumerState<ToolDock> {
           DockEdge.left => (
             Alignment.topRight,
             Alignment.topLeft,
-            const Offset(Space.s3, -Space.s2),
+            Offset(Space.s3 + shift, -Space.s2),
           ),
           DockEdge.right => (
             Alignment.topLeft,
             Alignment.topRight,
-            const Offset(-Space.s3, -Space.s2),
+            Offset(-Space.s3 + shift, -Space.s2),
           ),
         };
         return CompositedTransformFollower(
@@ -266,7 +345,7 @@ class _ToolDockState extends ConsumerState<ToolDock> {
                 key: ValueKey('options-${t.name}'),
                 label: l10n.toolOptions(toolLabel(l10n, t)),
                 edge: edge,
-                notchShift: -shift,
+                notchShift: vertical ? 0 : -shift,
                 child: ToolOptions(tool: t),
               ),
             ),
@@ -276,35 +355,28 @@ class _ToolDockState extends ConsumerState<ToolDock> {
       // Sürüklenirken kutu imleci izler; bırakınca en yakın kenara oturur.
       child: Transform.translate(
         offset: _drag,
-        child: _dockBox(c, axis, frames),
+        child: _dockBox(c, axis, content),
       ),
     );
   }
 
-  Widget _dockBox(InkenColors c, Axis axis, List<Widget> frames) =>
-      AnimatedOpacity(
-        opacity: _dragging ? 0.85 : 1,
-        duration: Motion.fast,
-        child: Container(
-          key: const ValueKey('tool-dock'),
-          padding: const EdgeInsets.all(Space.s1 + 2),
-          decoration: BoxDecoration(
-            color: c.surfaceRaised,
-            borderRadius: BorderRadius.circular(Radii.lg),
-            boxShadow: c.shadowDock,
-          ),
-          // Tek Flex: yön değişince düğmeler (ve panelin bağlı olduğu
-          // hedefler) yeniden kurulmaz. Dar ekranda kutu kaydırılır.
-          child: SingleChildScrollView(
-            scrollDirection: axis,
-            child: Flex(
-              direction: axis,
-              mainAxisSize: MainAxisSize.min,
-              children: frames,
-            ),
-          ),
-        ),
-      );
+  Widget _dockBox(InkenColors c, Axis axis, Widget content) => AnimatedOpacity(
+    key: const ValueKey('tool-dock'),
+    opacity: _dragging ? 0.85 : 1,
+    duration: Motion.fast,
+    child: Container(
+      key: _dockKey,
+      padding: const EdgeInsets.all(Space.s1 + 2),
+      decoration: BoxDecoration(
+        color: c.surfaceRaised,
+        borderRadius: BorderRadius.circular(Radii.lg),
+        boxShadow: c.shadowDock,
+      ),
+      // Düğmeler GlobalKey'li: yön değişince durumları ve panelin bağlı
+      // olduğu hedefler korunur. Ekrana sığmazsa kutu kaydırılır.
+      child: SingleChildScrollView(scrollDirection: axis, child: content),
+    ),
+  );
 }
 
 /// Yüzen araç kutusunu [edge] kenarına yerleştirir (bir `Stack` içinde).

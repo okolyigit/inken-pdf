@@ -982,7 +982,7 @@ void main() {
     });
   });
 
-  testWidgets('seç aracı yüzen araç kutusunda', (t) async {
+  testWidgets('seç ve metin seç tek düğmede; son tür hatırlanır', (t) async {
     await pump(t, toolbar: true);
     final button = find.byKey(const ValueKey('tool-select'));
     expect(button, findsOneWidget);
@@ -990,11 +990,74 @@ void main() {
       find.descendant(of: find.byType(ToolDock), matching: button),
       findsOneWidget,
     );
+    expect(find.byKey(const ValueKey('tool-textSelect')), findsNothing);
     await t.tap(button);
     await t.pump();
     expect(container.read(toolProvider).tool, Tool.select);
-    expect(container.read(toolOptionsProvider), isNull, reason: 'paneli yok');
+    expect(container.read(toolOptionsProvider), isNull);
+
+    // Seçiliyken dokunmak tür panelini açar; Metin seçilir, ikon değişir.
+    await t.tap(button);
+    await t.pumpAndSettle();
+    expect(container.read(toolOptionsProvider), Tool.select);
+    await t.tap(find.byKey(const ValueKey('seg-Tool.textSelect')));
+    await t.pumpAndSettle();
+    expect(container.read(toolProvider).tool, Tool.textSelect);
+    expect(container.read(toolOptionsProvider), isNull, reason: 'kapanır');
+    expect(
+      find.descendant(
+        of: button,
+        matching: find.byIcon(toolIcon(Tool.textSelect)),
+      ),
+      findsOneWidget,
+    );
+
+    // Başka araçtan dönünce son kullanılan tür seçilir.
+    await t.tap(find.byKey(const ValueKey('tool-hand')));
+    await t.pumpAndSettle();
+    await t.tap(button);
+    await t.pump();
+    expect(container.read(toolProvider).tool, Tool.textSelect);
   });
+
+  for (final side in ['left', 'right']) {
+    testWidgets('kenarda iki sütun: kalem ve silgi içte ($side)', (t) async {
+      await pump(t, toolbar: true, savedSettings: {'toolDock': side});
+      expect(find.byKey(const ValueKey('tool-dock-columns')), findsOneWidget);
+      Rect at(String tool) => t.getRect(find.byKey(ValueKey('tool-$tool')));
+      final outerX = at('hand').center.dx;
+      // Dış sütun: seç, şekil, metin aynı hizada.
+      for (final k in ['select', 'shape', 'text']) {
+        expect(at(k).center.dx, moreOrLessEquals(outerX), reason: k);
+      }
+      // Geri al / yinele yan yana, iki sütunun üstünde; sütunlar aynı
+      // yükseklikten başlar.
+      final undo = t.getRect(find.byKey(const ValueKey('undo')));
+      final redo = t.getRect(find.byKey(const ValueKey('redo')));
+      expect(redo.center.dy, moreOrLessEquals(undo.center.dy));
+      expect(undo.bottom, lessThanOrEqualTo(at('hand').top));
+      expect(undo.bottom, lessThanOrEqualTo(at('pen').top));
+      expect(at('pen').top, moreOrLessEquals(at('hand').top, epsilon: 1));
+      // İç sütun sayfaya bakar: solda sağda, sağda solda.
+      for (final k in ['pen', 'highlighter', 'laser', 'eraser']) {
+        final x = at(k).center.dx;
+        expect(side == 'left' ? x > outerX : x < outerX, isTrue, reason: k);
+      }
+
+      // Dış sütundaki şeklin paneli kutunun dışında açılır (iç sütunu
+      // örtmez).
+      await t.tap(find.byKey(const ValueKey('tool-shape')));
+      await t.tap(find.byKey(const ValueKey('tool-shape')));
+      await t.pumpAndSettle();
+      final dock = t.getRect(find.byKey(const ValueKey('tool-dock')));
+      final panel = t.getRect(find.byKey(const ValueKey('options-shape')));
+      if (side == 'left') {
+        expect(panel.left, greaterThanOrEqualTo(dock.right));
+      } else {
+        expect(panel.right, lessThanOrEqualTo(dock.left));
+      }
+    });
+  }
 
   testWidgets('en sağdaki aracın paneli ekrandan taşmaz', (t) async {
     await pump(t, toolbar: true);

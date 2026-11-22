@@ -1218,4 +1218,13 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get aboutPrivacy =>
       'Gizlilik: Inken PDF hiçbir veri toplamaz ve internete bağlanmaz. Ayarların, son belgelerin ve yedeklerin yalnızca bu cihazda kalır.';
+
+  @override
+  String get sectionSelect => 'Neyi seçeceksin';
+
+  @override
+  String get selectDrawings => 'Çizimler';
+
+  @override
+  String get selectText => 'Metin';
 }

@@ -31,7 +31,18 @@ class MobileDock extends ConsumerWidget {
     final c = context.colors;
     final state = ref.watch(toolProvider);
 
+    // Seç düğmesi seçme türlerinin ikisini de temsil eder (son kullanılan).
+    final selectKind = ref.watch(selectKindProvider);
+
     void tap(Tool tool) {
+      if (tool == Tool.select) {
+        if (selectTools.contains(state.tool)) {
+          showToolOptionsSheet(context, Tool.select);
+        } else {
+          ref.read(toolProvider.notifier).select(selectKind);
+        }
+        return;
+      }
       if (state.tool == tool && hasOptions(tool)) {
         showToolOptionsSheet(context, tool);
       } else {
@@ -43,10 +54,14 @@ class MobileDock extends ConsumerWidget {
       for (final t in tools)
         _DockTool(
           key: ValueKey('tool-${t.name}'),
-          icon: toolIcon(t, state.shapeKind),
+          icon: t == Tool.select
+              ? toolIcon(selectKind)
+              : toolIcon(t, state.shapeKind),
           label: toolLabel(l10n, t),
           shortLabel: toolShortLabel(l10n, t),
-          selected: state.tool == t,
+          selected: t == Tool.select
+              ? selectTools.contains(state.tool)
+              : state.tool == t,
           ink: toolInkColor(state, t),
           onTap: () => tap(t),
         ),

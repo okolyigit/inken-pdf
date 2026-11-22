@@ -360,5 +360,8 @@
   "bugReportSteps": "How can it be reproduced?",
   "bugReportCopiedEmail": "Couldn't open an email app. The report was copied to the clipboard; you can send it to {email}.",
   "bugReportCopiedGitHub": "Couldn't open the browser. The report was copied to the clipboard; you can paste it at {url}/issues.",
-  "aboutPrivacy": "Privacy: Inken PDF collects no data and doesn't connect to the internet. Your settings, recent documents and backups stay on this device."
+  "aboutPrivacy": "Privacy: Inken PDF collects no data and doesn't connect to the internet. Your settings, recent documents and backups stay on this device.",
+  "sectionSelect": "What to select",
+  "selectDrawings": "Drawings",
+  "selectText": "Text"
 }

@@ -1259,4 +1259,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aboutPrivacy =>
       'Privacy: Inken PDF collects no data and doesn\'t connect to the internet. Your settings, recent documents and backups stay on this device.';
+
+  @override
+  String get sectionSelect => 'What to select';
+
+  @override
+  String get selectDrawings => 'Drawings';
+
+  @override
+  String get selectText => 'Text';
 }

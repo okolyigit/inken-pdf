@@ -667,5 +667,8 @@
       }
     }
   },
-  "aboutPrivacy": "Gizlilik: Inken PDF hiçbir veri toplamaz ve internete bağlanmaz. Ayarların, son belgelerin ve yedeklerin yalnızca bu cihazda kalır."
+  "aboutPrivacy": "Gizlilik: Inken PDF hiçbir veri toplamaz ve internete bağlanmaz. Ayarların, son belgelerin ve yedeklerin yalnızca bu cihazda kalır.",
+  "sectionSelect": "Neyi seçeceksin",
+  "selectDrawings": "Çizimler",
+  "selectText": "Metin"
 }

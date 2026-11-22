@@ -159,7 +159,12 @@ void main() {
     // 1) Araç kutusundan Metin seç; başlık satırı ("Inken fixture - Sayfa
     // 1", x 72.., y 62..88 pt) sürüklenerek seçilir; çizim olmaz. Sürükleme
     // metnin üstünden başlamalı (pdfrx metin dışını seçim saymaz).
-    await click(t.getCenter(find.byKey(const ValueKey('tool-textSelect'))));
+    // Seç düğmesi: ilk tıklama seçer, ikincisi tür panelini açar.
+    await click(t.getCenter(find.byKey(const ValueKey('tool-select'))));
+    await t.pump();
+    await click(t.getCenter(find.byKey(const ValueKey('tool-select'))));
+    await t.pumpAndSettle();
+    await click(t.getCenter(find.byKey(const ValueKey('seg-Tool.textSelect'))));
     await t.pump();
     expect(container.read(toolProvider).tool, Tool.textSelect);
     await drag(at(72.5, 75), at(340, 75));

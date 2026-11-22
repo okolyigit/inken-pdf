@@ -2263,6 +2263,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Gizlilik: Inken PDF hiçbir veri toplamaz ve internete bağlanmaz. Ayarların, son belgelerin ve yedeklerin yalnızca bu cihazda kalır.'**
   String get aboutPrivacy;
+
+  /// No description provided for @sectionSelect.
+  ///
+  /// In tr, this message translates to:
+  /// **'Neyi seçeceksin'**
+  String get sectionSelect;
+
+  /// No description provided for @selectDrawings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çizimler'**
+  String get selectDrawings;
+
+  /// No description provided for @selectText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Metin'**
+  String get selectText;
 }
 
 class _AppLocalizationsDelegate
