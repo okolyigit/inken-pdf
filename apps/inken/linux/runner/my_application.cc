@@ -283,9 +283,24 @@ static void window_method_cb(FlMethodChannel* channel, FlMethodCall* call,
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 
+// GTK, bir ekran karesi içindeki hareket olaylarını birleştirip yalnızca
+// sonuncusunu verir (event compression). Tablet kalemi ~200 Hz nokta
+// gönderirken uygulamaya 30–60 Hz kalır; çizgi köşeli ve basamaklı çıkar.
+// Xournal++ gibi bu pencere ve alt pencerelerinde birleştirme kapatılır.
+static void disable_event_compression(GdkWindow* window) {
+  gdk_window_set_event_compression(window, FALSE);
+  g_autoptr(GList) children = gdk_window_get_children(window);
+  for (GList* l = children; l != nullptr; l = l->next) {
+    disable_event_compression(GDK_WINDOW(l->data));
+  }
+}
+
 // Called when first Flutter frame received.
 static void first_frame_cb(MyApplication* self, FlView* view) {
-  gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
+  GtkWidget* toplevel = gtk_widget_get_toplevel(GTK_WIDGET(view));
+  gtk_widget_show(toplevel);
+  GdkWindow* window = gtk_widget_get_window(toplevel);
+  if (window != nullptr) disable_event_compression(window);
 }
 
 // Implements GApplication::activate.
@@ -334,6 +349,9 @@ static void my_application_activate(GApplication* application) {
   }
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
+  // Linux'ta Impeller (OpenGL ES, SDF) çizgilerin kenarını yumuşatmıyor:
+  // kalem çizgileri pikselli çıkıyor. Skia ile çizilir.
+  fl_dart_project_set_enable_impeller(project, FALSE);
   fl_dart_project_set_dart_entrypoint_arguments(
       project, self->dart_entrypoint_arguments);
 
