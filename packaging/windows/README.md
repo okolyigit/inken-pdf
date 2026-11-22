@@ -42,7 +42,7 @@ Partner Center → Inken PDF → **Start submission**:
 
 - **Packages:** `InkenPDF-Store-<msix>.msix`. Aygıt ailesi: Windows 10/11 Desktop.
 - **Pricing and availability:** ücretsiz; pazarlar: hepsi (ya da Türkiye ile başla).
-- **Properties:** kategori **Education** (alt: Education tools) ya da **Productivity**. Gizlilik politikası: uygulama kişisel veri toplamaz, ağa çıkmaz; Partner Center yine de isterse depodaki bir sayfanın adresi verilebilir.
+- **Properties:** kategori **Productivity** (Verimlilik). Gizlilik politikası: uygulama kişisel veri toplamaz, ağa çıkmaz; Partner Center yine de isterse depodaki bir sayfanın adresi verilebilir.
 - **Age ratings:** IARC anketi; içerik yok, kullanıcılar arası iletişim yok → "3+ / Herkes".
 - **Submission options → Restricted capabilities:** `runFullTrust` için gerekçe:
 
