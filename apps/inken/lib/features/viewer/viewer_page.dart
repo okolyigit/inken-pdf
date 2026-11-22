@@ -31,6 +31,7 @@ import '../ink/tool_options.dart';
 import '../ink/tool_state.dart';
 import '../presentation/stage_cover.dart';
 import '../../platform/window_title.dart';
+import '../../theme/dialog_actions.dart';
 import '../../theme/logo.dart';
 import '../../theme/theme_mode.dart';
 import '../../theme/tokens.dart';
@@ -1113,17 +1114,19 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
         title: Text(l10n.unsavedChangesTitle),
         content: Text(l10n.unsavedChangesBody),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, _CloseChoice.cancel),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, _CloseChoice.discard),
-            child: Text(l10n.discardChanges),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, _CloseChoice.save),
-            child: Text(l10n.save),
+          DialogActions(
+            cancel: (
+              label: l10n.cancel,
+              onPressed: () => Navigator.pop(context, _CloseChoice.cancel),
+            ),
+            secondary: (
+              label: l10n.discardChanges,
+              onPressed: () => Navigator.pop(context, _CloseChoice.discard),
+            ),
+            primary: (
+              label: l10n.save,
+              onPressed: () => Navigator.pop(context, _CloseChoice.save),
+            ),
           ),
         ],
       ),

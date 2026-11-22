@@ -10,6 +10,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../platform/window_title.dart';
+import '../../theme/dialog_actions.dart';
 import '../../theme/logo.dart';
 import '../../theme/tokens.dart';
 import '../backup/backup_store.dart';
@@ -197,19 +198,23 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, _RecoveryChoice.later),
-            child: Text(l10n.recoveryLater),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, _RecoveryChoice.delete),
-            child: Text(l10n.recoveryDelete),
-          ),
-          if (exists)
-            FilledButton(
-              onPressed: () => Navigator.pop(context, _RecoveryChoice.restore),
-              child: Text(l10n.recoveryRestore),
+          DialogActions(
+            cancel: (
+              label: l10n.recoveryLater,
+              onPressed: () => Navigator.pop(context, _RecoveryChoice.later),
             ),
+            secondary: (
+              label: l10n.recoveryDelete,
+              onPressed: () => Navigator.pop(context, _RecoveryChoice.delete),
+            ),
+            primary: exists
+                ? (
+                    label: l10n.recoveryRestore,
+                    onPressed: () =>
+                        Navigator.pop(context, _RecoveryChoice.restore),
+                  )
+                : null,
+          ),
         ],
       ),
     );
