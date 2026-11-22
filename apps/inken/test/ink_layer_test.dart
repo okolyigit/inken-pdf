@@ -808,6 +808,7 @@ void main() {
       t,
     ) async {
       await pump(t);
+      tools().setPenWidth(2); // 3 pt: aşağıdaki sınırlar buna göre
       await drag(t, const Offset(100, 100), const Offset(140, 120));
       final a = items(0).single as Stroke;
       tools().select(Tool.select);
@@ -829,6 +830,7 @@ void main() {
 
     testWidgets('küçültme sınırı ve sayfa kenarı aşılmaz', (t) async {
       await pump(t);
+      tools().setPenWidth(2); // 3 pt: aşağıdaki sınırlar buna göre
       await drag(t, const Offset(100, 100), const Offset(140, 120));
       tools().select(Tool.select);
       await t.pump();

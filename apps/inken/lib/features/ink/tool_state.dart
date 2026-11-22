@@ -71,7 +71,7 @@ const int highlighterAlpha = 0x66;
 
 /// Kalınlıklar, sayfa birimi (pt). Kalem: ince, orta, kalın, çok kalın;
 /// fosforlu: ince, orta, kalın.
-const List<double> penWidths = [1.5, 3, 5, 8];
+const List<double> penWidths = [0.75, 1.5, 3, 5];
 const List<double> highlighterWidths = [10, 16, 24];
 
 /// Silginin ekrandaki yarıçapları (mantıksal piksel): küçük, orta, büyük.
