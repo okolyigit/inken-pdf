@@ -12,6 +12,7 @@ Future<void> fileCommand(WidgetTester t, String item) async {
     await t.tap(menuButton);
     await t.pumpAndSettle();
     if (find.byType(Drawer).evaluate().isNotEmpty) {
+      await openDrawerSection(t, 'file');
       await t.tap(find.widgetWithText(ListTile, item));
       await t.pumpAndSettle();
       return;
@@ -21,4 +22,19 @@ Future<void> fileCommand(WidgetTester t, String item) async {
   await t.pumpAndSettle();
   await t.tap(find.widgetWithText(MenuItemButton, item));
   await t.pumpAndSettle();
+}
+
+/// Telefon yan menüsünde [key] bölümünü açar (kapalıysa).
+Future<void> openDrawerSection(WidgetTester t, String key) async {
+  final header = find.byKey(ValueKey('drawer-$key'));
+  final column = find.ancestor(of: header, matching: find.byType(Column));
+  final items = find.descendant(
+    of: column.first,
+    matching: find.byType(ListTile),
+  );
+  // Kapalıyken bölümde yalnızca başlık vardır.
+  if (items.evaluate().length <= 1) {
+    await t.tap(header);
+    await t.pumpAndSettle();
+  }
 }

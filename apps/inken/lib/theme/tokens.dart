@@ -249,6 +249,9 @@ abstract final class Sizes {
   static const double appbarM = 56;
   static const double dockM = 72;
   static const double drawer = 300;
+
+  /// Telefon üst çubuğundaki ⋮ menüsünün genişliği.
+  static const double overflowMenu = 240;
 }
 
 /// Yerleşim eşikleri (en kısa kenar / genişlik, dp).

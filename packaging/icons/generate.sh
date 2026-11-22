@@ -8,6 +8,8 @@
 # çizici aynı sonucu verir, Figtree kurulu olmasa da.
 #
 # Kural (tasarım sistemi → AppIcon): 48px'in altında -small çizimleri.
+# Uygulama ikonunun küçük çizimi kaldırıldı (22 Kasım 2026): her boyutta
+# "PDF" etiketli ana ikon. Küçük çizim yalnızca .pdf dosya ikonunda var.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -41,7 +43,7 @@ ico() { # <ad> <küçük-ad> <çıktı>
   done
   python3 "$ROOT/packaging/icons/make_ico.py" "$3" "${files[@]}"
 }
-ico inken-app-icon inken-small "$APP/windows/runner/resources/app_icon.ico"
+ico inken-app-icon inken-app-icon "$APP/windows/runner/resources/app_icon.ico"
 ico inken-pdf-file inken-pdf-file-small "$APP/windows/runner/resources/pdf_file.ico"
 png inken-app-icon 1024 "$APP/windows/msix/logo.png"
 png inken-pdf-file 256 "$APP/windows/msix/pdf-file.png"
@@ -61,7 +63,7 @@ done
 HI="$ROOT/packaging/linux/icons/hicolor"
 rm -rf "$HI"
 for s in 16 24 32 48 64 128 256 512; do
-  icon inken-app-icon inken-small "$s" "$HI/${s}x${s}/apps/inken-pdf.png"
+  icon inken-app-icon inken-app-icon "$s" "$HI/${s}x${s}/apps/inken-pdf.png"
   icon inken-pdf-file inken-pdf-file-small "$s" \
     "$HI/${s}x${s}/mimetypes/application-pdf.png"
 done

@@ -9,7 +9,6 @@ import 'package:inken/l10n/app_localizations.dart';
 import 'package:inken/l10n/app_localizations_en.dart';
 import 'package:inken/l10n/app_localizations_tr.dart';
 import 'package:inken/platform/link_opener.dart';
-import 'package:inken/theme/logo.dart';
 
 void main() {
   test('gövde başlıkları ve uygulama bilgilerini içerir (tr, en)', () {
@@ -130,12 +129,4 @@ void main() {
     });
   });
 
-  test('logo: fiziksel boyut 48 pikselden küçükse sadeleştirilmiş ikon', () {
-    // Masaüstü 1x, 32px: sadeleştirilmiş.
-    expect(InkenLogo.assetFor(32, 1), contains('inken-small'));
-    // Telefon 3.5x, 32px (112 fiziksel piksel): "PDF" yazılı ana ikon.
-    expect(InkenLogo.assetFor(32, 3.5), contains('inken-app-icon'));
-    // Akıllı tahta 1.5x, 32px = 48: ana ikon.
-    expect(InkenLogo.assetFor(32, 1.5), contains('inken-app-icon'));
-  });
 }

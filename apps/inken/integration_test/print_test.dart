@@ -17,6 +17,8 @@ import 'package:inken/platform/print_service.dart';
 import 'package:inken_pdf/inken_pdf.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'ui.dart';
+
 class _FakePrinter implements PrintService {
   _FakePrinter(this.outcome);
 
@@ -154,9 +156,34 @@ void main() {
     await t.tap(find.byKey(const ValueKey('app-menu')));
     await t.pumpAndSettle();
     expect(find.byType(Drawer), findsOneWidget);
+    await openDrawerSection(t, 'file');
     await t.tap(find.widgetWithText(ListTile, 'Yazdır…'));
     await _until(t, () => printer.calls.length == 4);
     await t.pump(const Duration(milliseconds: 200));
     expect(find.byType(Drawer), findsNothing, reason: 'menü kapanır');
+
+    // Yan menü: bölümler kapanır, Ayarlar altta hep görünür.
+    await t.tap(find.byKey(const ValueKey('app-menu')));
+    await t.pumpAndSettle();
+    expect(find.widgetWithText(ListTile, 'Yazdır…'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('drawer-file')));
+    await t.pumpAndSettle();
+    expect(find.widgetWithText(ListTile, 'Yazdır…'), findsNothing);
+    final settings = find.widgetWithText(ListTile, 'Ayarlar…');
+    expect(settings, findsOneWidget);
+    expect(t.getRect(settings).bottom, lessThanOrEqualTo(800));
+    t.state<ScaffoldState>(find.byType(Scaffold).first).closeDrawer();
+    await t.pumpAndSettle();
+
+    // ⋮ menüsü düğmenin altında, sağ kenara hizalı açılır.
+    final more = t.getRect(find.byKey(const ValueKey('more')));
+    await t.tap(find.byKey(const ValueKey('more')));
+    await t.pumpAndSettle();
+    final redo = t.getRect(find.widgetWithText(MenuItemButton, 'Yinele'));
+    expect(redo.right, greaterThan(more.left), reason: '$redo $more');
+    expect(redo.right, lessThanOrEqualTo(400));
+    expect(redo.top, greaterThanOrEqualTo(more.bottom - 1));
+    await t.tapAt(const Offset(100, 600));
+    await t.pumpAndSettle();
   });
 }

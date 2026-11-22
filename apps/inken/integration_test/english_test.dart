@@ -152,12 +152,20 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.byKey(const ValueKey('app-menu')));
     await t.pumpAndSettle();
+    await t.tap(find.byKey(const ValueKey('drawer-file')));
+    await t.pumpAndSettle();
     await _shot(t, 'phone-drawer');
     await t.drag(find.byType(Drawer), const Offset(0, -600));
     await t.pumpAndSettle();
     await _shot(t, 'phone-drawer-2');
     await t.sendKeyEvent(LogicalKeyboardKey.escape);
     t.state<ScaffoldState>(find.byType(Scaffold).first).closeDrawer();
+    await t.pumpAndSettle();
+    // Telefonda ⋮ menüsü: sağ kenara hizalı.
+    await t.tap(find.byKey(const ValueKey('more')));
+    await t.pumpAndSettle();
+    await _shot(t, 'phone-more');
+    await t.sendKeyEvent(LogicalKeyboardKey.escape);
     await t.pumpAndSettle();
 
     // Telefonda raf kapalı gelir; üst çubuktaki düğmeyle açılır.

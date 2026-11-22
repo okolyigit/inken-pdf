@@ -107,6 +107,9 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
   /// raf açılınca önceki araca dönülür ([_parkedTool]).
   bool _phoneDock = false;
 
+  /// Telefon yan menüsünde açık bölümler (belge açıkken hatırlanır).
+  final Set<String> _drawerOpen = {};
+
   /// Raf kapanırken seçili olan araç; `null`: raf açık ya da telefon değil.
   Tool? _parkedTool;
 
@@ -1511,7 +1514,18 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
             icon: const Icon(LucideIcons.undo2),
             onPressed: session?.canUndo ?? false ? session!.undo : null,
           ),
+          // Sabit genişlik ve sağ kenara hizalı: MenuAnchor sağa sığmayan
+          // menüyü düğmenin soluna atar (ekranın ortasında açılırdı).
           MenuAnchor(
+            alignmentOffset: const Offset(-Sizes.overflowMenu, 0),
+            // Panel genişliği sabit kalsın (yoksa yazı kadar daralıp sola yaslanır).
+            crossAxisUnconstrained: false,
+            style: const MenuStyle(
+              alignment: AlignmentDirectional.bottomEnd,
+              fixedSize: WidgetStatePropertyAll(
+                Size.fromWidth(Sizes.overflowMenu),
+              ),
+            ),
             menuChildren: [
               MenuItemButton(
                 leadingIcon: const Icon(LucideIcons.redo2),
@@ -1551,16 +1565,6 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     final l10n = AppLocalizations.of(context);
     final c = context.colors;
 
-    Widget group(String label) => Padding(
-      padding: const EdgeInsets.fromLTRB(
-        Space.s4,
-        Space.s4,
-        Space.s4,
-        Space.s1,
-      ),
-      child: Text(label, style: InkenText.label.copyWith(color: c.inkMuted)),
-    );
-
     Widget item(
       IconData icon,
       String label,
@@ -1599,152 +1603,258 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       width: Sizes.drawer,
       backgroundColor: c.surface,
       child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: Space.s2),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(Space.s3),
-              child: Row(
+        // Bölümler açılır kapanır (açık olanlar belge açıkken hatırlanır);
+        // Ayarlar altta hep görünür.
+        child: StatefulBuilder(
+          builder: (context, setDrawer) {
+            Widget section(String key, String label, List<Widget> items) {
+              final open = _drawerOpen.contains(key);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const InkenLogo(size: 40),
-                  const SizedBox(width: Space.s3),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.appTitle,
-                          style: InkenText.heading.copyWith(color: c.ink),
-                        ),
-                        Text(
-                          widget.document.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: InkenText.caption.copyWith(color: c.inkMuted),
-                        ),
-                      ],
+                  ListTile(
+                    key: ValueKey('drawer-$key'),
+                    minTileHeight: Sizes.target,
+                    shape: const StadiumBorder(),
+                    hoverColor: c.surfaceHover,
+                    splashColor: c.brandTint,
+                    title: Text(
+                      label,
+                      style: InkenText.label.copyWith(color: c.inkMuted),
+                    ),
+                    trailing: AnimatedRotation(
+                      turns: open ? 0.5 : 0,
+                      duration: Motion.fast,
+                      child: Icon(
+                        LucideIcons.chevronDown,
+                        size: 20,
+                        color: c.inkMuted,
+                      ),
+                    ),
+                    onTap: () => setDrawer(
+                      () =>
+                          open ? _drawerOpen.remove(key) : _drawerOpen.add(key),
                     ),
                   ),
+                  AnimatedSize(
+                    duration: Motion.fast,
+                    curve: Curves.easeOut,
+                    alignment: Alignment.topCenter,
+                    child: open
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: items,
+                          )
+                        : const SizedBox(width: double.infinity),
+                  ),
                 ],
-              ),
-            ),
-            group(l10n.menuFile),
-            item(LucideIcons.filePlus, l10n.newDocument, _newDocument),
-            item(LucideIcons.folderOpen, l10n.openPdfMenu, _openAnother),
-            item(LucideIcons.save, l10n.save, _canSave(session) ? _save : null),
-            item(
-              LucideIcons.saveAll,
-              l10n.saveAs,
-              session == null || _saving ? null : _saveAs,
-            ),
-            item(
-              LucideIcons.fileDown,
-              l10n.exportFlattened,
-              session == null || _exporting ? null : _export,
-            ),
-            item(
-              LucideIcons.printer,
-              l10n.printDocument,
-              _actions(session).print,
-            ),
-            item(
-              LucideIcons.share2,
-              l10n.shareDocument,
-              _actions(session).share,
-            ),
-            item(
-              LucideIcons.fileText,
-              l10n.documentProperties,
-              session == null ? null : _showProperties,
-            ),
-            item(LucideIcons.x, l10n.closeDocument, _close),
-            group(l10n.menuEdit),
-            item(
-              LucideIcons.clipboardPaste,
-              l10n.paste,
-              session == null ? null : _paste,
-            ),
-            item(
-              LucideIcons.imagePlus,
-              l10n.insertImage,
-              session == null ? null : _insertImageFile,
-            ),
-            item(
-              LucideIcons.squareDashedMousePointer,
-              l10n.selectAll,
-              session == null ? null : _selectAll,
-            ),
-            item(
-              LucideIcons.textSelect,
-              l10n.toolTextSelect,
-              session == null ? null : () => _selectTool(Tool.textSelect),
-            ),
-            group(l10n.menuPage),
-            item(LucideIcons.chevronLeft, l10n.previousPage, () => _goPage(-1)),
-            item(LucideIcons.chevronRight, l10n.nextPage, () => _goPage(1)),
-            item(LucideIcons.hash, l10n.goToPage, _askGoToPage),
-            item(
-              LucideIcons.search,
-              l10n.find,
-              session == null ? null : _openSearch,
-            ),
-            group(l10n.menuView),
-            item(
-              LucideIcons.palette,
-              l10n.theme,
-              _chooseTheme,
-              subtitle: {
-                for (final (m, label) in themeChoices(l10n)) m: label,
-              }[ref.watch(themeModeProvider)],
-            ),
-            item(
-              LucideIcons.moon,
-              l10n.nightMode,
-              ref.read(nightModeProvider.notifier).toggle,
-              trailing: ref.watch(nightModeProvider)
-                  ? Icon(LucideIcons.check, color: c.brand)
-                  : null,
-            ),
-            item(
-              LucideIcons.maximize,
-              l10n.fullscreen,
-              () => _setFullscreen(true),
-            ),
-            item(LucideIcons.scan, l10n.fitPage, _controller.fitPage),
-            item(
-              LucideIcons.moveHorizontal,
-              l10n.fitWidth,
-              _controller.fitWidth,
-            ),
-            for (final mode in [StageCover.spotlight, StageCover.curtain])
-              item(
-                stageCoverIcon(mode),
-                stageCoverLabel(l10n, mode),
-                () => _toggleCover(mode),
-                trailing: ref.watch(stageCoverProvider).mode == mode
-                    ? Icon(LucideIcons.check, color: c.brand)
-                    : null,
-              ),
-            item(
-              LucideIcons.hand,
-              l10n.inputMode,
-              _chooseInputMode,
-              subtitle: switch (mode) {
-                InputMode.auto => l10n.inputModeAuto,
-                InputMode.pen => l10n.inputModePen,
-                InputMode.touch => l10n.inputModeTouch,
-              },
-            ),
-            item(LucideIcons.settings, l10n.settingsMenu, _openSettings),
-            group(l10n.menuHelp),
-            for (final (section, icon, label) in helpEntries(l10n))
-              item(
-                icon,
-                label,
-                () => openSettingsPage(context, initial: section),
-              ),
-            item(LucideIcons.share2, l10n.shareApp, () => shareApp(context)),
-          ],
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(Space.s3),
+                  child: Row(
+                    children: [
+                      const InkenLogo(size: 40),
+                      const SizedBox(width: Space.s3),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.appTitle,
+                              style: InkenText.heading.copyWith(color: c.ink),
+                            ),
+                            Text(
+                              widget.document.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: InkenText.caption.copyWith(
+                                color: c.inkMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: Space.s2),
+                    children: [
+                      section('file', l10n.menuFile, [
+                        item(
+                          LucideIcons.filePlus,
+                          l10n.newDocument,
+                          _newDocument,
+                        ),
+                        item(
+                          LucideIcons.folderOpen,
+                          l10n.openPdfMenu,
+                          _openAnother,
+                        ),
+                        item(
+                          LucideIcons.save,
+                          l10n.save,
+                          _canSave(session) ? _save : null,
+                        ),
+                        item(
+                          LucideIcons.saveAll,
+                          l10n.saveAs,
+                          session == null || _saving ? null : _saveAs,
+                        ),
+                        item(
+                          LucideIcons.fileDown,
+                          l10n.exportFlattened,
+                          session == null || _exporting ? null : _export,
+                        ),
+                        item(
+                          LucideIcons.printer,
+                          l10n.printDocument,
+                          _actions(session).print,
+                        ),
+                        item(
+                          LucideIcons.share2,
+                          l10n.shareDocument,
+                          _actions(session).share,
+                        ),
+                        item(
+                          LucideIcons.fileText,
+                          l10n.documentProperties,
+                          session == null ? null : _showProperties,
+                        ),
+                        item(LucideIcons.x, l10n.closeDocument, _close),
+                      ]),
+                      section('edit', l10n.menuEdit, [
+                        item(
+                          LucideIcons.clipboardPaste,
+                          l10n.paste,
+                          session == null ? null : _paste,
+                        ),
+                        item(
+                          LucideIcons.imagePlus,
+                          l10n.insertImage,
+                          session == null ? null : _insertImageFile,
+                        ),
+                        item(
+                          LucideIcons.squareDashedMousePointer,
+                          l10n.selectAll,
+                          session == null ? null : _selectAll,
+                        ),
+                        item(
+                          LucideIcons.textSelect,
+                          l10n.toolTextSelect,
+                          session == null
+                              ? null
+                              : () => _selectTool(Tool.textSelect),
+                        ),
+                      ]),
+                      section('page', l10n.menuPage, [
+                        item(
+                          LucideIcons.chevronLeft,
+                          l10n.previousPage,
+                          () => _goPage(-1),
+                        ),
+                        item(
+                          LucideIcons.chevronRight,
+                          l10n.nextPage,
+                          () => _goPage(1),
+                        ),
+                        item(LucideIcons.hash, l10n.goToPage, _askGoToPage),
+                        item(
+                          LucideIcons.search,
+                          l10n.find,
+                          session == null ? null : _openSearch,
+                        ),
+                      ]),
+                      section('view', l10n.menuView, [
+                        item(
+                          LucideIcons.palette,
+                          l10n.theme,
+                          _chooseTheme,
+                          subtitle: {
+                            for (final (m, label) in themeChoices(l10n))
+                              m: label,
+                          }[ref.watch(themeModeProvider)],
+                        ),
+                        item(
+                          LucideIcons.moon,
+                          l10n.nightMode,
+                          ref.read(nightModeProvider.notifier).toggle,
+                          trailing: ref.watch(nightModeProvider)
+                              ? Icon(LucideIcons.check, color: c.brand)
+                              : null,
+                        ),
+                        item(
+                          LucideIcons.maximize,
+                          l10n.fullscreen,
+                          () => _setFullscreen(true),
+                        ),
+                        item(
+                          LucideIcons.scan,
+                          l10n.fitPage,
+                          _controller.fitPage,
+                        ),
+                        item(
+                          LucideIcons.moveHorizontal,
+                          l10n.fitWidth,
+                          _controller.fitWidth,
+                        ),
+                        for (final mode in [
+                          StageCover.spotlight,
+                          StageCover.curtain,
+                        ])
+                          item(
+                            stageCoverIcon(mode),
+                            stageCoverLabel(l10n, mode),
+                            () => _toggleCover(mode),
+                            trailing: ref.watch(stageCoverProvider).mode == mode
+                                ? Icon(LucideIcons.check, color: c.brand)
+                                : null,
+                          ),
+                        item(
+                          LucideIcons.hand,
+                          l10n.inputMode,
+                          _chooseInputMode,
+                          subtitle: switch (mode) {
+                            InputMode.auto => l10n.inputModeAuto,
+                            InputMode.pen => l10n.inputModePen,
+                            InputMode.touch => l10n.inputModeTouch,
+                          },
+                        ),
+                      ]),
+                      section('help', l10n.menuHelp, [
+                        for (final (target, icon, label) in helpEntries(l10n))
+                          item(
+                            icon,
+                            label,
+                            () => openSettingsPage(context, initial: target),
+                          ),
+                        item(
+                          LucideIcons.share2,
+                          l10n.shareApp,
+                          () => shareApp(context),
+                        ),
+                      ]),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: c.line),
+                Padding(
+                  padding: const EdgeInsets.all(Space.s2),
+                  child: item(
+                    LucideIcons.settings,
+                    l10n.settingsMenu,
+                    _openSettings,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -1813,9 +1923,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
           : '${widget.document.sourceName}#$_displayGen',
       controller: _controller,
       onLoaded: _onLoaded,
-      backgroundColor: ref.watch(nightModeProvider)
-          ? NightMode.desk
-          : c.canvas,
+      backgroundColor: ref.watch(nightModeProvider) ? NightMode.desk : c.canvas,
       pageGap: phone ? Space.s3 : Space.s8,
       onLink: _openLink,
       linkColor: c.brand.withValues(alpha: 0.06),
