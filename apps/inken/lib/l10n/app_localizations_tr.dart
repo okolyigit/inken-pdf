@@ -1227,4 +1227,64 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get selectText => 'Metin';
+
+  @override
+  String get opacity => 'Opaklık';
+
+  @override
+  String percent(int value) {
+    return '%$value';
+  }
+
+  @override
+  String get editImage => 'Görseli düzenle';
+
+  @override
+  String get imageEditHint =>
+      'Köşe ve kenarlardan sürükleyerek kırp; çerçevenin içinden tutup kaydır.';
+
+  @override
+  String get cropRatio => 'Kırpma oranı';
+
+  @override
+  String get cropFree => 'Serbest';
+
+  @override
+  String get cropOriginal => 'Orijinal';
+
+  @override
+  String get imageSizeOnPage => 'Sayfadaki boyut';
+
+  @override
+  String get imageWidth => 'Genişlik';
+
+  @override
+  String get imageHeight => 'Yükseklik';
+
+  @override
+  String get unitCm => 'cm';
+
+  @override
+  String get aspectLocked => 'En-boy oranı kilitli';
+
+  @override
+  String get aspectUnlocked => 'En-boy oranı serbest';
+
+  @override
+  String get aspectHint => 'Kilitliyken en-boy oranı korunur.';
+
+  @override
+  String get rotate => 'Döndür';
+
+  @override
+  String get rotateLeftShort => 'Sola';
+
+  @override
+  String get rotateRightShort => 'Sağa';
+
+  @override
+  String get resetEdits => 'Sıfırla';
+
+  @override
+  String get applyEdits => 'Uygula';
 }

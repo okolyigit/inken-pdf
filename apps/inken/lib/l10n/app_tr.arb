@@ -670,5 +670,31 @@
   "aboutPrivacy": "Gizlilik: Inken PDF hiçbir veri toplamaz ve internete bağlanmaz. Ayarların, son belgelerin ve yedeklerin yalnızca bu cihazda kalır.",
   "sectionSelect": "Neyi seçeceksin",
   "selectDrawings": "Çizimler",
-  "selectText": "Metin"
+  "selectText": "Metin",
+  "opacity": "Opaklık",
+  "percent": "%{value}",
+  "editImage": "Görseli düzenle",
+  "imageEditHint": "Köşe ve kenarlardan sürükleyerek kırp; çerçevenin içinden tutup kaydır.",
+  "cropRatio": "Kırpma oranı",
+  "cropFree": "Serbest",
+  "cropOriginal": "Orijinal",
+  "imageSizeOnPage": "Sayfadaki boyut",
+  "imageWidth": "Genişlik",
+  "imageHeight": "Yükseklik",
+  "unitCm": "cm",
+  "aspectLocked": "En-boy oranı kilitli",
+  "aspectUnlocked": "En-boy oranı serbest",
+  "aspectHint": "Kilitliyken en-boy oranı korunur.",
+  "rotate": "Döndür",
+  "rotateLeftShort": "Sola",
+  "rotateRightShort": "Sağa",
+  "resetEdits": "Sıfırla",
+  "applyEdits": "Uygula",
+  "@percent": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -21,6 +21,7 @@ class SelectionBar extends StatelessWidget {
     required this.session,
     required this.pad,
     required this.onCopy,
+    this.onEditImage,
     this.barKey,
   });
 
@@ -33,6 +34,9 @@ class SelectionBar extends StatelessWidget {
   /// Seçim kutusunun öğelerden uzaklığı (ekran pikseli).
   final double pad;
   final VoidCallback onCopy;
+
+  /// Tek görsel seçiliyken "Görseli düzenle".
+  final VoidCallback? onEditImage;
 
   /// Çubukla seçim kutusu arası (ekran pikseli).
   static const double gap = Space.s3;
@@ -57,6 +61,7 @@ class SelectionBar extends StatelessWidget {
           key: barKey,
           session: session,
           onCopy: onCopy,
+          onEditImage: session.selectedImage == null ? null : onEditImage,
           colors: session.selectionHasColor,
         ),
       );
@@ -70,10 +75,12 @@ class _Bar extends StatelessWidget {
     required this.session,
     required this.onCopy,
     required this.colors,
+    this.onEditImage,
   });
 
   final InkSession session;
   final VoidCallback onCopy;
+  final VoidCallback? onEditImage;
   final bool colors;
 
   @override
@@ -114,6 +121,15 @@ class _Bar extends StatelessWidget {
                     child: VerticalDivider(width: Space.s3, color: c.line),
                   ),
                 ],
+                if (onEditImage case final edit?)
+                  IconButton(
+                    key: const ValueKey('selection-edit-image'),
+                    tooltip: l10n.editImage,
+                    icon: const Icon(LucideIcons.crop),
+                    onPressed: edit,
+                  ),
+                if (session.selectionOpacityPercent case final percent?)
+                  _OpacityButton(session: session, percent: percent),
                 IconButton(
                   key: const ValueKey('selection-copy'),
                   tooltip: '${l10n.copy} (Ctrl+C)',
@@ -130,6 +146,66 @@ class _Bar extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Seçili metin ve görsellerin opaklığı: dokununca kaydırıcı açılır;
+/// bırakınca tek geri alma adımıyla uygulanır.
+class _OpacityButton extends StatefulWidget {
+  const _OpacityButton({required this.session, required this.percent});
+
+  final InkSession session;
+  final int percent;
+
+  @override
+  State<_OpacityButton> createState() => _OpacityButtonState();
+}
+
+class _OpacityButtonState extends State<_OpacityButton> {
+  int? _dragging;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MenuAnchor(
+      menuChildren: [
+        SizedBox(
+          width: 260,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              Space.s3,
+              Space.s2,
+              Space.s2,
+              Space.s1,
+            ),
+            child: StatefulBuilder(
+              builder: (context, setLocal) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(l10n.opacity, style: InkenText.label),
+                  OpacitySlider(
+                    key: const ValueKey('selection-opacity-slider'),
+                    percent: _dragging ?? widget.percent,
+                    onChanged: (v) => setLocal(() => _dragging = v),
+                    onChangeEnd: (v) {
+                      _dragging = null;
+                      widget.session.setSelectionOpacity(v);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+      builder: (context, menu, _) => IconButton(
+        key: const ValueKey('selection-opacity'),
+        tooltip: '${l10n.opacity} (${l10n.percent(widget.percent)})',
+        icon: const Icon(LucideIcons.blend),
+        onPressed: () => menu.isOpen ? menu.close() : menu.open(),
       ),
     );
   }

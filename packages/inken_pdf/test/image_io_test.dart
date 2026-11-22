@@ -169,6 +169,64 @@ void main() {
     });
   });
 
+  group('görsel düzenleme: kırpma, döndürme, opaklık', () {
+    final src = fixture('two_pages.pdf');
+    final turned = _image('r', _idA, 60, 100, 80).copyWith(rotation: 1);
+    // Sol yarı (kırmızı üstte, mavi altta), kutuya esnetilir.
+    final cropped = _image('c', _idA, 200, 100, 80).copyWith(cropRight: 0.5);
+    final faded = _image('o', _idA, 340, 100, 80).copyWith(opacity: 0.5);
+    late InkenWriteResult saved;
+
+    setUpAll(() {
+      saved = writeInkenPdf(
+        (
+          src,
+          encodeInkenDocument(
+            _withItems(src, [
+              [turned, cropped, faded],
+            ]),
+          ),
+        ),
+        null,
+        {_idA: _quadrants(_pngA)},
+      );
+      _dump('image-edit.pdf', saved.pdf);
+    });
+
+    test('saat yönünde çeyrek tur', () {
+      expect(_quads(render(saved.pdf, 0), turned), [
+        'mavi',
+        'kırmızı',
+        'beyaz',
+        'yeşil',
+      ]);
+    });
+
+    test('kırpılan yarı kutuyu doldurur', () {
+      expect(_quads(render(saved.pdf, 0), cropped), [
+        'kırmızı',
+        'kırmızı',
+        'mavi',
+        'mavi',
+      ]);
+    });
+
+    test('yarı saydam görsel beyaz zeminde açık görünür', () {
+      final r = render(saved.pdf, 0);
+      final rgb = r.rgb((faded.x + 20).round(), (faded.y + 20).round());
+      expect(rgb >> 16 & 0xFF, greaterThan(230));
+      expect(rgb >> 8 & 0xFF, inInclusiveRange(100, 160));
+      expect(rgb & 0xFF, inInclusiveRange(100, 160));
+    });
+
+    test('düzenleme geri okunur; orijinal görsel baytları değişmez', () {
+      final r = readInkenPdf(saved.pdf);
+      final items = decodeInkenDocument(r.inkenJson!).pages[0].items;
+      expect(items, [turned, cropped, faded]);
+      expect(r.images[_idA], _pngA);
+    });
+  });
+
   test('döndürülmüş ve kırpılmış sayfalarda yerinde ve doğru yönde', () {
     final src = fixture('rotated.pdf');
     final sizes = pageSizes(src);

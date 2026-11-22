@@ -197,13 +197,13 @@ return image(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  InkTool tool,  int color,  double width, @InkPointsConverter()  List<InkPoint> points)?  stroke,TResult Function( String id,  ShapeKind kind,  int color,  double width,  double x1,  double y1,  double x2,  double y2)?  shape,TResult Function( String id,  String text,  int color,  double fontSize,  double x,  double y,  double width,  double height)?  text,TResult Function( String id,  String imageId,  double x,  double y,  double width,  double height)?  image,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  InkTool tool,  int color,  double width, @InkPointsConverter()  List<InkPoint> points)?  stroke,TResult Function( String id,  ShapeKind kind,  int color,  double width,  double x1,  double y1,  double x2,  double y2)?  shape,TResult Function( String id,  String text,  int color,  double fontSize,  double x,  double y,  double width,  double height)?  text,TResult Function( String id,  String imageId,  double x,  double y,  double width,  double height,  double opacity,  int rotation,  double cropLeft,  double cropTop,  double cropRight,  double cropBottom)?  image,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case Stroke() when stroke != null:
 return stroke(_that.id,_that.tool,_that.color,_that.width,_that.points);case Shape() when shape != null:
 return shape(_that.id,_that.kind,_that.color,_that.width,_that.x1,_that.y1,_that.x2,_that.y2);case TextItem() when text != null:
 return text(_that.id,_that.text,_that.color,_that.fontSize,_that.x,_that.y,_that.width,_that.height);case ImageItem() when image != null:
-return image(_that.id,_that.imageId,_that.x,_that.y,_that.width,_that.height);case _:
+return image(_that.id,_that.imageId,_that.x,_that.y,_that.width,_that.height,_that.opacity,_that.rotation,_that.cropLeft,_that.cropTop,_that.cropRight,_that.cropBottom);case _:
   return orElse();
 
 }
@@ -221,13 +221,13 @@ return image(_that.id,_that.imageId,_that.x,_that.y,_that.width,_that.height);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  InkTool tool,  int color,  double width, @InkPointsConverter()  List<InkPoint> points)  stroke,required TResult Function( String id,  ShapeKind kind,  int color,  double width,  double x1,  double y1,  double x2,  double y2)  shape,required TResult Function( String id,  String text,  int color,  double fontSize,  double x,  double y,  double width,  double height)  text,required TResult Function( String id,  String imageId,  double x,  double y,  double width,  double height)  image,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  InkTool tool,  int color,  double width, @InkPointsConverter()  List<InkPoint> points)  stroke,required TResult Function( String id,  ShapeKind kind,  int color,  double width,  double x1,  double y1,  double x2,  double y2)  shape,required TResult Function( String id,  String text,  int color,  double fontSize,  double x,  double y,  double width,  double height)  text,required TResult Function( String id,  String imageId,  double x,  double y,  double width,  double height,  double opacity,  int rotation,  double cropLeft,  double cropTop,  double cropRight,  double cropBottom)  image,}) {final _that = this;
 switch (_that) {
 case Stroke():
 return stroke(_that.id,_that.tool,_that.color,_that.width,_that.points);case Shape():
 return shape(_that.id,_that.kind,_that.color,_that.width,_that.x1,_that.y1,_that.x2,_that.y2);case TextItem():
 return text(_that.id,_that.text,_that.color,_that.fontSize,_that.x,_that.y,_that.width,_that.height);case ImageItem():
-return image(_that.id,_that.imageId,_that.x,_that.y,_that.width,_that.height);}
+return image(_that.id,_that.imageId,_that.x,_that.y,_that.width,_that.height,_that.opacity,_that.rotation,_that.cropLeft,_that.cropTop,_that.cropRight,_that.cropBottom);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -241,13 +241,13 @@ return image(_that.id,_that.imageId,_that.x,_that.y,_that.width,_that.height);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  InkTool tool,  int color,  double width, @InkPointsConverter()  List<InkPoint> points)?  stroke,TResult? Function( String id,  ShapeKind kind,  int color,  double width,  double x1,  double y1,  double x2,  double y2)?  shape,TResult? Function( String id,  String text,  int color,  double fontSize,  double x,  double y,  double width,  double height)?  text,TResult? Function( String id,  String imageId,  double x,  double y,  double width,  double height)?  image,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  InkTool tool,  int color,  double width, @InkPointsConverter()  List<InkPoint> points)?  stroke,TResult? Function( String id,  ShapeKind kind,  int color,  double width,  double x1,  double y1,  double x2,  double y2)?  shape,TResult? Function( String id,  String text,  int color,  double fontSize,  double x,  double y,  double width,  double height)?  text,TResult? Function( String id,  String imageId,  double x,  double y,  double width,  double height,  double opacity,  int rotation,  double cropLeft,  double cropTop,  double cropRight,  double cropBottom)?  image,}) {final _that = this;
 switch (_that) {
 case Stroke() when stroke != null:
 return stroke(_that.id,_that.tool,_that.color,_that.width,_that.points);case Shape() when shape != null:
 return shape(_that.id,_that.kind,_that.color,_that.width,_that.x1,_that.y1,_that.x2,_that.y2);case TextItem() when text != null:
 return text(_that.id,_that.text,_that.color,_that.fontSize,_that.x,_that.y,_that.width,_that.height);case ImageItem() when image != null:
-return image(_that.id,_that.imageId,_that.x,_that.y,_that.width,_that.height);case _:
+return image(_that.id,_that.imageId,_that.x,_that.y,_that.width,_that.height,_that.opacity,_that.rotation,_that.cropLeft,_that.cropTop,_that.cropRight,_that.cropBottom);case _:
   return null;
 
 }
@@ -526,7 +526,7 @@ as double,
 @JsonSerializable()
 
 class ImageItem implements InkItem {
-  const ImageItem({required this.id, required this.imageId, required this.x, required this.y, required this.width, required this.height,  String? $type}): $type = $type ?? 'image';
+  const ImageItem({required this.id, required this.imageId, required this.x, required this.y, required this.width, required this.height, this.opacity = 1.0, this.rotation = 0, this.cropLeft = 0.0, this.cropTop = 0.0, this.cropRight = 1.0, this.cropBottom = 1.0,  String? $type}): $type = $type ?? 'image';
   factory ImageItem.fromJson(Map<String, dynamic> json) => _$ImageItemFromJson(json);
 
 @override final  String id;
@@ -535,6 +535,12 @@ class ImageItem implements InkItem {
  final  double y;
 @override final  double width;
  final  double height;
+@JsonKey() final  double opacity;
+@JsonKey() final  int rotation;
+@JsonKey() final  double cropLeft;
+@JsonKey() final  double cropTop;
+@JsonKey() final  double cropRight;
+@JsonKey() final  double cropBottom;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -553,18 +559,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is ImageItem&&(identical(other.id, id) || other.id == id)&&(identical(other.imageId, imageId) || other.imageId == imageId)&&(identical(other.x, x) || other.x == x)&&(identical(other.y, y) || other.y == y)&&(identical(other.width, width) || other.width == width)&&(identical(other.height, height) || other.height == height));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ImageItem&&(identical(other.id, id) || other.id == id)&&(identical(other.imageId, imageId) || other.imageId == imageId)&&(identical(other.x, x) || other.x == x)&&(identical(other.y, y) || other.y == y)&&(identical(other.width, width) || other.width == width)&&(identical(other.height, height) || other.height == height)&&(identical(other.opacity, opacity) || other.opacity == opacity)&&(identical(other.rotation, rotation) || other.rotation == rotation)&&(identical(other.cropLeft, cropLeft) || other.cropLeft == cropLeft)&&(identical(other.cropTop, cropTop) || other.cropTop == cropTop)&&(identical(other.cropRight, cropRight) || other.cropRight == cropRight)&&(identical(other.cropBottom, cropBottom) || other.cropBottom == cropBottom));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,imageId,x,y,width,height);
+    return Object.hash(runtimeType,id,imageId,x,y,width,height,opacity,rotation,cropLeft,cropTop,cropRight,cropBottom);
 }
 
 @override
 String toString() {
-    return 'InkItem.image(id: $id, imageId: $imageId, x: $x, y: $y, width: $width, height: $height)';
+    return 'InkItem.image(id: $id, imageId: $imageId, x: $x, y: $y, width: $width, height: $height, opacity: $opacity, rotation: $rotation, cropLeft: $cropLeft, cropTop: $cropTop, cropRight: $cropRight, cropBottom: $cropBottom)';
 }
 
 
@@ -575,7 +581,7 @@ abstract mixin class $ImageItemCopyWith<$Res> implements $InkItemCopyWith<$Res> 
   factory $ImageItemCopyWith(ImageItem value, $Res Function(ImageItem) _then) = _$ImageItemCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String imageId, double x, double y, double width, double height
+ String id, String imageId, double x, double y, double width, double height, double opacity, int rotation, double cropLeft, double cropTop, double cropRight, double cropBottom
 });
 
 
@@ -592,7 +598,7 @@ class _$ImageItemCopyWithImpl<$Res>
 
 /// Create a copy of InkItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? imageId = null,Object? x = null,Object? y = null,Object? width = null,Object? height = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? imageId = null,Object? x = null,Object? y = null,Object? width = null,Object? height = null,Object? opacity = null,Object? rotation = null,Object? cropLeft = null,Object? cropTop = null,Object? cropRight = null,Object? cropBottom = null,}) {
   return _then(ImageItem(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,imageId: null == imageId ? _self.imageId : imageId // ignore: cast_nullable_to_non_nullable
@@ -600,6 +606,12 @@ as String,x: null == x ? _self.x : x // ignore: cast_nullable_to_non_nullable
 as double,y: null == y ? _self.y : y // ignore: cast_nullable_to_non_nullable
 as double,width: null == width ? _self.width : width // ignore: cast_nullable_to_non_nullable
 as double,height: null == height ? _self.height : height // ignore: cast_nullable_to_non_nullable
+as double,opacity: null == opacity ? _self.opacity : opacity // ignore: cast_nullable_to_non_nullable
+as double,rotation: null == rotation ? _self.rotation : rotation // ignore: cast_nullable_to_non_nullable
+as int,cropLeft: null == cropLeft ? _self.cropLeft : cropLeft // ignore: cast_nullable_to_non_nullable
+as double,cropTop: null == cropTop ? _self.cropTop : cropTop // ignore: cast_nullable_to_non_nullable
+as double,cropRight: null == cropRight ? _self.cropRight : cropRight // ignore: cast_nullable_to_non_nullable
+as double,cropBottom: null == cropBottom ? _self.cropBottom : cropBottom // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }

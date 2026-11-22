@@ -133,13 +133,13 @@ void main() {
       final json = encodeInkenDocument(doc);
       expect(json, contains('"kind":"coordinate"'));
       expect(decodeInkenDocument(json), doc);
-      expect(currentFormatVersion, 3);
+      expect(currentFormatVersion, greaterThanOrEqualTo(3));
       const v2 =
           '{"formatVersion":2,"pages":[{"sourceIndex":0,"width":595,'
           '"height":842,"items":[{"type":"shape","id":"s","kind":"ellipse",'
           '"color":4278190080,"width":2,"x1":0,"y1":0,"x2":10,"y2":10}]}]}';
       final old = decodeInkenDocument(v2);
-      expect(old.formatVersion, 3);
+      expect(old.formatVersion, currentFormatVersion);
       expect((old.pages.single.items.single as Shape).kind, ShapeKind.ellipse);
     });
 

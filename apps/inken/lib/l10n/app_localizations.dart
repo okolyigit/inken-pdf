@@ -2281,6 +2281,120 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Metin'**
   String get selectText;
+
+  /// No description provided for @opacity.
+  ///
+  /// In tr, this message translates to:
+  /// **'Opaklık'**
+  String get opacity;
+
+  /// No description provided for @percent.
+  ///
+  /// In tr, this message translates to:
+  /// **'%{value}'**
+  String percent(int value);
+
+  /// No description provided for @editImage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görseli düzenle'**
+  String get editImage;
+
+  /// No description provided for @imageEditHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Köşe ve kenarlardan sürükleyerek kırp; çerçevenin içinden tutup kaydır.'**
+  String get imageEditHint;
+
+  /// No description provided for @cropRatio.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kırpma oranı'**
+  String get cropRatio;
+
+  /// No description provided for @cropFree.
+  ///
+  /// In tr, this message translates to:
+  /// **'Serbest'**
+  String get cropFree;
+
+  /// No description provided for @cropOriginal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Orijinal'**
+  String get cropOriginal;
+
+  /// No description provided for @imageSizeOnPage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayfadaki boyut'**
+  String get imageSizeOnPage;
+
+  /// No description provided for @imageWidth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Genişlik'**
+  String get imageWidth;
+
+  /// No description provided for @imageHeight.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yükseklik'**
+  String get imageHeight;
+
+  /// No description provided for @unitCm.
+  ///
+  /// In tr, this message translates to:
+  /// **'cm'**
+  String get unitCm;
+
+  /// No description provided for @aspectLocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'En-boy oranı kilitli'**
+  String get aspectLocked;
+
+  /// No description provided for @aspectUnlocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'En-boy oranı serbest'**
+  String get aspectUnlocked;
+
+  /// No description provided for @aspectHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kilitliyken en-boy oranı korunur.'**
+  String get aspectHint;
+
+  /// No description provided for @rotate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Döndür'**
+  String get rotate;
+
+  /// No description provided for @rotateLeftShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sola'**
+  String get rotateLeftShort;
+
+  /// No description provided for @rotateRightShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağa'**
+  String get rotateRightShort;
+
+  /// No description provided for @resetEdits.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırla'**
+  String get resetEdits;
+
+  /// No description provided for @applyEdits.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygula'**
+  String get applyEdits;
 }
 
 class _AppLocalizationsDelegate

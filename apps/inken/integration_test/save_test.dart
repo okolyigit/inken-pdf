@@ -106,7 +106,12 @@ void main() {
     // Kaydet düğmesi.
     await _saveViaMenu(t);
     final target = File('${dir.path}/ders_inken.pdf');
-    await _until(t, () => !session.isDirty);
+    // Kayıt bitip durum satırı "Kaydedildi" olana kadar (isDirty daha
+    // önce düşer, "Kaydediliyor…" bir an daha görünür).
+    await _until(
+      t,
+      () => !session.isDirty && find.text('Kaydedildi').evaluate().isNotEmpty,
+    );
     expect(target.existsSync(), isTrue);
     expect(
       original.readAsBytesSync(),

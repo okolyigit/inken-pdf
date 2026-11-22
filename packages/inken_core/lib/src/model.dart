@@ -122,6 +122,11 @@ sealed class InkItem with _$InkItem {
   /// Görsel; (x,y) sol üst köşe. Baytları modelde değil, PDF'e gömülü
   /// `inken-image-<imageId>.png` ekindedir ([imageAttachmentName]).
   /// Aynı görsel birden çok öğede kullanılabilir.
+  ///
+  /// Düzenleme yıkıcı değildir, orijinal baytlar değişmez: önce kırpılır
+  /// ([cropLeft]…[cropBottom], orijinal görselin 0–1 oranlarıyla), sonra
+  /// saat yönünde [rotation] çeyrek tur döndürülür, sonuç (x,y,width,
+  /// height) kutusuna yerleşir; [opacity] 0–1 saydamlık.
   const factory InkItem.image({
     required String id,
     required String imageId,
@@ -129,6 +134,12 @@ sealed class InkItem with _$InkItem {
     required double y,
     required double width,
     required double height,
+    @Default(1.0) double opacity,
+    @Default(0) int rotation,
+    @Default(0.0) double cropLeft,
+    @Default(0.0) double cropTop,
+    @Default(1.0) double cropRight,
+    @Default(1.0) double cropBottom,
   }) = ImageItem;
 
   factory InkItem.fromJson(Map<String, dynamic> json) =>

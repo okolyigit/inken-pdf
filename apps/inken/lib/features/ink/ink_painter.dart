@@ -181,14 +181,57 @@ void _paintImage(Canvas canvas, ImageItem g, InkImages? images) {
     canvas.drawRect(dst, Paint()..color = const Color(imagePlaceholderColor));
     return;
   }
+  paintEditedImage(
+    canvas,
+    image,
+    dst,
+    crop: cropOf(g),
+    turns: g.rotation,
+    opacity: g.opacity,
+  );
+}
+
+/// [image]'ı kırpıp ([crop], orijinalin oranları) saat yönünde [turns]
+/// çeyrek tur döndürerek [dst]'ye çizer; [opacity] 0–1. PDF'e yazılan
+/// görünümle aynı ([transformImagePixels]).
+void paintEditedImage(
+  Canvas canvas,
+  ui.Image image,
+  Rect dst, {
+  CropRect crop = fullCrop,
+  int turns = 0,
+  double opacity = 1,
+}) {
+  final w = image.width.toDouble(), h = image.height.toDouble();
+  final c = clampCrop(crop);
+  final src = Rect.fromLTRB(c.left * w, c.top * h, c.right * w, c.bottom * h);
+  final q = normalizeTurns(turns);
+  final paint = Paint()
+    ..filterQuality = FilterQuality.medium
+    ..isAntiAlias = true
+    ..color = Color.fromRGBO(0, 0, 0, opacity.clamp(0.0, 1.0));
+  if (q == 0) {
+    canvas.drawImageRect(image, src, dst, paint);
+    return;
+  }
+  // Döndürülmüş çizim: kutunun ortasına taşı, döndür, döndürülmemiş
+  // boyutlu kutuya çiz (tek turda en ve boy yer değiştirir).
+  final size = q.isOdd ? Size(dst.height, dst.width) : dst.size;
+  canvas
+    ..save()
+    ..translate(dst.center.dx, dst.center.dy)
+    ..rotate(q * math.pi / 2);
   canvas.drawImageRect(
     image,
-    Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-    dst,
-    Paint()
-      ..filterQuality = FilterQuality.medium
-      ..isAntiAlias = true,
+    src,
+    Rect.fromCenter(
+      center: Offset.zero,
+      width: size.width,
+      height: size.height,
+    ),
+    paint,
   );
+  canvas.restore();
 }
 
 /// Sayfaların tamamlanmış çizimlerini [ui.Picture] olarak saklar.
@@ -198,8 +241,7 @@ void _paintImage(Canvas canvas, ImageItem g, InkImages? images) {
 /// Bir görsel sonradan çözülünce ([InkImages.version]) sayfalar yeniden
 /// kaydedilir.
 class InkPictureCache {
-  final Map<int, (List<InkItem>, int, InkRecolor?, ui.Picture)> _pictures =
-      {};
+  final Map<int, (List<InkItem>, int, InkRecolor?, ui.Picture)> _pictures = {};
 
   ui.Picture pictureFor(
     int page,
@@ -312,7 +354,9 @@ class InkLayerPainter extends CustomPainter {
           }
         }
       } else if (items.isNotEmpty) {
-        canvas.drawPicture(cache.pictureFor(view.index, items, font, images, recolor));
+        canvas.drawPicture(
+          cache.pictureFor(view.index, items, font, images, recolor),
+        );
       }
       if (movingHere && target == null) {
         // Taşınanlar kaydırılarak, geri kalanı önbellekten.

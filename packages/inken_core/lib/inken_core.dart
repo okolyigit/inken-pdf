@@ -13,6 +13,7 @@ export 'src/instruments.dart';
 export 'src/backup.dart';
 export 'src/geometry.dart';
 export 'src/history.dart';
+export 'src/image_edit.dart';
 export 'src/inken_core_base.dart';
 export 'src/model.dart';
 export 'src/pages.dart';

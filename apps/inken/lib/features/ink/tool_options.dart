@@ -592,6 +592,62 @@ class _TextOptions extends ConsumerWidget {
             ],
           ),
         ),
+        _Section(
+          label: l10n.opacity,
+          divided: true,
+          child: OpacitySlider(
+            key: const ValueKey('text-opacity'),
+            percent: s.textOpacity,
+            onChanged: n.setTextOpacity,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Opaklık kaydırıcısı: %10–100, 10'ar adım; sağda değer. [onChangeEnd]
+/// bırakınca bir kez (geri alma adımı tek olsun diye).
+class OpacitySlider extends StatelessWidget {
+  const OpacitySlider({
+    super.key,
+    required this.percent,
+    this.onChanged,
+    this.onChangeEnd,
+  });
+
+  final int percent;
+  final ValueChanged<int>? onChanged;
+  final ValueChanged<int>? onChangeEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final l10n = AppLocalizations.of(context);
+    return Row(
+      children: [
+        Expanded(
+          child: Slider(
+            value: percent.clamp(10, 100).toDouble(),
+            min: 10,
+            max: 100,
+            divisions: 9,
+            label: l10n.percent(percent),
+            semanticFormatterCallback: (v) => l10n.percent(v.round()),
+            onChanged: onChanged == null ? null : (v) => onChanged!(v.round()),
+            onChangeEnd: onChangeEnd == null
+                ? null
+                : (v) => onChangeEnd!(v.round()),
+          ),
+        ),
+        SizedBox(
+          width: 48,
+          child: Text(
+            l10n.percent(percent),
+            textAlign: TextAlign.end,
+            style: InkenText.numeric.copyWith(color: c.ink),
+          ),
+        ),
       ],
     );
   }

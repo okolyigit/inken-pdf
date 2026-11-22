@@ -1268,4 +1268,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectText => 'Text';
+
+  @override
+  String get opacity => 'Opacity';
+
+  @override
+  String percent(int value) {
+    return '$value%';
+  }
+
+  @override
+  String get editImage => 'Edit image';
+
+  @override
+  String get imageEditHint =>
+      'Drag the corners and edges to crop; drag inside the frame to move it.';
+
+  @override
+  String get cropRatio => 'Crop ratio';
+
+  @override
+  String get cropFree => 'Free';
+
+  @override
+  String get cropOriginal => 'Original';
+
+  @override
+  String get imageSizeOnPage => 'Size on page';
+
+  @override
+  String get imageWidth => 'Width';
+
+  @override
+  String get imageHeight => 'Height';
+
+  @override
+  String get unitCm => 'cm';
+
+  @override
+  String get aspectLocked => 'Aspect ratio locked';
+
+  @override
+  String get aspectUnlocked => 'Aspect ratio unlocked';
+
+  @override
+  String get aspectHint => 'While locked, the aspect ratio is kept.';
+
+  @override
+  String get rotate => 'Rotate';
+
+  @override
+  String get rotateLeftShort => 'Left';
+
+  @override
+  String get rotateRightShort => 'Right';
+
+  @override
+  String get resetEdits => 'Reset';
+
+  @override
+  String get applyEdits => 'Apply';
 }

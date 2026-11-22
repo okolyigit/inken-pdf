@@ -17,7 +17,11 @@ class UnsupportedFormatVersion implements Exception {
 typedef _Migration = Map<String, dynamic> Function(Map<String, dynamic> json);
 
 /// Sürüm N → N+1 dönüştürücüleri. Format değişince buraya eklenir.
-const Map<int, _Migration> _migrations = {1: _v1ToV2, 2: _v2ToV3};
+const Map<int, _Migration> _migrations = {
+  1: _v1ToV2,
+  2: _v2ToV3,
+  3: _v3ToV4,
+};
 
 /// 2: görsel öğesi (`image`) eklendi. Eski veride değişecek bir şey yok;
 /// sürüm, görselli dosyayı eski uygulamanın açıp görselleri sessizce
@@ -28,6 +32,12 @@ Map<String, dynamic> _v1ToV2(Map<String, dynamic> json) => json;
 /// değişecek bir şey yok; sürüm, eski uygulama böyle bir dosyayı "bozuk"
 /// yerine "daha yeni sürümle yazılmış" diye geri çevirsin diye arttı.
 Map<String, dynamic> _v2ToV3(Map<String, dynamic> json) => json;
+
+/// 4: görselde opaklık, döndürme ve kırpma (`opacity`, `rotation`,
+/// `cropLeft`…`cropBottom`). Eksik alanlar varsayılanı alır (opak,
+/// döndürülmemiş, kırpılmamış); eski veride değişecek bir şey yok. Sürüm,
+/// eski uygulama kırpılmış görseli kırpılmamış göstermesin diye arttı.
+Map<String, dynamic> _v3ToV4(Map<String, dynamic> json) => json;
 
 String encodeInkenDocument(InkenDocument document) =>
     jsonEncode(document.toJson());

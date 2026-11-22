@@ -12,7 +12,17 @@ import '../settings/settings_store.dart';
 /// girmez (geri al / kayıt yok).
 /// Sıra arayüzdeki sıradır (araç kutusu, telefon rafı, Araçlar menüsü):
 /// yazan araçlar yan yana, ardından silgi.
-enum Tool { hand, select, pen, highlighter, laser, eraser, shape, text, textSelect }
+enum Tool {
+  hand,
+  select,
+  pen,
+  highlighter,
+  laser,
+  eraser,
+  shape,
+  text,
+  textSelect,
+}
 
 /// Silginin ne sildiği.
 enum EraserMode {
@@ -125,6 +135,7 @@ class ToolState {
     this.shapeWidth = 1,
     this.textColor = defaultPenColor,
     this.textSize = 1,
+    this.textOpacity = 100,
     this.customColors = const [],
   });
 
@@ -167,6 +178,9 @@ class ToolState {
   final int textColor;
   final int textSize;
 
+  /// Yeni metnin opaklığı, yüzde (10–100, 10'ar).
+  final int textOpacity;
+
   /// Bu oturumda en az bir kalem girdisi görüldü mü ([InputMode.auto] için).
   final bool stylusSeen;
 
@@ -206,6 +220,7 @@ class ToolState {
     int? shapeWidth,
     int? textColor,
     int? textSize,
+    int? textOpacity,
     List<int>? customColors,
   }) => ToolState(
     tool: tool ?? this.tool,
@@ -223,6 +238,7 @@ class ToolState {
     shapeWidth: shapeWidth ?? this.shapeWidth,
     textColor: textColor ?? this.textColor,
     textSize: textSize ?? this.textSize,
+    textOpacity: textOpacity ?? this.textOpacity,
     customColors: customColors ?? this.customColors,
   );
 }
@@ -243,6 +259,7 @@ Map<String, Object> toolStyleOf(ToolState s) => {
   'shapeWidth': s.shapeWidth,
   'textColor': formatHexColor(s.textColor),
   'textSize': s.textSize,
+  'textOpacity': s.textOpacity,
 };
 
 /// [toolStyleOf]'un tersi: okunamayan ya da aralık dışı değer [base]'deki
@@ -281,8 +298,16 @@ ToolState toolStyleFrom(ToolState base, Map<String, Object?>? json) {
     shapeWidth: index('shapeWidth', penWidths.length),
     textColor: color('textColor'),
     textSize: index('textSize', textSizes.length),
+    textOpacity: switch (json['textOpacity']) {
+      final int v when v >= 10 && v <= 100 => v,
+      _ => null,
+    },
   );
 }
+
+/// Metin rengi [color]'un alfası [percent] opaklığa ayarlanmış hâli.
+int opaqueText(int color, int percent) =>
+    ((percent.clamp(0, 100) * 255 / 100).round() << 24) | (color & 0xFFFFFF);
 
 class ToolNotifier extends Notifier<ToolState> {
   @override
@@ -330,6 +355,8 @@ class ToolNotifier extends Notifier<ToolState> {
   void setShapeWidth(int index) => state = state.copyWith(shapeWidth: index);
   void setTextColor(int color) => state = state.copyWith(textColor: color);
   void setTextSize(int index) => state = state.copyWith(textSize: index);
+  void setTextOpacity(int percent) =>
+      state = state.copyWith(textOpacity: percent.clamp(10, 100));
   void setHighlighterWidth(int index) =>
       state = state.copyWith(highlighterWidth: index);
 

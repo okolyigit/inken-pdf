@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'coordinate_plane.dart';
+import 'image_edit.dart';
 import 'model.dart';
 import 'stroke_builder.dart';
 import 'text_font.dart';
@@ -64,9 +65,18 @@ class AnnotationAppearance {
     this.image,
   });
 
-  /// Görselde: hangi görsel ve birim kareyi (görsel uzayı, sol alt orijin)
-  /// PDF uzayındaki yerine götüren matris. Akış ([stream]) boştur.
-  final ({String imageId, PdfAffine matrix})? image;
+  /// Görselde: hangi görsel, birim kareyi (görsel uzayı, sol alt orijin)
+  /// PDF uzayındaki yerine götüren matris ve yazmadan önce piksellere
+  /// uygulanacak kırpma, döndürme ve opaklık ([transformImagePixels]).
+  /// Akış ([stream]) boştur.
+  final ({
+    String imageId,
+    PdfAffine matrix,
+    CropRect crop,
+    int turns,
+    double opacity,
+  })?
+  image;
 
   /// `/Contents`: metin öğesinin yazısı (okuyucular ipucu / erişilebilirlik
   /// için gösterir); diğerlerinde `null`.
@@ -140,7 +150,13 @@ AnnotationAppearance _imageAppearance(ImageItem g, PdfAffine t) {
     borderWidth: 0,
     inkList: const [],
     stream: '',
-    image: (imageId: g.imageId, matrix: matrix),
+    image: (
+      imageId: g.imageId,
+      matrix: matrix,
+      crop: cropOf(g),
+      turns: g.rotation,
+      opacity: g.opacity,
+    ),
   );
 }
 

@@ -4,7 +4,7 @@ import 'package:crypto/crypto.dart';
 
 /// `inken.json` format sürümü. Şema değişirse artırılır ve
 /// `serialization.dart` içine bir dönüştürücü eklenir.
-const int currentFormatVersion = 3;
+const int currentFormatVersion = 4;
 
 /// PDF açıklamalarının `/NM` alanındaki önek: `inken:<id>`.
 const String inkenAnnotationPrefix = 'inken:';

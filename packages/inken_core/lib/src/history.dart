@@ -1,4 +1,5 @@
 import 'geometry.dart';
+import 'image_edit.dart';
 import 'model.dart';
 import 'pages.dart';
 
@@ -252,6 +253,49 @@ class RecolorItems extends EditCommand {
     (old) => [
       for (final i in old)
         if (before[i.id] case final b?) recolorItem(b, color) else i,
+    ],
+  );
+
+  @override
+  InkenDocument revert(InkenDocument doc) => _withPage(
+    doc,
+    pageIndex,
+    (old) => [for (final i in old) before[i.id] ?? i],
+  );
+}
+
+/// Seçili metin ve görsellerin opaklığını [opacity] (0–1) yapar.
+class SetOpacity extends EditCommand {
+  const SetOpacity._(this.pageIndex, this.before, this.opacity);
+
+  /// [ids] içinden sayfada bulunan ve opaklığı olanlara; zaten o
+  /// opaklıktakiler atlanır.
+  factory SetOpacity(
+    InkenDocument doc,
+    int pageIndex,
+    Set<String> ids,
+    double opacity,
+  ) => SetOpacity._(pageIndex, {
+    for (final item in doc.pages[pageIndex].items)
+      if (ids.contains(item.id) &&
+          hasOpacity(item) &&
+          withOpacity(item, opacity) != item)
+        item.id: item,
+  }, opacity);
+
+  final int pageIndex;
+  final Map<String, InkItem> before;
+  final double opacity;
+
+  bool get isEmpty => before.isEmpty;
+
+  @override
+  InkenDocument apply(InkenDocument doc) => _withPage(
+    doc,
+    pageIndex,
+    (old) => [
+      for (final i in old)
+        if (before[i.id] case final b?) withOpacity(b, opacity) else i,
     ],
   );
 

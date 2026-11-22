@@ -201,7 +201,7 @@ InkenExportResult writeFlattenedPdf(
             skipped++;
             continue;
           }
-          _addImageAnnotation(doc, page, ap, g.matrix, image);
+          _addImageAnnotation(doc, page, ap, g.matrix, _prepared(image, g));
           continue;
         }
         _addAnnotation(page, ap);
@@ -600,6 +600,37 @@ void _addAnnotation(FPDF_PAGE page, AnnotationAppearance ap) {
 /// Görsel: Stamp açıklaması; görünüm akışını PDFium görsel nesnesinden
 /// üretir (`FPDFAnnot_AppendObject`). Saydamlık yumuşak maske olarak
 /// korunur.
+/// Öğenin kırpma, döndürme ve opaklığı uygulanmış pikselleri; değişiklik
+/// yoksa görselin kendisi.
+InkenImage _prepared(
+  InkenImage image,
+  ({
+    String imageId,
+    PdfAffine matrix,
+    CropRect crop,
+    int turns,
+    double opacity,
+  })
+  g,
+) {
+  if (image.width <= 0 || image.height <= 0) return image;
+  final t = transformImagePixels(
+    image.rgba,
+    image.width,
+    image.height,
+    crop: g.crop,
+    turns: g.turns,
+    opacity: g.opacity,
+  );
+  if (identical(t.rgba, image.rgba)) return image;
+  return InkenImage(
+    png: image.png,
+    width: t.width,
+    height: t.height,
+    rgba: t.rgba,
+  );
+}
+
 void _addImageAnnotation(
   FPDF_DOCUMENT doc,
   FPDF_PAGE page,

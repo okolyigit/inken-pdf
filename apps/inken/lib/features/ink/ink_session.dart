@@ -418,6 +418,41 @@ class InkSession extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Seçimde opaklığı ayarlanabilen öğe (metin, görsel) var mı?
+  bool get selectionHasOpacity => selectedItems.any(hasOpacity);
+
+  /// Seçimdeki ilk metnin / görselin opaklığı, yüzde; yoksa `null`.
+  int? get selectionOpacityPercent {
+    for (final i in selectedItems) {
+      if (hasOpacity(i)) return (itemOpacity(i) * 100).round();
+    }
+    return null;
+  }
+
+  /// Seçili metin ve görselleri [percent] opaklığa getirir (tek geri alma
+  /// adımı).
+  void setSelectionOpacity(int percent) {
+    final page = selectionPage;
+    if (page == null) return;
+    final command = SetOpacity(document, page, _selected, percent / 100);
+    if (command.isEmpty) return;
+    _history.execute(command);
+    notifyListeners();
+  }
+
+  /// Seçimde tek bir görsel varsa o (düzenleyici için).
+  ImageItem? get selectedImage => switch (selectedItems) {
+    [final ImageItem g] => g,
+    _ => null,
+  };
+
+  /// Öğeyi aynı kimlikli yeni hâliyle değiştirir (tek geri alma adımı).
+  void replaceItem(int page, InkItem before, InkItem after) {
+    if (before == after) return;
+    _history.execute(ReplaceItem(page, before, after));
+    _changed();
+  }
+
   /// [items]'ı [page] sayfasına yeni kimliklerle (dx, dy) kaydırarak ekler,
   /// sayfanın içinde tutar ve seçer (yapıştır). Tek geri alma adımı.
   void pasteItems(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:inken/features/ink/image_editor.dart';
 import 'package:inken/features/ink/ink_layer.dart';
 import 'package:inken/features/ink/ink_session.dart';
 import 'package:inken/features/ink/ink_toolbar.dart';
@@ -1387,5 +1389,132 @@ void main() {
         expect(settings.get<String>('toolDock'), 'bottom');
       },
     );
+  });
+
+  group('görsel düzenleme ve opaklık', () {
+    // Sayfa 0'da (20,20) 60×40 pt görsel: ekranda (90,60)–(210,140).
+    const image = ImageItem(
+      id: 'g',
+      imageId: 'a',
+      x: 20,
+      y: 20,
+      width: 60,
+      height: 40,
+    );
+    const text = TextItem(
+      id: 't',
+      text: 'Not',
+      color: 0xFF1A1A1A,
+      fontSize: 14,
+      x: 20,
+      y: 200,
+      width: 40,
+      height: 20,
+    );
+
+    Future<void> setUpItems(WidgetTester t) async {
+      await pump(t);
+      final decoded = await t.runAsync(() async {
+        final recorder = ui.PictureRecorder();
+        Canvas(recorder).drawColor(const Color(0xFFFF0000), BlendMode.src);
+        return recorder.endRecording().toImage(30, 20);
+      });
+      // Görseli oturum sahiplenir (kapanınca o bırakır).
+      session.images.add('a', Uint8List.fromList([1, 2, 3]), decoded);
+      session.insertImage(0, image);
+      session.pasteItems(0, const [text], dx: 0, dy: 0);
+      session.clearSelection();
+      tools().select(Tool.select);
+      await t.pump();
+    }
+
+    Future<void> click(WidgetTester t, Offset at) async {
+      await t.tapAt(at, kind: PointerDeviceKind.mouse);
+      await t.pump(const Duration(milliseconds: 50));
+    }
+
+    testWidgets('seç aracıyla çift tıklama düzenleyiciyi açar; tek adım', (
+      t,
+    ) async {
+      await setUpItems(t);
+      await click(t, const Offset(150, 100));
+      expect(find.byType(ImageEditor), findsNothing, reason: 'tek tık seçer');
+      await click(t, const Offset(150, 100));
+      await t.pumpAndSettle();
+      expect(find.byType(ImageEditor), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('image-edit-rotate-right')));
+      await t.tap(find.byKey(const ValueKey('image-edit-apply')));
+      await t.pumpAndSettle();
+      final g = items(0).whereType<ImageItem>().single;
+      expect(g.rotation, 1);
+      expect(g.width, closeTo(40, 1e-6));
+      expect(g.height, closeTo(60, 1e-6));
+      expect((g.x, g.y), (20, 20));
+      session.undo();
+      expect(items(0).whereType<ImageItem>().single, image);
+    });
+
+    testWidgets('vazgeçince değişmez', (t) async {
+      await setUpItems(t);
+      await click(t, const Offset(150, 100));
+      await click(t, const Offset(150, 100));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('image-edit-rotate-right')));
+      await t.tap(find.byKey(const ValueKey('image-edit-cancel')));
+      await t.pumpAndSettle();
+      expect(items(0).whereType<ImageItem>().single, image);
+    });
+
+    testWidgets('seçim çubuğu: görselde düzenle, metinde yalnız opaklık', (
+      t,
+    ) async {
+      await setUpItems(t);
+      session.select(0, {'g'});
+      await t.pump();
+      expect(
+        find.byKey(const ValueKey('selection-edit-image')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('selection-opacity')), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('selection-edit-image')));
+      await t.pumpAndSettle();
+      expect(find.byType(ImageEditor), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('image-edit-cancel')));
+      await t.pumpAndSettle();
+
+      final textId = items(0).whereType<TextItem>().single.id;
+      session.select(0, {textId});
+      await t.pump();
+      expect(find.byKey(const ValueKey('selection-edit-image')), findsNothing);
+      await t.tap(find.byKey(const ValueKey('selection-opacity')));
+      await t.pumpAndSettle();
+      final slider = find.byKey(const ValueKey('selection-opacity-slider'));
+      expect(slider, findsOneWidget);
+      // Kaydırıcının sol ucuna: %10.
+      final track = t.getRect(
+        find.descendant(of: slider, matching: find.byType(Slider)),
+      );
+      await t.tapAt(track.centerLeft + const Offset(4, 0));
+      await t.pumpAndSettle();
+      final after = items(0).whereType<TextItem>().single;
+      expect(itemOpacity(after), closeTo(0.1, 0.01));
+      session.undo();
+      expect(itemOpacity(items(0).whereType<TextItem>().single), 1);
+    });
+
+    testWidgets('metin aracı opaklığı yeni metne uygulanır', (t) async {
+      await pump(t);
+      tools()
+        ..select(Tool.text)
+        ..setTextOpacity(40);
+      await t.pump();
+      await t.tapAt(const Offset(150, 200), kind: PointerDeviceKind.mouse);
+      await t.pump();
+      await t.enterText(find.byKey(const ValueKey('text-editor')), 'Soluk');
+      await t.tapAt(const Offset(300, 500), kind: PointerDeviceKind.mouse);
+      await t.pump();
+      final item = items(0).whereType<TextItem>().single;
+      expect(item.color >>> 24, (0.4 * 255).round());
+    });
   });
 }

@@ -14,6 +14,7 @@ import '../../l10n/app_localizations.dart';
 import 'draw_gesture.dart';
 import 'fading_ink.dart';
 import '../viewer/night_mode.dart';
+import 'image_editor.dart';
 import 'ink_painter.dart';
 import 'ink_session.dart';
 import 'instruments.dart';
@@ -133,7 +134,7 @@ class _InkLayerState extends ConsumerState<InkLayer>
       draft = TextItem(
         id: '',
         text: '',
-        color: tools.textColor,
+        color: opaqueText(tools.textColor, tools.textOpacity),
         fontSize: size,
         x: p.dx.clamp(0, layer.width),
         y: (p.dy - size * factor / 2).clamp(0, layer.height),
@@ -500,11 +501,19 @@ class _InkLayerState extends ConsumerState<InkLayer>
       session.beginResize(corner, p.dx, p.dy);
       return;
     }
+    final hit = itemAt(session.document.pages[view.index], p.dx, p.dy, pad);
+    if (_isImageDoubleTap(view.index, hit, p)) {
+      final image = session.document.pages[view.index].items
+          .whereType<ImageItem>()
+          .firstWhere((i) => i.id == hit);
+      session.select(view.index, {hit!});
+      _editImage(view.index, image);
+      return;
+    }
     if (session.selectionContains(view.index, p.dx, p.dy, pad)) {
       _beginMove(p);
       return;
     }
-    final hit = itemAt(session.document.pages[view.index], p.dx, p.dy, pad);
     if (hit != null) {
       session.select(view.index, {hit});
       _beginMove(p);
@@ -512,6 +521,49 @@ class _InkLayerState extends ConsumerState<InkLayer>
     }
     _select = _SelectGesture.marquee;
     session.beginMarquee(view.index, p.dx, p.dy);
+  }
+
+  /// Son görsel dokunuşu (çift dokunuşla düzenleyici açılır).
+  ({int page, String id, DateTime at, Offset p})? _lastImageTap;
+
+  /// [hit] bir görselse ve az önce aynı görsele yakın bir yerden
+  /// dokunulduysa `true`; değilse bu dokunuşu hatırlar.
+  bool _isImageDoubleTap(int page, String? hit, Offset p) {
+    final items = widget.session.document.pages[page].items;
+    final isImage =
+        hit != null && items.any((i) => i.id == hit && i is ImageItem);
+    final now = DateTime.now();
+    final last = _lastImageTap;
+    if (!isImage) {
+      _lastImageTap = null;
+      return false;
+    }
+    final view = widget.geometry.viewportOf(page);
+    final slop = kDoubleTapSlop / (view?.scale ?? 1);
+    if (last != null &&
+        last.page == page &&
+        last.id == hit &&
+        now.difference(last.at) <= kDoubleTapTimeout * 1.5 &&
+        (last.p - p).distance <= slop) {
+      _lastImageTap = null;
+      return true;
+    }
+    _lastImageTap = (page: page, id: hit, at: now, p: p);
+    return false;
+  }
+
+  /// Görsel düzenleyiciyi açar; uygulanırsa tek geri alma adımıyla işler.
+  Future<void> _editImage(int page, ImageItem item) async {
+    final image = widget.session.images.image(item.imageId);
+    if (image == null) return;
+    final result = await showImageEditor(context, item: item, image: image);
+    if (!mounted || result == null) return;
+    final current = widget.session.document.pages[page].items
+        .where((i) => i.id == item.id)
+        .firstOrNull;
+    if (current != item) return; // bu arada değişti
+    widget.session.replaceItem(page, item, result);
+    widget.session.select(page, {item.id});
   }
 
   /// Ekrandaki [local] noktasına en yakın tutamak (dokunma payı içinde).
@@ -850,6 +902,11 @@ class _InkLayerState extends ConsumerState<InkLayer>
               geometry: widget.geometry,
               session: widget.session,
               pad: _hitSlop / 2,
+              onEditImage: () {
+                final page = widget.session.selectionPage;
+                final image = widget.session.selectedImage;
+                if (page != null && image != null) _editImage(page, image);
+              },
               onCopy: () => copySelection(
                 ref,
                 widget.session,

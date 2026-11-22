@@ -92,6 +92,12 @@ ImageItem _$ImageItemFromJson(Map<String, dynamic> json) => ImageItem(
   y: (json['y'] as num).toDouble(),
   width: (json['width'] as num).toDouble(),
   height: (json['height'] as num).toDouble(),
+  opacity: (json['opacity'] as num?)?.toDouble() ?? 1.0,
+  rotation: (json['rotation'] as num?)?.toInt() ?? 0,
+  cropLeft: (json['cropLeft'] as num?)?.toDouble() ?? 0.0,
+  cropTop: (json['cropTop'] as num?)?.toDouble() ?? 0.0,
+  cropRight: (json['cropRight'] as num?)?.toDouble() ?? 1.0,
+  cropBottom: (json['cropBottom'] as num?)?.toDouble() ?? 1.0,
   $type: json['type'] as String?,
 );
 
@@ -102,6 +108,12 @@ Map<String, dynamic> _$ImageItemToJson(ImageItem instance) => <String, dynamic>{
   'y': instance.y,
   'width': instance.width,
   'height': instance.height,
+  'opacity': instance.opacity,
+  'rotation': instance.rotation,
+  'cropLeft': instance.cropLeft,
+  'cropTop': instance.cropTop,
+  'cropRight': instance.cropRight,
+  'cropBottom': instance.cropBottom,
   'type': instance.$type,
 };
 
