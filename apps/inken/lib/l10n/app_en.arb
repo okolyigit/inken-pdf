@@ -264,6 +264,8 @@
   "aboutApp": "About Inken PDF",
   "settingsInfo": "App information",
   "keyboardShortcuts": "Keyboard shortcuts",
+  "guideMenu": "Getting started",
+  "guideFileName": "Getting Started.pdf",
   "versionWithBuild": "{version} (build {build})",
   "aboutVersion": "Version {version}",
   "aboutRepository": "Inken PDF on GitHub",

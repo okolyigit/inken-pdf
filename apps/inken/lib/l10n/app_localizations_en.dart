@@ -947,6 +947,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keyboardShortcuts => 'Keyboard shortcuts';
 
   @override
+  String get guideMenu => 'Getting started';
+
+  @override
+  String get guideFileName => 'Getting Started.pdf';
+
+  @override
   String versionWithBuild(String version, String build) {
     return '$version (build $build)';
   }

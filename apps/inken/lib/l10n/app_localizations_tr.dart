@@ -906,6 +906,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get keyboardShortcuts => 'Klavye kısayolları';
 
   @override
+  String get guideMenu => 'Başlarken';
+
+  @override
+  String get guideFileName => 'Başlarken.pdf';
+
+  @override
   String versionWithBuild(String version, String build) {
     return '$version (derleme $build)';
   }

@@ -498,6 +498,14 @@
   "aboutApp": "Hakkında Inken PDF",
   "settingsInfo": "Uygulama bilgileri",
   "keyboardShortcuts": "Klavye kısayolları",
+  "guideMenu": "Başlarken",
+  "@guideMenu": {
+    "description": "Yardım menüsünde tanıtım PDF'ini açan öğe; ilk kurulumda da kendiliğinden açılır."
+  },
+  "guideFileName": "Başlarken.pdf",
+  "@guideFileName": {
+    "description": "Tanıtım PDF'inin gösterilen ve kaydederken önerilen adı."
+  },
   "versionWithBuild": "{version} (derleme {build})",
   "@versionWithBuild": {
     "placeholders": {

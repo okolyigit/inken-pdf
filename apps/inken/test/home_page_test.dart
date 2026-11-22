@@ -488,6 +488,17 @@ void main() {
 
     testWidgets('Yardım menüsü: kısayollar, bilgiler, hakkında', (t) async {
       await pump(t);
+      await t.tap(find.widgetWithText(SubmenuButton, 'Yardım'));
+      await t.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('help-guide')),
+          matching: find.text('Başlarken'),
+        ),
+        findsOneWidget,
+      );
+      await t.sendKeyEvent(LogicalKeyboardKey.escape);
+      await t.pumpAndSettle();
       for (final (key, check) in [
         ('help-shortcuts', 'Page Down'),
         ('help-info', 'PDF motoru'),

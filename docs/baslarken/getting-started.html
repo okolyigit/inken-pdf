@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Getting Started — Inken PDF</title>
+<meta name="author" content="Ocky Apps">
+<meta name="description" content="An introduction to Inken PDF that you can try out by writing on it.">
+<style>
+@font-face { font-family: Figtree; src: url(../../apps/inken/assets/fonts/Figtree-Regular.ttf); font-weight: 400; }
+@font-face { font-family: Figtree; src: url(../../apps/inken/assets/fonts/Figtree-Medium.ttf); font-weight: 500; }
+@font-face { font-family: Figtree; src: url(../../apps/inken/assets/fonts/Figtree-SemiBold.ttf); font-weight: 600 700; }
+@font-face { font-family: Fraunces; src: url(../../apps/inken/assets/fonts/Fraunces-SemiBold.ttf); font-weight: 600; }
+@font-face { font-family: JetBrainsMono; src: url(../../apps/inken/assets/fonts/JetBrainsMono-Medium.ttf); font-weight: 500; }
+
+:root {
+  --canvas: #e9e3d6; --surface: #fbf8f2; --well: #ece5d7; --line: #ddd4c4; --line-strong: #857d6e;
+  --ink: #1b2233; --muted: #5b6375; --brand: #233f8f; --tint: #e3e9f8; --accent: #c4501c;
+  --pen-blue: #1f5ad6; --pen-red: #d42a3f; --pen-green: #178a47; --hl-yellow: #ffe34d;
+}
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #fff; color: var(--ink); font: 400 10.5pt/1.5 Figtree, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; height: 297mm; padding: 16mm 18mm 14mm; position: relative; page-break-after: always; overflow: hidden; display: flex; flex-direction: column; }
+.page:last-child { page-break-after: auto; }
+.folio { position: absolute; left: 18mm; right: 18mm; bottom: 8mm; display: flex; justify-content: space-between; font: 500 8pt/1 Figtree; color: var(--muted); }
+.folio b { font: 500 8pt/1 JetBrainsMono; color: var(--muted); }
+.kicker { font: 600 8.5pt/1 Figtree; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 3mm; }
+h1 { font: 600 26pt/1.1 Fraunces, serif; margin: 0 0 3mm; color: var(--ink); }
+h2 { font: 600 14pt/1.2 Fraunces, serif; margin: 6mm 0 2mm; color: var(--ink); }
+h3 { font: 600 11pt/1.3 Figtree; margin: 0 0 1mm; color: var(--ink); }
+p { margin: 0 0 2.5mm; }
+.lead { font-size: 12pt; line-height: 1.5; color: var(--muted); margin-bottom: 5mm; max-width: 150mm; }
+.rule { height: 1.2pt; background: var(--brand); margin: 0 0 5mm; }
+kbd { font: 500 8.5pt/1 JetBrainsMono; padding: 1.2mm 1.6mm; border-radius: 1.4mm; background: var(--well); color: var(--ink); white-space: nowrap; }
+.ico { display: inline-grid; place-items: center; width: 8.5mm; height: 8.5mm; border-radius: 2.2mm; background: var(--well); color: var(--ink); flex: none; }
+.ico svg { width: 5mm; height: 5mm; }
+.ico.on { background: var(--brand); color: #fff; }
+.inline-ico svg { width: 3.6mm; height: 3.6mm; vertical-align: -0.6mm; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 6mm; }
+.feat { display: flex; gap: 3mm; align-items: flex-start; }
+.feat p { margin: 0; color: #2e3648; font-size: 10pt; }
+.feat .t { flex: 1; }
+
+.try { border: 1pt dashed var(--line-strong); border-radius: 3mm; padding: 2.5mm 3.5mm; position: relative; flex: none;
+  }
+.try .ln { position: absolute; left: 0; right: 0; height: 0; border-top: .7pt solid #e6e0d4; }
+.try .lab { font: 600 8pt/1 Figtree; letter-spacing: .06em; text-transform: uppercase; color: var(--brand); background: #fff; padding: 0 1.5mm; position: absolute; top: -2mm; left: 3mm; }
+.try .hint { font-size: 9pt; color: var(--muted); margin: 1mm 0 0; background: #fff; display: inline-block; }
+.try.plain { background-image: none; }
+
+.note { background: var(--tint); border-radius: 3mm; padding: 3mm 4mm; font-size: 9.8pt; color: #22305a; }
+.note b { color: var(--brand); }
+
+table { border-collapse: collapse; width: 100%; font-size: 9.5pt; }
+th, td { text-align: left; padding: 1.6mm 2mm; border-bottom: .6pt solid var(--line); vertical-align: top; }
+th { font: 600 8.5pt/1.2 Figtree; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; border-bottom: 1pt solid var(--line-strong); }
+td:first-child { white-space: nowrap; }
+
+/* kapak */
+.cover { background: var(--surface); padding: 0; }
+.cover .band { background: var(--brand); height: 118mm; position: relative; overflow: hidden; }
+.cover .band svg.wave { position: absolute; left: -10mm; right: -10mm; bottom: 20mm; }
+.cover .logo { position: absolute; left: 18mm; top: 22mm; width: 30mm; height: 30mm; }
+.cover .body { padding: 14mm 18mm 0; }
+.cover h1 { font-size: 46pt; margin: 0 0 4mm; }
+.cover .sub { font-size: 14pt; color: var(--muted); max-width: 140mm; line-height: 1.45; }
+.cover .meta { position: absolute; left: 18mm; bottom: 14mm; font: 500 9pt/1.5 Figtree; color: var(--muted); }
+.cover .meta b { color: var(--ink); }
+.cover .try { position: absolute; left: 18mm; right: 18mm; bottom: 34mm; height: 46mm; background-color: #fff; }
+
+.shot { border-radius: 3mm; overflow: hidden; border: .8pt solid var(--line-strong); }
+.shot img { display: block; width: 100%; }
+.callouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm 5mm; margin-top: 4mm; }
+.callouts div { font-size: 9.5pt; color: #2e3648; }
+.callouts b { display: inline-grid; place-items: center; width: 5mm; height: 5mm; border-radius: 50%; background: var(--accent); color: #fff; font: 600 8pt/1 Figtree; margin-right: 1.5mm; }
+
+.swatches { display: flex; gap: 2mm; margin: 1mm 0 0; }
+.swatches i { width: 4.5mm; height: 4.5mm; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 .5pt rgba(0,0,0,.2); }
+.widths { display: flex; gap: 3mm; align-items: center; margin-top: 1mm; font-size: 8.5pt; color: var(--muted); }
+.widths span { display: inline-flex; align-items: center; gap: 1.2mm; }
+.widths i { display: inline-block; width: 9mm; background: var(--ink); border-radius: 1mm; }
+
+.coord { width: 100%; height: 100%; }
+.spacer { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1 · KAPAK ============ -->
+<section class="page cover">
+  <div class="band">
+    <img class="logo" src="../../apps/inken/assets/brand/inken-app-icon.svg" alt="">
+    <svg class="wave" viewBox="0 0 800 120" preserveAspectRatio="none" height="34mm" width="120%" aria-hidden="true">
+      <path d="M0 80 C120 20 220 120 340 70 S560 10 680 60 S780 90 820 60" fill="none" stroke="#d95f28" stroke-width="14" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="body">
+    <div class="kicker">Inken PDF · Getting started guide</div>
+    <h1>Getting Started</h1>
+    <p class="sub">Open your PDF, pick up your pen, teach your lesson. This document is a short tour of every Inken PDF feature, and the best way to learn is to write on it while you read. The <b>Try it</b> boxes are there for that.</p>
+  </div>
+  <div class="try"><span class="lab">Try it</span><p class="hint">Pick the pen and write your name here. Then undo it with Ctrl+Z.</p></div>
+  <div class="meta"><b>Windows · Linux · Android</b><br>Free and open source (GPL-3.0-or-later) · github.com/okolyigit/inken-pdf</div>
+</section>
+
+<!-- ============ 2 · EKRAN ============ -->
+<section class="page">
+  <div class="kicker">1 · First steps</div>
+  <h1>Know your screen</h1>
+  <div class="rule"></div>
+  <p class="lead">In Inken the drawing tools are not on a fixed bar: they live in the <b>tool box</b> floating over the document. When you are not using it, it fades so it never hides the page.</p>
+  <div class="shot"><img src="lesson.jpg" alt="Inken PDF screen"></div>
+  <div class="callouts">
+    <div><b>1</b><b style="background:none;color:var(--ink);width:auto;margin:0">Menu bar:</b> File, Edit, View, Page, Tools, Help; the save status on the right.</div>
+    <div><b>2</b><b style="background:none;color:var(--ink);width:auto;margin:0">Quick access:</b> open, save, export, print; insert / delete / rotate a page; search, go to page, page panel, full screen.</div>
+    <div><b>3</b><b style="background:none;color:var(--ink);width:auto;margin:0">Tool box:</b> every drawing tool. Drag or tap its handle to dock it at the top, bottom, left or right.</div>
+    <div><b>4</b><b style="background:none;color:var(--ink);width:auto;margin:0">Page navigator:</b> use the arrows, or tap the number and type a page.</div>
+    <div><b>5</b><b style="background:none;color:var(--ink);width:auto;margin:0">Zoom:</b> − / + or the slider; tap the percentage to fit the page or the width.</div>
+    <div><b>6</b><b style="background:none;color:var(--ink);width:auto;margin:0">Page panel:</b> the tab on the left; thumbnails and contents.</div>
+  </div>
+  <h2>Ways to open a PDF</h2>
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="folder-open"></i></span><div class="t"><h3>Open</h3><p>File → Open… or <kbd>Ctrl+O</kbd>. Recent files wait on the start screen with thumbnails.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="mouse-pointer-click"></i></span><div class="t"><h3>Drag and drop</h3><p>Drop a PDF on the window. Drop an image and it is added to the open page.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="file-plus"></i></span><div class="t"><h3>New</h3><p><kbd>Ctrl+N</kbd> opens a blank notebook; its pages can be grid, lined, dotted or a coordinate plane.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="lock-keyhole"></i></span><div class="t"><h3>Password-protected PDF</h3><p>Inken asks for the password. For encrypted or signed files, drawings are saved to a separate copy.</p></div></div>
+  </div>
+  <div class="folio"><span>Inken PDF · Getting Started</span><b>2</b></div>
+</section>
+
+<!-- ============ 3 · YAZAN ARAÇLAR ============ -->
+<section class="page">
+  <div class="kicker">2 · Writing and drawing</div>
+  <h1>Pen, highlighter, eraser</h1>
+  <div class="rule"></div>
+  <p class="lead">Tap a tool to pick it. Tap it once more to open its color and thickness. The panel closes by itself when you start drawing.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico on"><i data-lucide="pen-line"></i></span><div class="t"><h3>Pen <kbd>P</kbd></h3>
+      <p>Six colors and up to four custom colors. With a pressure-sensitive pen, lines get thicker as you press.</p>
+      <div class="swatches"><i style="background:#1a1a1a"></i><i style="background:#1f5ad6"></i><i style="background:#d42a3f"></i><i style="background:#178a47"></i><i style="background:#e07f00"></i><i style="background:#7a3cc0"></i></div>
+      <div class="widths"><span><i style="height:.27mm"></i>Thin</span><span><i style="height:.53mm"></i>Medium</span><span><i style="height:1.06mm"></i>Thick</span><span><i style="height:1.76mm"></i>Very thick</span></div></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="highlighter"></i></span><div class="t"><h3>Highlighter <kbd>H</kbd></h3>
+      <p>Swipe over the text; it stays readable underneath. Yellow, green, pink, blue.</p>
+      <div class="swatches"><i style="background:#ffe34d"></i><i style="background:#93f0a6"></i><i style="background:#ff9fd6"></i><i style="background:#92d6ff"></i></div></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="sparkles"></i></span><div class="t"><h3>Vanishing pen <kbd>L</kbd></h3><p>Point things out: what you write fades in a few seconds and never enters the document.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="eraser"></i></span><div class="t"><h3>Eraser <kbd>E</kbd></h3><p><b>Stroke</b> erases the whole line you touch, <b>Pixel</b> only the part you pass over. Your pen's eraser end and side button erase too.</p></div></div>
+  </div>
+
+  <h2>Highlight this line</h2>
+  <p style="font-size:12pt">The hypotenuse is the side opposite the right angle, and the longest side of a right triangle.</p>
+
+  <div class="try" style="height:58mm;margin-top:4mm"><span class="lab">Try it</span><p class="hint">Write with the pen and try the different thicknesses; then compare the two eraser modes.</p></div>
+
+  <div class="note" style="margin-top:5mm"><b>Pen and finger.</b> Once you use a pen, your finger scrolls the page and your palm does not draw. To write with a finger on a smart board: Tools → Touch behavior → <i>Finger draws, two fingers scroll</i>. In any tool, hold <kbd>Space</kbd> to pan for a moment.</div>
+  <div class="folio"><span>Inken PDF · Getting Started</span><b>3</b></div>
+</section>
+
+<!-- ============ 4 · ŞEKİL, METİN, ÖLÇME ============ -->
+<section class="page">
+  <div class="kicker">2 · Writing and drawing</div>
+  <h1>Shapes, text, measuring tools</h1>
+  <div class="rule"></div>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="move-up-right"></i></span><div class="t"><h3>Shape <kbd>G</kbd></h3><p>Line, arrow, rectangle, ellipse and coordinate plane. Hold <kbd>Shift</kbd> for squares, circles and 15° steps.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="type"></i></span><div class="t"><h3>Text <kbd>T</kbd></h3><p>Tap the page and type; <kbd>Enter</kbd> starts a new line. Tap existing text to edit it. Math signs such as √ π ≤ ∞ are all there.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="ruler"></i></span><div class="t"><h3>Measuring tools</h3><p>In the Shape panel: <b>ruler, set square, protractor, compass</b>. They sit on the page and your pen follows their edges.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="image-plus"></i></span><div class="t"><h3>Image</h3><p>Paste a copied image or screenshot with <kbd>Ctrl+V</kbd>, insert one from a file, or drag it onto the window.</p></div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:6mm;flex:1">
+    <div class="try plain" style="display:flex;flex-direction:column"><span class="lab">Try it · coordinate plane</span>
+      <p class="hint">Draw the line y = 2x − 1.</p>
+      <svg class="coord" viewBox="0 0 200 200" aria-hidden="true" style="flex:1">
+        <defs><pattern id="g" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="#e6e0d4" stroke-width=".6"/></pattern></defs>
+        <rect x="10" y="10" width="180" height="180" fill="url(#g)"/>
+        <path d="M100 8V192M8 100H192" stroke="#1b2233" stroke-width="1.1"/>
+        <path d="M100 8l-3 6h6zM192 100l-6-3v6z" fill="#1b2233"/>
+        <text x="186" y="112" font-size="8" fill="#5b6375" font-family="Figtree">x</text><text x="105" y="16" font-size="8" fill="#5b6375" font-family="Figtree">y</text>
+      </svg>
+    </div>
+    <div class="try plain" style="display:flex;flex-direction:column"><span class="lab">Try it · measuring</span>
+      <p class="hint">Measure AB with the ruler, find the angle with the protractor, draw a circle around A with the compass.</p>
+      <svg viewBox="0 0 200 200" aria-hidden="true" style="flex:1;width:100%">
+        <path d="M40 160 L170 160 L60 60 Z" fill="#e3e9f8" stroke="#233f8f" stroke-width="1.6" stroke-linejoin="round"/>
+        <text x="30" y="172" font-size="10" fill="#1b2233" font-family="Figtree">A</text><text x="172" y="172" font-size="10" fill="#1b2233" font-family="Figtree">B</text><text x="54" y="54" font-size="10" fill="#1b2233" font-family="Figtree">C</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="try" style="height:36mm;margin-top:6mm"><span class="lab">Try it · text</span><p class="hint">Type here with the Text tool: a² + b² = c²</p></div>
+  <div class="folio"><span>Inken PDF · Getting Started</span><b>4</b></div>
+</section>
+
+<!-- ============ 5 · SEÇMEK VE DÜZENLEMEK ============ -->
+<section class="page">
+  <div class="kicker">3 · Editing</div>
+  <h1>Select, move, fix</h1>
+  <div class="rule"></div>
+  <p class="lead">Nothing is final: every step can be undone, even after saving. You can move, resize and recolor the drawings you select.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="mouse-pointer-2"></i></span><div class="t"><h3>Select <kbd>V</kbd></h3><p>Tap or draw a box to select. Drag to move (even to another page), resize from a corner, press <kbd>Delete</kbd> to remove.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="palette"></i></span><div class="t"><h3>Selection bar</h3><p>Appears above the selection: change the color, set the opacity of text and images, copy, delete.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="crop"></i></span><div class="t"><h3>Edit image</h3><p>Double-tap an image: crop (free, 1:1, 4:3, 16:9), rotate, set its size in cm, change its opacity. The original is kept; <b>Reset</b> takes you back.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="text-select"></i></span><div class="t"><h3>Select text</h3><p>Switch to <b>Text</b> in the Select tool's panel to select and copy the PDF's own text.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="undo-2"></i></span><div class="t"><h3>Undo / Redo</h3><p><kbd>Ctrl+Z</kbd> · <kbd>Ctrl+Y</kbd>. At the top of the tool box.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="search"></i></span><div class="t"><h3>Search the document</h3><p><kbd>Ctrl+F</kbd>: matches are marked on the page; step through them with next / previous.</p></div></div>
+  </div>
+
+  <div class="try" style="height:70mm;margin-top:7mm"><span class="lab">Try it</span>
+    <p class="hint">Draw three things: a star, an arrow, a word. Select two of them together, move them right and make them red. Then undo it all.</p></div>
+
+  <div class="note" style="margin-top:6mm"><b>A word to search for:</b> “hypotenuse” is not on this page, but it is on page 3. Search with <kbd>Ctrl+F</kbd> and jump to it.</div>
+  <div class="folio"><span>Inken PDF · Getting Started</span><b>5</b></div>
+</section>
+
+<!-- ============ 6 · DERS SIRASINDA ============ -->
+<section class="page">
+  <div class="kicker">4 · During the lesson</div>
+  <h1>In class, on the board</h1>
+  <div class="rule"></div>
+  <p class="lead">For drawing your students' attention to the right part of the page on a smart board or projector.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="flashlight"></i></span><div class="t"><h3>Spotlight <kbd>S</kbd></h3><p>Light up one part of the page and dim the rest. Drag the dimmed area to move the light, resize it from its edge, and keep writing inside it.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="blinds"></i></span><div class="t"><h3>Curtain <kbd>C</kbd></h3><p>Cover the page and pull it down to reveal it line by line; keep the answer for last. <kbd>Esc</kbd> closes it.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="maximize"></i></span><div class="t"><h3>Full screen <kbd>F11</kbd></h3><p>The menus hide; only the page and the floating boxes remain.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="moon"></i></span><div class="t"><h3>Dark theme and night mode</h3><p>The dark theme darkens the interface and keeps the page white. <b>Night mode</b> darkens the page itself too, keeping its colors.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="scaling"></i></span><div class="t"><h3>Interface size</h3><p>View → Interface size: Normal, Large, <b>Smart board</b>. Buttons and labels stay readable from the back of the room.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="hand"></i></span><div class="t"><h3>Pan</h3><p>Drag the page to scroll; pinch with two fingers to zoom. Use the bar on the right to move quickly through a long document.</p></div></div>
+  </div>
+
+  <h2>Try the curtain</h2>
+  <p>Open the curtain and pull it down to show the steps one by one.</p>
+  <table style="font-size:11pt">
+    <tr><td style="width:18mm;color:var(--muted)">Question</td><td>The legs of a right triangle are 6 cm and 8 cm. How long is the hypotenuse?</td></tr>
+    <tr><td style="color:var(--muted)">Step 1</td><td>6² + 8² = c²</td></tr>
+    <tr><td style="color:var(--muted)">Step 2</td><td>36 + 64 = c²</td></tr>
+    <tr><td style="color:var(--muted)">Step 3</td><td>c² = 100</td></tr>
+    <tr><td style="color:var(--muted)">Answer</td><td><b>c = 10 cm</b></td></tr>
+  </table>
+
+  <div class="try" style="height:46mm;margin-top:7mm"><span class="lab">Try it · spotlight</span><p class="hint">Turn on the spotlight, move the light onto the “Answer” row above and write inside it.</p></div>
+  <div class="folio"><span>Inken PDF · Getting Started</span><b>6</b></div>
+</section>
+
+<!-- ============ 7 · SAYFALAR ============ -->
+<section class="page">
+  <div class="kicker">5 · Pages</div>
+  <h1>Arrange your pages</h1>
+  <div class="rule"></div>
+  <p class="lead">Add blank pages as the lesson goes on, rotate or delete the wrong ones, and find your way through long documents with the contents.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="panel-left"></i></span><div class="t"><h3>Page panel</h3><p>The tab on the left: thumbnails and the PDF's table of contents. Select several thumbnails to delete them together.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="file-plus-2"></i></span><div class="t"><h3>Insert page</h3><p>Blank, grid, dotted, lined or coordinate plane; white, black or manila paper; portrait or landscape. Before or after.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="rotate-cw"></i></span><div class="t"><h3>Rotate</h3><p><kbd>Ctrl+R</kbd> right, <kbd>Ctrl+Shift+R</kbd> left. Drawings turn with the page.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="hash"></i></span><div class="t"><h3>Go to page</h3><p><kbd>Ctrl+G</kbd> or tap the number in the page navigator. <kbd>PgUp</kbd> / <kbd>PgDn</kbd>, <kbd>Home</kbd> / <kbd>End</kbd>.</p></div></div>
+  </div>
+
+  <h2>Page templates</h2>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4mm;margin-top:2mm">
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff"></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Blank</figcaption></figure>
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff;background-image:linear-gradient(#d7dbe6 .4pt,transparent .4pt),linear-gradient(90deg,#d7dbe6 .4pt,transparent .4pt);background-size:3mm 3mm"></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Grid</figcaption></figure>
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff;background-image:radial-gradient(#9aa1b2 .5pt,transparent .6pt);background-size:3mm 3mm"></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Dotted</figcaption></figure>
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff;background-image:linear-gradient(transparent 3.6mm,#c9d3ea 3.6mm,#c9d3ea 3.8mm,transparent 3.8mm);background-size:100% 4mm"></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Lined</figcaption></figure>
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff;position:relative;background-image:linear-gradient(#e3e6ee .4pt,transparent .4pt),linear-gradient(90deg,#e3e6ee .4pt,transparent .4pt);background-size:3mm 3mm"><i style="position:absolute;left:50%;top:2mm;bottom:2mm;width:.8pt;background:#1b2233"></i><i style="position:absolute;top:50%;left:2mm;right:2mm;height:.8pt;background:#1b2233"></i></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Coordinate plane</figcaption></figure>
+  </div>
+
+  <div class="try" style="height:52mm;margin-top:8mm"><span class="lab">Try it</span><p class="hint">Insert a grid page after this one and draw a table on it. Then open the page panel and find the new page.</p></div>
+  <div class="folio"><span>Inken PDF · Getting Started</span><b>7</b></div>
+</section>
+
+<!-- ============ 8 · KAYDET, PAYLAŞ, YAZDIR ============ -->
+<section class="page">
+  <div class="kicker">6 · Saving and sharing</div>
+  <h1>Drawings live in the PDF</h1>
+  <div class="rule"></div>
+  <p class="lead">When you save, drawings are written into the PDF file itself and show up in any PDF reader. Open it in Inken again and they are still editable.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="save"></i></span><div class="t"><h3>Save <kbd>Ctrl+S</kbd></h3><p>Your original PDF is never touched: the first save writes <b>name_inken.pdf</b> next to it, later saves go there. <b>Save as</b> <kbd>Ctrl+Shift+S</kbd>.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="file-down"></i></span><div class="t"><h3>Export with drawings embedded</h3><p>A copy with the drawings burned into the pages, for sending to students and printing.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="printer"></i></span><div class="t"><h3>Print <kbd>Ctrl+P</kbd></h3><p>Preview, printer, copies, page range, fit / actual size, drawings on or off; color, two-sided, paper, orientation.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="share-2"></i></span><div class="t"><h3>Share</h3><p>Attaches the file to a new email; on a phone, the system share sheet opens.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="life-buoy"></i></span><div class="t"><h3>Automatic backup</h3><p>Unsaved drawings are backed up every minute; if the app closes unexpectedly, you can restore them on the next start.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="info"></i></span><div class="t"><h3>Document properties <kbd>Ctrl+D</kbd></h3><p>Title, author, page size, PDF version, password and signature details.</p></div></div>
+  </div>
+
+  <h2>On a phone</h2>
+  <p>On a phone the tools sit in a rack at the bottom of the screen. The rack starts closed, so the document opens for reading; the <span class="inline-ico"><i data-lucide="pen-line"></i></span> button in the top bar opens it. Tapping the selected tool again opens its options from the bottom; the menus slide in from the left with ☰.</p>
+
+  <h2>Privacy</h2>
+  <p>Inken PDF collects no data and never connects to the internet; no account, no ads. Your settings, recent files and backups stay on your device.</p>
+
+  <div class="note" style="margin-top:4mm"><b>Found a problem?</b> Settings → About → <b>Report a bug</b>, by email or on GitHub. App details are added to the report for you.</div>
+  <div class="folio"><span>Inken PDF · Getting Started</span><b>8</b></div>
+</section>
+
+<!-- ============ 9 · KISAYOLLAR ============ -->
+<section class="page">
+  <div class="kicker">Appendix</div>
+  <h1>Keyboard shortcuts</h1>
+  <div class="rule"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 8mm">
+    <table>
+      <tr><th colspan="2">Tools</th></tr>
+      <tr><td><kbd>P</kbd></td><td>Pen</td></tr>
+      <tr><td><kbd>H</kbd></td><td>Highlighter</td></tr>
+      <tr><td><kbd>L</kbd></td><td>Vanishing pen</td></tr>
+      <tr><td><kbd>E</kbd></td><td>Eraser</td></tr>
+      <tr><td><kbd>V</kbd></td><td>Select</td></tr>
+      <tr><td><kbd>G</kbd></td><td>Shape</td></tr>
+      <tr><td><kbd>T</kbd></td><td>Text</td></tr>
+      <tr><td><kbd>Space</kbd></td><td>Hold: pan for a moment</td></tr>
+      <tr><td><kbd>Shift</kbd></td><td>While drawing a shape: square, circle, 15°</td></tr>
+      <tr><td><kbd>S</kbd> · <kbd>C</kbd></td><td>Spotlight · Curtain</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Close the panel, selection or cover; leave full screen</td></tr>
+      <tr><th colspan="2" style="padding-top:5mm">Edit</th></tr>
+      <tr><td><kbd>Ctrl+Z</kbd></td><td>Undo</td></tr>
+      <tr><td><kbd>Ctrl+Y</kbd></td><td>Redo</td></tr>
+      <tr><td><kbd>Ctrl+X</kbd> <kbd>C</kbd> <kbd>V</kbd></td><td>Cut · Copy · Paste (images too)</td></tr>
+      <tr><td><kbd>Ctrl+A</kbd></td><td>Select all</td></tr>
+      <tr><td><kbd>Delete</kbd></td><td>Delete selection</td></tr>
+      <tr><td><kbd>Ctrl+F</kbd></td><td>Search the document</td></tr>
+    </table>
+    <table>
+      <tr><th colspan="2">File</th></tr>
+      <tr><td><kbd>Ctrl+N</kbd></td><td>New</td></tr>
+      <tr><td><kbd>Ctrl+O</kbd></td><td>Open</td></tr>
+      <tr><td><kbd>Ctrl+S</kbd></td><td>Save</td></tr>
+      <tr><td><kbd>Ctrl+Shift+S</kbd></td><td>Save as</td></tr>
+      <tr><td><kbd>Ctrl+P</kbd></td><td>Print</td></tr>
+      <tr><td><kbd>Ctrl+D</kbd></td><td>Document properties</td></tr>
+      <tr><td><kbd>Ctrl+W</kbd></td><td>Close document</td></tr>
+      <tr><td><kbd>Ctrl+,</kbd></td><td>Settings</td></tr>
+      <tr><th colspan="2" style="padding-top:5mm">Pages and view</th></tr>
+      <tr><td><kbd>PgUp</kbd> · <kbd>PgDn</kbd></td><td>Previous · next page</td></tr>
+      <tr><td><kbd>Home</kbd> · <kbd>End</kbd></td><td>First · last page</td></tr>
+      <tr><td><kbd>Ctrl+G</kbd></td><td>Go to page</td></tr>
+      <tr><td><kbd>Ctrl+R</kbd></td><td>Rotate right (left with <kbd>Shift</kbd>)</td></tr>
+      <tr><td><kbd>Ctrl+=</kbd> · <kbd>Ctrl+−</kbd></td><td>Zoom in · out</td></tr>
+      <tr><td><kbd>Ctrl+0</kbd></td><td>Fit page</td></tr>
+      <tr><td><kbd>Ctrl+1</kbd> · <kbd>Ctrl+2</kbd></td><td>Actual size · fit width</td></tr>
+      <tr><td><kbd>Ctrl</kbd> + wheel</td><td>Zoom in / out</td></tr>
+      <tr><td><kbd>F11</kbd></td><td>Full screen</td></tr>
+    </table>
+  </div>
+  <div class="spacer"></div>
+  <div style="display:flex;align-items:center;gap:5mm;border-top:.6pt solid var(--line);padding-top:5mm">
+    <img src="../../apps/inken/assets/brand/inken-app-icon.svg" alt="" style="width:14mm;height:14mm">
+    <p style="margin:0;font-size:9.5pt;color:var(--muted)"><b style="color:var(--ink)">Inken PDF</b> is free software (GPL-3.0-or-later). Source code, releases and feedback: github.com/okolyigit/inken-pdf · Contact: ockyapps@gmail.com</p>
+  </div>
+  <div class="folio"><span>Inken PDF · Getting Started</span><b>9</b></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script>window.lucide && window.lucide.createIcons({ attrs: { 'stroke-width': 2 } });</script>
+<script>
+document.querySelectorAll('.try:not(.plain)').forEach(function (box) {
+  var mm = 96 / 25.4, step = 8.85 * mm, h = box.clientHeight;
+  for (var y = 6 * mm + step; y < h - 2 * mm; y += step) {
+    var l = document.createElement('i'); l.className = 'ln'; l.style.top = y + 'px'; box.insertBefore(l, box.firstChild);
+  }
+});
+</script>
+</body>
+</html>

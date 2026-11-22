@@ -15,26 +15,32 @@ import '../files/document_io.dart';
 /// Okunamayan ya da bozuk dosya yok sayılır: ayarlar varsayılana döner,
 /// uygulama açılmaya devam eder.
 class SettingsStore {
-  SettingsStore._(this._file, this._values);
+  SettingsStore._(this._file, this._values, {required this.isFresh});
 
-  /// Dosyasız (testler ve varsayılan): yalnızca bellekte.
-  SettingsStore.memory([Map<String, Object?>? values])
+  /// Dosyasız (testler ve varsayılan): yalnızca bellekte. [isFresh]
+  /// yeni kurulumu taklit eder.
+  SettingsStore.memory([Map<String, Object?>? values, this.isFresh = false])
     : _file = null,
       _values = {...?values};
+
+  /// Açılışta ayar dosyası yoktu: uygulama bu cihazda ilk kez çalışıyor
+  /// (ya da önceki sürüm hiç ayar yazmamıştı).
+  final bool isFresh;
 
   static Future<SettingsStore> load({Directory? directory}) async {
     final dir = directory ?? await getApplicationSupportDirectory();
     final file = File('${dir.path}/settings.json');
     var values = <String, Object?>{};
+    final fresh = !file.existsSync();
     try {
-      if (file.existsSync()) {
+      if (!fresh) {
         final json = jsonDecode(await file.readAsString());
         if (json is Map<String, Object?>) values = json;
       }
     } on Object catch (e) {
       debugPrint('Ayarlar okunamadı: $e');
     }
-    return SettingsStore._(file, values);
+    return SettingsStore._(file, values, isFresh: fresh);
   }
 
   final File? _file;

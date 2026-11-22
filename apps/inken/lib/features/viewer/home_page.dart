@@ -17,6 +17,8 @@ import '../backup/backup_store.dart';
 import '../files/document_io.dart';
 import '../files/launch_file.dart';
 import '../files/pdf_drop.dart';
+import '../files/guide.dart';
+import '../settings/settings_store.dart';
 import '../files/open_document.dart';
 import '../files/recent_documents.dart';
 import '../ink/ink_toolbar.dart';
@@ -75,6 +77,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       final launch = await _takeLaunch();
       if (launch != null && mounted) {
         await _openRecent(launch);
+        return;
+      }
+      // Yeni kurulum: kılavuz bir kez kendiliğinden açılır.
+      if (takeFirstRunGuide(ref.read(settingsStoreProvider))) {
+        await _openGuide();
         return;
       }
       await _offerRecovery();
@@ -239,6 +246,18 @@ class _HomePageState extends ConsumerState<HomePage> {
         .openNew(name: AppLocalizations.of(context).untitledDocument),
   );
 
+  /// "Başlarken" kılavuzunu açar (Yardım menüsü, ilk kurulum).
+  Future<void> _openGuide() {
+    final l10n = AppLocalizations.of(context);
+    return _guardOpen(() async {
+      final guide = await loadGuide(l10n);
+      await ref
+          .read(openDocumentProvider.notifier)
+          .openGuide(name: guide.name, bytes: guide.bytes);
+      return null;
+    });
+  }
+
   Future<void> _open() => _guardOpen(
     () => ref
         .read(openDocumentProvider.notifier)
@@ -330,6 +349,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       onNew: _newDocument,
       onOpen: _open,
       onSettings: _openSettings,
+      onGuide: _openGuide,
       // Araçlar belge açılınca seçilir (araç kutusu da burada pasif).
       onSelectTool: null,
       fileExtras: [

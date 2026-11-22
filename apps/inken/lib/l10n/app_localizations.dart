@@ -1682,6 +1682,18 @@ abstract class AppLocalizations {
   /// **'Klavye kısayolları'**
   String get keyboardShortcuts;
 
+  /// Yardım menüsünde tanıtım PDF'ini açan öğe; ilk kurulumda da kendiliğinden açılır.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlarken'**
+  String get guideMenu;
+
+  /// Tanıtım PDF'inin gösterilen ve kaydederken önerilen adı.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlarken.pdf'**
+  String get guideFileName;
+
   /// No description provided for @versionWithBuild.
   ///
   /// In tr, this message translates to:

@@ -25,6 +25,7 @@ class OpenDocument {
     this.recovered,
     this.images = const {},
     this.password,
+    this.isGuide = false,
     String? sourceName,
   }) : displayBytes = displayBytes ?? bytes,
        sourceName = sourceName ?? '$name#${identityHashCode(bytes)}';
@@ -61,6 +62,11 @@ class OpenDocument {
   /// Açılış parolası (parolalı dosyada). Bellekte kalır, diske yazılmaz;
   /// kaydedilen kopya da aynı parolayı ister.
   final String? password;
+
+  /// Uygulamayla gelen "Başlarken" kılavuzu: yeri yoktur (ilk kayıt
+  /// "Farklı kaydet"), kapatırken kaydedilmemiş değişiklik sorulmaz
+  /// (Dene alanlarındaki karalamalar). Kaydedilince sıradan belge olur.
+  final bool isGuide;
 
   /// Görüntüleyici önbelleği ve sayfa anahtarı için kimlik. Kayıttan sonra
   /// değişmez; böylece kaydetmek görüntüleyiciyi yeniden yüklemez.
@@ -112,6 +118,7 @@ OpenDocument documentFromRead({
   String? path,
   bool writable = true,
   String? password,
+  bool isGuide = false,
 }) {
   InkenDocument? model;
   final json = read.inkenJson;
@@ -138,6 +145,7 @@ OpenDocument documentFromRead({
     writable: writable,
     model: model,
     isProtected: read.isProtected,
+    isGuide: isGuide,
     images: read.images,
     password: password,
   );
@@ -361,6 +369,21 @@ class OpenDocumentNotifier extends Notifier<OpenDocument?> {
     final bytes = await newBlankPdf();
     final read = await loadInkenFile(bytes);
     state = documentFromRead(name: name, bytes: bytes, read: read);
+  }
+
+  /// "Başlarken" kılavuzunu açar ([loadGuide]): yeri yoktur, son
+  /// belgelere girmez.
+  Future<void> openGuide({
+    required String name,
+    required Uint8List bytes,
+  }) async {
+    final read = await loadInkenFile(bytes);
+    state = documentFromRead(
+      name: name,
+      bytes: bytes,
+      read: read,
+      isGuide: true,
+    );
   }
 
   /// Son belgelerden açar. Dosya yoksa ya da okunamıyorsa okuma hatası

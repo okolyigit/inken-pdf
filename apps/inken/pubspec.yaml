@@ -80,6 +80,8 @@ flutter:
   # assets/fonts/OFL-*.txt). Çevrimdışı çalışsın diye google_fonts yok.
   assets:
     - assets/brand/
+    # Başlarken kılavuzu (docs/baslarken/build.sh üretir).
+    - assets/guide/
     # Lisans metinleri: Ayarlar → Hakkında → Lisanslar ([registerAppLicenses]).
     - assets/fonts/LICENSE-DejaVu.txt
     - assets/fonts/OFL-Figtree.txt

@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Başlarken — Inken PDF</title>
+<meta name="author" content="Ocky Apps">
+<meta name="description" content="Inken PDF'i tanıtan, üzerine yazarak denenebilen başlangıç belgesi.">
+<style>
+@font-face { font-family: Figtree; src: url(../../apps/inken/assets/fonts/Figtree-Regular.ttf); font-weight: 400; }
+@font-face { font-family: Figtree; src: url(../../apps/inken/assets/fonts/Figtree-Medium.ttf); font-weight: 500; }
+@font-face { font-family: Figtree; src: url(../../apps/inken/assets/fonts/Figtree-SemiBold.ttf); font-weight: 600 700; }
+@font-face { font-family: Fraunces; src: url(../../apps/inken/assets/fonts/Fraunces-SemiBold.ttf); font-weight: 600; }
+@font-face { font-family: JetBrainsMono; src: url(../../apps/inken/assets/fonts/JetBrainsMono-Medium.ttf); font-weight: 500; }
+
+:root {
+  --canvas: #e9e3d6; --surface: #fbf8f2; --well: #ece5d7; --line: #ddd4c4; --line-strong: #857d6e;
+  --ink: #1b2233; --muted: #5b6375; --brand: #233f8f; --tint: #e3e9f8; --accent: #c4501c;
+  --pen-blue: #1f5ad6; --pen-red: #d42a3f; --pen-green: #178a47; --hl-yellow: #ffe34d;
+}
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #fff; color: var(--ink); font: 400 10.5pt/1.5 Figtree, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; height: 297mm; padding: 16mm 18mm 14mm; position: relative; page-break-after: always; overflow: hidden; display: flex; flex-direction: column; }
+.page:last-child { page-break-after: auto; }
+.folio { position: absolute; left: 18mm; right: 18mm; bottom: 8mm; display: flex; justify-content: space-between; font: 500 8pt/1 Figtree; color: var(--muted); }
+.folio b { font: 500 8pt/1 JetBrainsMono; color: var(--muted); }
+.kicker { font: 600 8.5pt/1 Figtree; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 3mm; }
+h1 { font: 600 26pt/1.1 Fraunces, serif; margin: 0 0 3mm; color: var(--ink); }
+h2 { font: 600 14pt/1.2 Fraunces, serif; margin: 6mm 0 2mm; color: var(--ink); }
+h3 { font: 600 11pt/1.3 Figtree; margin: 0 0 1mm; color: var(--ink); }
+p { margin: 0 0 2.5mm; }
+.lead { font-size: 12pt; line-height: 1.5; color: var(--muted); margin-bottom: 5mm; max-width: 150mm; }
+.rule { height: 1.2pt; background: var(--brand); margin: 0 0 5mm; }
+kbd { font: 500 8.5pt/1 JetBrainsMono; padding: 1.2mm 1.6mm; border-radius: 1.4mm; background: var(--well); color: var(--ink); white-space: nowrap; }
+.ico { display: inline-grid; place-items: center; width: 8.5mm; height: 8.5mm; border-radius: 2.2mm; background: var(--well); color: var(--ink); flex: none; }
+.ico svg { width: 5mm; height: 5mm; }
+.ico.on { background: var(--brand); color: #fff; }
+.inline-ico svg { width: 3.6mm; height: 3.6mm; vertical-align: -0.6mm; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 6mm; }
+.feat { display: flex; gap: 3mm; align-items: flex-start; }
+.feat p { margin: 0; color: #2e3648; font-size: 10pt; }
+.feat .t { flex: 1; }
+
+.try { border: 1pt dashed var(--line-strong); border-radius: 3mm; padding: 2.5mm 3.5mm; position: relative; flex: none;
+  }
+.try .ln { position: absolute; left: 0; right: 0; height: 0; border-top: .7pt solid #e6e0d4; }
+.try .lab { font: 600 8pt/1 Figtree; letter-spacing: .06em; text-transform: uppercase; color: var(--brand); background: #fff; padding: 0 1.5mm; position: absolute; top: -2mm; left: 3mm; }
+.try .hint { font-size: 9pt; color: var(--muted); margin: 1mm 0 0; background: #fff; display: inline-block; }
+.try.plain { background-image: none; }
+
+.note { background: var(--tint); border-radius: 3mm; padding: 3mm 4mm; font-size: 9.8pt; color: #22305a; }
+.note b { color: var(--brand); }
+
+table { border-collapse: collapse; width: 100%; font-size: 9.5pt; }
+th, td { text-align: left; padding: 1.6mm 2mm; border-bottom: .6pt solid var(--line); vertical-align: top; }
+th { font: 600 8.5pt/1.2 Figtree; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; border-bottom: 1pt solid var(--line-strong); }
+td:first-child { white-space: nowrap; }
+
+/* kapak */
+.cover { background: var(--surface); padding: 0; }
+.cover .band { background: var(--brand); height: 118mm; position: relative; overflow: hidden; }
+.cover .band svg.wave { position: absolute; left: -10mm; right: -10mm; bottom: 20mm; }
+.cover .logo { position: absolute; left: 18mm; top: 22mm; width: 30mm; height: 30mm; }
+.cover .body { padding: 14mm 18mm 0; }
+.cover h1 { font-size: 46pt; margin: 0 0 4mm; }
+.cover .sub { font-size: 14pt; color: var(--muted); max-width: 140mm; line-height: 1.45; }
+.cover .meta { position: absolute; left: 18mm; bottom: 14mm; font: 500 9pt/1.5 Figtree; color: var(--muted); }
+.cover .meta b { color: var(--ink); }
+.cover .try { position: absolute; left: 18mm; right: 18mm; bottom: 34mm; height: 46mm; background-color: #fff; }
+
+.shot { border-radius: 3mm; overflow: hidden; border: .8pt solid var(--line-strong); }
+.shot img { display: block; width: 100%; }
+.callouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm 5mm; margin-top: 4mm; }
+.callouts div { font-size: 9.5pt; color: #2e3648; }
+.callouts b { display: inline-grid; place-items: center; width: 5mm; height: 5mm; border-radius: 50%; background: var(--accent); color: #fff; font: 600 8pt/1 Figtree; margin-right: 1.5mm; }
+
+.swatches { display: flex; gap: 2mm; margin: 1mm 0 0; }
+.swatches i { width: 4.5mm; height: 4.5mm; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 .5pt rgba(0,0,0,.2); }
+.widths { display: flex; gap: 3mm; align-items: center; margin-top: 1mm; font-size: 8.5pt; color: var(--muted); }
+.widths span { display: inline-flex; align-items: center; gap: 1.2mm; }
+.widths i { display: inline-block; width: 9mm; background: var(--ink); border-radius: 1mm; }
+
+.coord { width: 100%; height: 100%; }
+.spacer { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1 · KAPAK ============ -->
+<section class="page cover">
+  <div class="band">
+    <img class="logo" src="../../apps/inken/assets/brand/inken-app-icon.svg" alt="">
+    <svg class="wave" viewBox="0 0 800 120" preserveAspectRatio="none" height="34mm" width="120%" aria-hidden="true">
+      <path d="M0 80 C120 20 220 120 340 70 S560 10 680 60 S780 90 820 60" fill="none" stroke="#d95f28" stroke-width="14" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="body">
+    <div class="kicker">Inken PDF · Başlangıç rehberi</div>
+    <h1>Başlarken</h1>
+    <p class="sub">PDF'ini aç, kalemini seç, dersini anlat. Bu belge Inken PDF'in her özelliğini kısaca tanıtır; en iyi öğrenme yolu da onu okurken üzerine yazmak. Sayfalardaki <b>Dene</b> alanları bunun için.</p>
+  </div>
+  <div class="try"><span class="lab">Dene</span><p class="hint">Kalemi seç ve buraya adını yaz. Sonra Ctrl+Z ile geri al.</p></div>
+  <div class="meta"><b>Windows · Linux · Android</b><br>Ücretsiz ve açık kaynak (GPL-3.0-or-later) · github.com/okolyigit/inken-pdf</div>
+</section>
+
+<!-- ============ 2 · EKRAN ============ -->
+<section class="page">
+  <div class="kicker">1 · İlk adımlar</div>
+  <h1>Ekranı tanı</h1>
+  <div class="rule"></div>
+  <p class="lead">Inken'de çizim araçları sabit bir çubukta değil, belgenin üstünde yüzen <b>araç kutusundadır</b>. Kullanmadığında soluklaşır, sayfayı örtmez.</p>
+  <div class="shot"><img src="ders.jpg" alt="Inken PDF ekranı"></div>
+  <div class="callouts">
+    <div><b>1</b><b style="background:none;color:var(--ink);width:auto;margin:0">Menü çubuğu:</b> Dosya, Düzen, Görünüm, Sayfa, Araçlar, Yardım; sağda kayıt durumu.</div>
+    <div><b>2</b><b style="background:none;color:var(--ink);width:auto;margin:0">Hızlı erişim:</b> aç, kaydet, dışa aktar, yazdır; sayfa ekle / sil / döndür; ara, sayfaya git, sayfa paneli, tam ekran.</div>
+    <div><b>3</b><b style="background:none;color:var(--ink);width:auto;margin:0">Araç kutusu:</b> bütün çizim araçları. Tutamağından sürükle ya da dokun: üste, alta, sola, sağa yerleşir.</div>
+    <div><b>4</b><b style="background:none;color:var(--ink);width:auto;margin:0">Sayfa gezgini:</b> oklarla ilerle; sayıya dokunup sayfa numarası yaz.</div>
+    <div><b>5</b><b style="background:none;color:var(--ink);width:auto;margin:0">Yakınlaştırma:</b> − / + ya da çubuk; yüzdeye dokun: sayfaya veya genişliğe sığdır.</div>
+    <div><b>6</b><b style="background:none;color:var(--ink);width:auto;margin:0">Sayfa paneli:</b> soldaki sekme; küçük resimler ve içindekiler.</div>
+  </div>
+  <h2>PDF açmanın yolları</h2>
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="folder-open"></i></span><div class="t"><h3>Aç</h3><p>Dosya → Aç… ya da <kbd>Ctrl+O</kbd>. Açılış ekranında son açılanlar küçük resimleriyle durur.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="mouse-pointer-click"></i></span><div class="t"><h3>Sürükle bırak</h3><p>PDF'i pencereye bırak. Görsel bırakırsan açık sayfaya eklenir.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="file-plus"></i></span><div class="t"><h3>Yeni</h3><p><kbd>Ctrl+N</kbd> boş bir defter açar; sayfaları kareli, çizgili, noktalı ya da koordinat düzlemi olabilir.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="lock-keyhole"></i></span><div class="t"><h3>Parolalı PDF</h3><p>Parolayı sorar. Şifreli ya da imzalı dosyada çizimler ayrı bir kopyaya kaydedilir.</p></div></div>
+  </div>
+  <div class="folio"><span>Inken PDF · Başlarken</span><b>2</b></div>
+</section>
+
+<!-- ============ 3 · YAZAN ARAÇLAR ============ -->
+<section class="page">
+  <div class="kicker">2 · Yazmak ve çizmek</div>
+  <h1>Kalem, fosforlu, silgi</h1>
+  <div class="rule"></div>
+  <p class="lead">Bir araca dokun, seçilir. Aynı araca bir kez daha dokun, rengi ve kalınlığı açılır. Çizmeye başlayınca panel kendiliğinden kapanır.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico on"><i data-lucide="pen-line"></i></span><div class="t"><h3>Kalem <kbd>P</kbd></h3>
+      <p>Altı renk ve en çok dört özel renk. Basınç algılayan kalemde bastıkça kalınlaşır.</p>
+      <div class="swatches"><i style="background:#1a1a1a"></i><i style="background:#1f5ad6"></i><i style="background:#d42a3f"></i><i style="background:#178a47"></i><i style="background:#e07f00"></i><i style="background:#7a3cc0"></i></div>
+      <div class="widths"><span><i style="height:.27mm"></i>İnce</span><span><i style="height:.53mm"></i>Orta</span><span><i style="height:1.06mm"></i>Kalın</span><span><i style="height:1.76mm"></i>Çok kalın</span></div></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="highlighter"></i></span><div class="t"><h3>Fosforlu <kbd>H</kbd></h3>
+      <p>Metnin üzerinden geç; alttaki yazı okunur kalır. Sarı, yeşil, pembe, mavi.</p>
+      <div class="swatches"><i style="background:#ffe34d"></i><i style="background:#93f0a6"></i><i style="background:#ff9fd6"></i><i style="background:#92d6ff"></i></div></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="sparkles"></i></span><div class="t"><h3>Geçici kalem <kbd>L</kbd></h3><p>Göstererek anlat: yazdığın birkaç saniyede kaybolur, belgeye girmez.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="eraser"></i></span><div class="t"><h3>Silgi <kbd>E</kbd></h3><p><b>Çizgi</b> türü dokunduğun çizginin tamamını, <b>Piksel</b> türü yalnızca üzerinden geçtiğin kısmı siler. Kalemin silgi ucu ve yan tuşu da siler.</p></div></div>
+  </div>
+
+  <h2>Bu satırı fosforlu kalemle işaretle</h2>
+  <p style="font-size:12pt">Hipotenüs, dik üçgende dik açının karşısındaki kenardır ve üçgenin en uzun kenarıdır.</p>
+
+  <div class="try" style="height:58mm;margin-top:4mm"><span class="lab">Dene</span><p class="hint">Kalemle yaz, farklı kalınlıkları dene; sonra silginin iki türünü karşılaştır.</p></div>
+
+  <div class="note" style="margin-top:5mm"><b>Kalem ve parmak.</b> Kalem kullandığında parmak sayfayı kaydırır, avuç içi çizmez. Akıllı tahtada parmakla yazmak için: Araçlar → Dokunma davranışı → <i>Parmak çizer, iki parmak kaydırır</i>. Başka araçtayken <kbd>Boşluk</kbd>'u basılı tutmak geçici olarak kaydırır.</div>
+  <div class="folio"><span>Inken PDF · Başlarken</span><b>3</b></div>
+</section>
+
+<!-- ============ 4 · ŞEKİL, METİN, ÖLÇME ============ -->
+<section class="page">
+  <div class="kicker">2 · Yazmak ve çizmek</div>
+  <h1>Şekil, metin, ölçme araçları</h1>
+  <div class="rule"></div>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="move-up-right"></i></span><div class="t"><h3>Şekil <kbd>G</kbd></h3><p>Çizgi, ok, dikdörtgen, elips ve koordinat düzlemi. <kbd>Shift</kbd> basılıyken kare, daire ve 15° adımlar.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="type"></i></span><div class="t"><h3>Metin <kbd>T</kbd></h3><p>Sayfaya dokun ve yaz; <kbd>Enter</kbd> yeni satır. Var olan metne dokununca düzenlenir. Türkçe harfler ve √ π ≤ ∞ gibi işaretler eksiksiz.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="ruler"></i></span><div class="t"><h3>Ölçme araçları</h3><p>Şekil panelinde <b>cetvel, gönye, iletki, pergel</b>. Sayfanın üstünde durur, kalem kenarlarına yaslanır.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="image-plus"></i></span><div class="t"><h3>Görsel</h3><p>Kopyaladığın görseli ya da ekran görüntüsünü <kbd>Ctrl+V</kbd> ile yapıştır; dosyadan ekle ya da pencereye sürükle.</p></div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:6mm;flex:1">
+    <div class="try plain" style="display:flex;flex-direction:column"><span class="lab">Dene · koordinat düzlemi</span>
+      <p class="hint">y = 2x − 1 doğrusunu çiz.</p>
+      <svg class="coord" viewBox="0 0 200 200" aria-hidden="true" style="flex:1">
+        <defs><pattern id="g" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="#e6e0d4" stroke-width=".6"/></pattern></defs>
+        <rect x="10" y="10" width="180" height="180" fill="url(#g)"/>
+        <path d="M100 8V192M8 100H192" stroke="#1b2233" stroke-width="1.1"/>
+        <path d="M100 8l-3 6h6zM192 100l-6-3v6z" fill="#1b2233"/>
+        <text x="186" y="112" font-size="8" fill="#5b6375" font-family="Figtree">x</text><text x="105" y="16" font-size="8" fill="#5b6375" font-family="Figtree">y</text>
+      </svg>
+    </div>
+    <div class="try plain" style="display:flex;flex-direction:column"><span class="lab">Dene · ölçme</span>
+      <p class="hint">Cetvelle AB'yi ölç, iletkiyle açıyı bul, pergelle A merkezli çember çiz.</p>
+      <svg viewBox="0 0 200 200" aria-hidden="true" style="flex:1;width:100%">
+        <path d="M40 160 L170 160 L60 60 Z" fill="#e3e9f8" stroke="#233f8f" stroke-width="1.6" stroke-linejoin="round"/>
+        <text x="30" y="172" font-size="10" fill="#1b2233" font-family="Figtree">A</text><text x="172" y="172" font-size="10" fill="#1b2233" font-family="Figtree">B</text><text x="54" y="54" font-size="10" fill="#1b2233" font-family="Figtree">C</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="try" style="height:36mm;margin-top:6mm"><span class="lab">Dene · metin</span><p class="hint">Metin aracıyla buraya yaz: a² + b² = c²</p></div>
+  <div class="folio"><span>Inken PDF · Başlarken</span><b>4</b></div>
+</section>
+
+<!-- ============ 5 · SEÇMEK VE DÜZENLEMEK ============ -->
+<section class="page">
+  <div class="kicker">3 · Düzenlemek</div>
+  <h1>Seç, taşı, düzelt</h1>
+  <div class="rule"></div>
+  <p class="lead">Hiçbir şey kalıcı değil: her adım geri alınır, kaydettikten sonra da. Seçtiğin çizimleri taşıyabilir, büyütebilir, rengini değiştirebilirsin.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="mouse-pointer-2"></i></span><div class="t"><h3>Seç <kbd>V</kbd></h3><p>Dokunarak ya da dikdörtgen çizerek seç. Sürükleyerek taşı (başka sayfaya da), köşeden büyüt, <kbd>Delete</kbd> ile sil.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="palette"></i></span><div class="t"><h3>Seçim çubuğu</h3><p>Seçimin üstünde çıkar: rengi değiştir, metin ve görselin opaklığını ayarla, kopyala, sil.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="crop"></i></span><div class="t"><h3>Görseli düzenle</h3><p>Görsele çift dokun: kırp (serbest, 1:1, 4:3, 16:9), döndür, boyutunu cm ile ayarla, opaklığını değiştir. Orijinal bozulmaz; <b>Sıfırla</b> ile dönülür.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="text-select"></i></span><div class="t"><h3>Metin seç</h3><p>Seç aracının panelinden <b>Metin</b>'e geç: PDF'in kendi yazısını seçip kopyala.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="undo-2"></i></span><div class="t"><h3>Geri al / Yinele</h3><p><kbd>Ctrl+Z</kbd> · <kbd>Ctrl+Y</kbd>. Araç kutusunun en üstünde.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="search"></i></span><div class="t"><h3>Belgede ara</h3><p><kbd>Ctrl+F</kbd>: sonuçlar sayfada işaretlenir, sonraki / önceki ile gez.</p></div></div>
+  </div>
+
+  <div class="try" style="height:70mm;margin-top:7mm"><span class="lab">Dene</span>
+    <p class="hint">Üç şey çiz: bir yıldız, bir ok, bir kelime. Seç aracıyla ikisini birlikte seç, sağa taşı, rengini kırmızı yap. Sonra hepsini geri al.</p></div>
+
+  <div class="note" style="margin-top:6mm"><b>Arama için bir kelime:</b> bu sayfada “hipotenüs” geçmiyor ama 3. sayfada geçiyor. <kbd>Ctrl+F</kbd> ile ara ve sonuca git.</div>
+  <div class="folio"><span>Inken PDF · Başlarken</span><b>5</b></div>
+</section>
+
+<!-- ============ 6 · DERS SIRASINDA ============ -->
+<section class="page">
+  <div class="kicker">4 · Ders sırasında</div>
+  <h1>Sınıfta, tahtada</h1>
+  <div class="rule"></div>
+  <p class="lead">Akıllı tahtada ve projeksiyonda öğrencinin dikkatini sayfanın doğru yerine çekmek için.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="flashlight"></i></span><div class="t"><h3>Spot ışığı <kbd>S</kbd></h3><p>Sayfanın bir yerini aydınlat, gerisini karart. Karartıyı sürükleyerek ışığı gezdir, kenarından büyüt; ışığın içinde yazmaya devam et.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="blinds"></i></span><div class="t"><h3>Perde <kbd>C</kbd></h3><p>Sayfayı ört, aşağı çektikçe satır satır göster; yanıtı sona sakla. <kbd>Esc</kbd> kapatır.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="maximize"></i></span><div class="t"><h3>Tam ekran <kbd>F11</kbd></h3><p>Menüler gizlenir; yalnızca sayfa ve yüzen kutular kalır.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="moon"></i></span><div class="t"><h3>Koyu tema ve gece modu</h3><p>Koyu tema arayüzü koyulaştırır, sayfa beyaz kalır. <b>Gece modu</b> sayfanın kendisini de koyulaştırır; renkler korunur.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="scaling"></i></span><div class="t"><h3>Arayüz boyutu</h3><p>Görünüm → Arayüz boyutu: Normal, Büyük, <b>Akıllı tahta</b>. Düğmeler ve yazılar uzaktan okunur.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="hand"></i></span><div class="t"><h3>Kaydır</h3><p>Sayfayı sürükleyerek kaydır; iki parmakla yakınlaştır. Sağdaki çubukla uzun belgede hızlıca git.</p></div></div>
+  </div>
+
+  <h2>Perdeyi dene</h2>
+  <p>Perdeyi aç ve aşağı doğru çekerek adımları tek tek göster.</p>
+  <table style="font-size:11pt">
+    <tr><td style="width:18mm;color:var(--muted)">Soru</td><td>Dik kenarları 6 cm ve 8 cm olan dik üçgenin hipotenüsü kaç cm'dir?</td></tr>
+    <tr><td style="color:var(--muted)">1. adım</td><td>6² + 8² = c²</td></tr>
+    <tr><td style="color:var(--muted)">2. adım</td><td>36 + 64 = c²</td></tr>
+    <tr><td style="color:var(--muted)">3. adım</td><td>c² = 100</td></tr>
+    <tr><td style="color:var(--muted)">Yanıt</td><td><b>c = 10 cm</b></td></tr>
+  </table>
+
+  <div class="try" style="height:46mm;margin-top:7mm"><span class="lab">Dene · spot ışığı</span><p class="hint">Spot ışığını aç, ışığı yukarıdaki tablonun “Yanıt” satırına taşı ve içine yaz.</p></div>
+  <div class="folio"><span>Inken PDF · Başlarken</span><b>6</b></div>
+</section>
+
+<!-- ============ 7 · SAYFALAR ============ -->
+<section class="page">
+  <div class="kicker">5 · Sayfalar</div>
+  <h1>Sayfaları düzenle</h1>
+  <div class="rule"></div>
+  <p class="lead">Ders ilerledikçe boş sayfa ekle, yanlış sayfayı döndür ya da sil; uzun belgede içindekilerle gezin.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="panel-left"></i></span><div class="t"><h3>Sayfa paneli</h3><p>Soldaki sekme: küçük resimler ve PDF'in içindekiler listesi. Küçük resimlerde birden çok sayfa seçip birlikte silebilirsin.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="file-plus-2"></i></span><div class="t"><h3>Sayfa ekle</h3><p>Boş, kareli, noktalı, çizgili ya da koordinat düzlemi; beyaz, siyah ya da saman kâğıdı; dikey ya da yatay. Önüne ya da arkasına.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="rotate-cw"></i></span><div class="t"><h3>Döndür</h3><p><kbd>Ctrl+R</kbd> sağa, <kbd>Ctrl+Shift+R</kbd> sola. Çizimler sayfayla birlikte döner.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="hash"></i></span><div class="t"><h3>Sayfaya git</h3><p><kbd>Ctrl+G</kbd> ya da sayfa gezginindeki sayıya dokun. <kbd>PgUp</kbd> / <kbd>PgDn</kbd>, <kbd>Home</kbd> / <kbd>End</kbd>.</p></div></div>
+  </div>
+
+  <h2>Sayfa şablonları</h2>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4mm;margin-top:2mm">
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff"></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Boş</figcaption></figure>
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff;background-image:linear-gradient(#d7dbe6 .4pt,transparent .4pt),linear-gradient(90deg,#d7dbe6 .4pt,transparent .4pt);background-size:3mm 3mm"></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Kareli</figcaption></figure>
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff;background-image:radial-gradient(#9aa1b2 .5pt,transparent .6pt);background-size:3mm 3mm"></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Noktalı</figcaption></figure>
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff;background-image:linear-gradient(transparent 3.6mm,#c9d3ea 3.6mm,#c9d3ea 3.8mm,transparent 3.8mm);background-size:100% 4mm"></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Çizgili</figcaption></figure>
+    <figure style="margin:0"><div style="height:34mm;border:.6pt solid var(--line-strong);border-radius:1.5mm;background:#fff;position:relative;background-image:linear-gradient(#e3e6ee .4pt,transparent .4pt),linear-gradient(90deg,#e3e6ee .4pt,transparent .4pt);background-size:3mm 3mm"><i style="position:absolute;left:50%;top:2mm;bottom:2mm;width:.8pt;background:#1b2233"></i><i style="position:absolute;top:50%;left:2mm;right:2mm;height:.8pt;background:#1b2233"></i></div><figcaption style="font-size:9pt;color:var(--muted);margin-top:1.5mm">Koordinat düzlemi</figcaption></figure>
+  </div>
+
+  <div class="try" style="height:52mm;margin-top:8mm"><span class="lab">Dene</span><p class="hint">Bu sayfanın arkasına kareli bir sayfa ekle, oraya bir tablo çiz. Sonra sayfa panelini aç ve yeni sayfayı gör.</p></div>
+  <div class="folio"><span>Inken PDF · Başlarken</span><b>7</b></div>
+</section>
+
+<!-- ============ 8 · KAYDET, PAYLAŞ, YAZDIR ============ -->
+<section class="page">
+  <div class="kicker">6 · Kaydetmek ve paylaşmak</div>
+  <h1>Çizimler PDF'in içinde</h1>
+  <div class="rule"></div>
+  <p class="lead">Kaydettiğinde çizimler PDF dosyasının kendisine yazılır ve her PDF okuyucuda görünür. Inken'de yeniden açınca düzenlenebilir kalır.</p>
+
+  <div class="grid2">
+    <div class="feat"><span class="ico"><i data-lucide="save"></i></span><div class="t"><h3>Kaydet <kbd>Ctrl+S</kbd></h3><p>Orijinal PDF'e dokunulmaz: ilk kayıt yanına <b>ad_inken.pdf</b> olarak yazılır, sonrakiler ona. <b>Farklı kaydet</b> <kbd>Ctrl+Shift+S</kbd>.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="file-down"></i></span><div class="t"><h3>Çizimleri gömerek dışa aktar</h3><p>Çizimlerin sayfaya işlendiği bir kopya: öğrencilere göndermek ve yazdırmak için.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="printer"></i></span><div class="t"><h3>Yazdır <kbd>Ctrl+P</kbd></h3><p>Önizleme, yazıcı, kopya, sayfa aralığı, sığdır / gerçek boyut, çizimler açık / kapalı; renk, çift taraf, kâğıt, yön.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="share-2"></i></span><div class="t"><h3>Paylaş</h3><p>Dosyayı e-postaya ekler; telefonda sistemin paylaşma ekranı açılır.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="life-buoy"></i></span><div class="t"><h3>Otomatik yedek</h3><p>Kaydedilmemiş çizimler dakikada bir yedeklenir; uygulama kapanırsa açılışta geri yüklenir.</p></div></div>
+    <div class="feat"><span class="ico"><i data-lucide="info"></i></span><div class="t"><h3>Belge özellikleri <kbd>Ctrl+D</kbd></h3><p>Başlık, yazar, sayfa boyutu, PDF sürümü, parola ve imza bilgisi.</p></div></div>
+  </div>
+
+  <h2>Telefonda</h2>
+  <p>Telefonda araçlar ekranın altındaki rafta durur; raf başta kapalıdır, belge okuma hâlinde açılır. Üst çubuktaki <span class="inline-ico"><i data-lucide="pen-line"></i></span> rafı açar. Seçili araca ikinci dokunuş seçenekleri alttan açar; menüler ☰ ile soldan gelir.</p>
+
+  <h2>Gizlilik</h2>
+  <p>Inken PDF hiçbir veri toplamaz ve internete bağlanmaz; hesap gerekmez, reklam yok. Ayarların, son belgelerin ve yedeklerin yalnızca senin cihazında kalır.</p>
+
+  <div class="note" style="margin-top:4mm"><b>Bir sorun mu var?</b> Ayarlar → Hakkında → <b>Hata bildir</b>: e-postayla ya da GitHub'da. Uygulama bilgileri bildirime kendiliğinden eklenir.</div>
+  <div class="folio"><span>Inken PDF · Başlarken</span><b>8</b></div>
+</section>
+
+<!-- ============ 9 · KISAYOLLAR ============ -->
+<section class="page">
+  <div class="kicker">Ek</div>
+  <h1>Klavye kısayolları</h1>
+  <div class="rule"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 8mm">
+    <table>
+      <tr><th colspan="2">Araçlar</th></tr>
+      <tr><td><kbd>P</kbd></td><td>Kalem</td></tr>
+      <tr><td><kbd>H</kbd></td><td>Fosforlu</td></tr>
+      <tr><td><kbd>L</kbd></td><td>Geçici kalem</td></tr>
+      <tr><td><kbd>E</kbd></td><td>Silgi</td></tr>
+      <tr><td><kbd>V</kbd></td><td>Seç</td></tr>
+      <tr><td><kbd>G</kbd></td><td>Şekil</td></tr>
+      <tr><td><kbd>T</kbd></td><td>Metin</td></tr>
+      <tr><td><kbd>Boşluk</kbd></td><td>Basılı tut: geçici olarak kaydır</td></tr>
+      <tr><td><kbd>Shift</kbd></td><td>Şekil çizerken: kare, daire, 15°</td></tr>
+      <tr><td><kbd>S</kbd> · <kbd>C</kbd></td><td>Spot ışığı · Perde</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Paneli, seçimi, örtüyü kapat; tam ekrandan çık</td></tr>
+      <tr><th colspan="2" style="padding-top:5mm">Düzen</th></tr>
+      <tr><td><kbd>Ctrl+Z</kbd></td><td>Geri al</td></tr>
+      <tr><td><kbd>Ctrl+Y</kbd></td><td>Yinele</td></tr>
+      <tr><td><kbd>Ctrl+X</kbd> <kbd>C</kbd> <kbd>V</kbd></td><td>Kes · Kopyala · Yapıştır (görsel de)</td></tr>
+      <tr><td><kbd>Ctrl+A</kbd></td><td>Tümünü seç</td></tr>
+      <tr><td><kbd>Delete</kbd></td><td>Seçileni sil</td></tr>
+      <tr><td><kbd>Ctrl+F</kbd></td><td>Belgede ara</td></tr>
+    </table>
+    <table>
+      <tr><th colspan="2">Dosya</th></tr>
+      <tr><td><kbd>Ctrl+N</kbd></td><td>Yeni</td></tr>
+      <tr><td><kbd>Ctrl+O</kbd></td><td>Aç</td></tr>
+      <tr><td><kbd>Ctrl+S</kbd></td><td>Kaydet</td></tr>
+      <tr><td><kbd>Ctrl+Shift+S</kbd></td><td>Farklı kaydet</td></tr>
+      <tr><td><kbd>Ctrl+P</kbd></td><td>Yazdır</td></tr>
+      <tr><td><kbd>Ctrl+D</kbd></td><td>Belge özellikleri</td></tr>
+      <tr><td><kbd>Ctrl+W</kbd></td><td>Belgeyi kapat</td></tr>
+      <tr><td><kbd>Ctrl+,</kbd></td><td>Ayarlar</td></tr>
+      <tr><th colspan="2" style="padding-top:5mm">Sayfa ve görünüm</th></tr>
+      <tr><td><kbd>PgUp</kbd> · <kbd>PgDn</kbd></td><td>Önceki · sonraki sayfa</td></tr>
+      <tr><td><kbd>Home</kbd> · <kbd>End</kbd></td><td>İlk · son sayfa</td></tr>
+      <tr><td><kbd>Ctrl+G</kbd></td><td>Sayfaya git</td></tr>
+      <tr><td><kbd>Ctrl+R</kbd></td><td>Sağa döndür (<kbd>Shift</kbd> ile sola)</td></tr>
+      <tr><td><kbd>Ctrl+=</kbd> · <kbd>Ctrl+−</kbd></td><td>Yakınlaştır · uzaklaştır</td></tr>
+      <tr><td><kbd>Ctrl+0</kbd></td><td>Sayfaya sığdır</td></tr>
+      <tr><td><kbd>Ctrl+1</kbd> · <kbd>Ctrl+2</kbd></td><td>Gerçek boyut · genişliğe sığdır</td></tr>
+      <tr><td><kbd>Ctrl</kbd> + tekerlek</td><td>Yakınlaştır / uzaklaştır</td></tr>
+      <tr><td><kbd>F11</kbd></td><td>Tam ekran</td></tr>
+    </table>
+  </div>
+  <div class="spacer"></div>
+  <div style="display:flex;align-items:center;gap:5mm;border-top:.6pt solid var(--line);padding-top:5mm">
+    <img src="../../apps/inken/assets/brand/inken-app-icon.svg" alt="" style="width:14mm;height:14mm">
+    <p style="margin:0;font-size:9.5pt;color:var(--muted)"><b style="color:var(--ink)">Inken PDF</b> özgür yazılımdır (GPL-3.0-or-later). Kaynak kod, sürümler ve geri bildirim: github.com/okolyigit/inken-pdf · İletişim: ockyapps@gmail.com</p>
+  </div>
+  <div class="folio"><span>Inken PDF · Başlarken</span><b>9</b></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script>window.lucide && window.lucide.createIcons({ attrs: { 'stroke-width': 2 } });</script>
+<script>
+document.querySelectorAll('.try:not(.plain)').forEach(function (box) {
+  var mm = 96 / 25.4, step = 8.85 * mm, h = box.clientHeight;
+  for (var y = 6 * mm + step; y < h - 2 * mm; y += step) {
+    var l = document.createElement('i'); l.className = 'ln'; l.style.top = y + 'px'; box.insertBefore(l, box.firstChild);
+  }
+});
+</script>
+</body>
+</html>

@@ -305,13 +305,15 @@ class DocumentMenuActions {
 /// ekranların klavye işleyicisindedir. [barStyle] verilirse üst düzey
 /// başlıklar menü çubuğu biçimindedir. [fileExtras] "Aç…"ın altına girer
 /// (son belgeler). [onSelectTool] `null` ise araçlar pasif (açılış ekranı).
-/// [onNew] tek boş sayfalık yeni PDF açar.
+/// [onNew] tek boş sayfalık yeni PDF açar; [onGuide] "Başlarken"
+/// kılavuzunu.
 List<Widget> appMenus(
   BuildContext context,
   WidgetRef ref, {
   required VoidCallback onNew,
   required VoidCallback onOpen,
   required VoidCallback onSettings,
+  required VoidCallback onGuide,
   ValueChanged<Tool>? onSelectTool,
   DocumentMenuActions actions = const DocumentMenuActions(),
   ButtonStyle? barStyle,
@@ -627,14 +629,14 @@ List<Widget> appMenus(
     ),
     SubmenuButton(
       style: barStyle,
-      menuChildren: helpMenuItems(context),
+      menuChildren: helpMenuItems(context, onGuide: onGuide),
       child: Text(l10n.menuHelp),
     ),
   ];
 }
 
 /// Yardım: kısayollar, uygulama bilgileri, hakkında (Ayarlar sayfasının
-/// ilgili sekmesini açar).
+/// ilgili sekmesini açar). Menülerde önlerinde "Başlarken" kılavuzu durur.
 List<(SettingsSection, IconData, String)> helpEntries(AppLocalizations l10n) =>
     [
       (SettingsSection.shortcuts, LucideIcons.keyboard, l10n.keyboardShortcuts),
@@ -642,7 +644,16 @@ List<(SettingsSection, IconData, String)> helpEntries(AppLocalizations l10n) =>
       (SettingsSection.about, LucideIcons.info, l10n.aboutApp),
     ];
 
-List<Widget> helpMenuItems(BuildContext context) => [
+List<Widget> helpMenuItems(
+  BuildContext context, {
+  required VoidCallback onGuide,
+}) => [
+  MenuItemButton(
+    key: const ValueKey('help-guide'),
+    leadingIcon: const Icon(LucideIcons.bookOpen),
+    onPressed: onGuide,
+    child: Text(AppLocalizations.of(context).guideMenu),
+  ),
   for (final (section, icon, label) in helpEntries(
     AppLocalizations.of(context),
   ))

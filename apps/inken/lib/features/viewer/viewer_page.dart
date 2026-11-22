@@ -14,6 +14,7 @@ import '../../l10n/app_localizations.dart';
 import '../backup/backup_store.dart';
 import '../files/document_io.dart';
 import '../files/document_properties.dart';
+import '../files/guide.dart';
 import '../files/open_document.dart';
 import '../ink/ink_images.dart';
 import '../ink/ink_layer.dart';
@@ -1138,6 +1139,8 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
   Future<bool> _askToClose() async {
     final session = _session;
     if (session == null || !session.isDirty) return true;
+    // Kılavuzdaki karalamalar için sorulmaz (kaydedilince sıradan belge).
+    if (widget.document.isGuide) return true;
     final l10n = AppLocalizations.of(context);
     final choice = await showDialog<_CloseChoice>(
       context: context,
@@ -1179,6 +1182,24 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
           : AppExitResponse.cancel;
     } finally {
       _askingToClose = false;
+    }
+  }
+
+  /// "Başlarken" kılavuzunu açar; açık belgede kaydedilmemiş değişiklik
+  /// varsa önce sorar.
+  Future<void> _openGuide() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    if (!await _confirmClose() || !mounted) return;
+    try {
+      final guide = await loadGuide(l10n);
+      await ref
+          .read(openDocumentProvider.notifier)
+          .openGuide(name: guide.name, bytes: guide.bytes);
+    } on Object catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(openErrorMessage(l10n, e))),
+      );
     }
   }
 
@@ -1382,6 +1403,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     onNew: _newDocument,
     onOpen: _openAnother,
     onSettings: _openSettings,
+    onGuide: _openGuide,
     onSelectTool: _selectTool,
     actions: _actions(session),
   );
@@ -1862,6 +1884,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                         ),
                       ]),
                       section('help', l10n.menuHelp, [
+                        item(LucideIcons.bookOpen, l10n.guideMenu, _openGuide),
                         for (final (target, icon, label) in helpEntries(l10n))
                           item(
                             icon,
