@@ -786,7 +786,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      'Teach from PDFs. Drawings are saved inside the PDF and appear in any PDF reader.';
+      'A light, fast PDF reader you can write and draw on. Drawings are saved inside the PDF and appear in any PDF reader. Free, no account needed.';
 
   @override
   String get aboutFonts =>
@@ -794,7 +794,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutAppLicense =>
-      'Inken PDF is free software: you can use, modify and redistribute it under the GNU General Public License version 3 or any later version (GPL-3.0-or-later). It comes with no warranty.';
+      'Inken PDF is free software: you can use, modify and redistribute it under the GNU General Public License version 3 or any later version (GPL-3.0-or-later). It comes with no warranty. This is a beta; keep a separate copy of important files.';
 
   @override
   String get aboutLicenses => 'Licenses';
@@ -967,7 +967,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String shareAppText(String url) {
-    return 'Inken PDF: an app for teaching on top of PDFs. Free and open source: $url';
+    return 'Inken PDF: a light, fast, free PDF reader you can write and draw on. No account needed, open source: $url';
   }
 
   @override
@@ -1212,4 +1212,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copyText => 'Copy text';
+
+  @override
+  String get bugReport => 'Report a bug';
+
+  @override
+  String get bugReportTitle => 'How would you like to report it?';
+
+  @override
+  String get bugReportEmail => 'By email';
+
+  @override
+  String bugReportEmailHint(String email) {
+    return 'To $email. No account needed; you can attach a screenshot.';
+  }
+
+  @override
+  String get bugReportGitHub => 'On GitHub';
+
+  @override
+  String get bugReportGitHubHint =>
+      'Needs a GitHub account. The report is public and you can follow its progress there.';
+
+  @override
+  String get bugReportSubject => 'Inken PDF bug report';
+
+  @override
+  String get bugReportWhat => 'What happened?';
+
+  @override
+  String get bugReportExpected => 'What did you expect?';
+
+  @override
+  String get bugReportSteps => 'How can it be reproduced?';
+
+  @override
+  String bugReportCopiedEmail(String email) {
+    return 'Couldn\'t open an email app. The report was copied to the clipboard; you can send it to $email.';
+  }
+
+  @override
+  String bugReportCopiedGitHub(String url) {
+    return 'Couldn\'t open the browser. The report was copied to the clipboard; you can paste it at $url/issues.';
+  }
+
+  @override
+  String get aboutPrivacy =>
+      'Privacy: Inken PDF collects no data and doesn\'t connect to the internet. Your settings, recent documents and backups stay on this device.';
 }

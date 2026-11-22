@@ -743,7 +743,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      'Öğretmenler için PDF üzerinde ders anlatma uygulaması. Çizimler PDF\'in içine, her okuyucuda görünecek biçimde kaydedilir.';
+      'Hafif ve hızlı bir PDF okuyucu; üzerine yazıp çizebilirsin. Çizimler PDF\'in içine, her okuyucuda görünecek biçimde kaydedilir. Ücretsiz, hesap gerekmez.';
 
   @override
   String get aboutFonts =>
@@ -751,7 +751,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get aboutAppLicense =>
-      'Inken PDF özgür yazılımdır: GNU Genel Kamu Lisansı sürüm 3 ya da sonraki sürümleri (GPL-3.0-or-later) koşullarıyla kullanabilir, değiştirebilir ve dağıtabilirsin. Hiçbir garanti verilmez.';
+      'Inken PDF özgür yazılımdır: GNU Genel Kamu Lisansı sürüm 3 ya da sonraki sürümleri (GPL-3.0-or-later) koşullarıyla kullanabilir, değiştirebilir ve dağıtabilirsin. Hiçbir garanti verilmez. Deneme sürümüdür; önemli dosyalarının bir kopyasını ayrıca sakla.';
 
   @override
   String get aboutLicenses => 'Lisanslar';
@@ -926,7 +926,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String shareAppText(String url) {
-    return 'Inken PDF: öğretmenler için PDF üzerinde ders anlatma uygulaması. Ücretsiz ve açık kaynak: $url';
+    return 'Inken PDF: hafif, hızlı ve ücretsiz PDF okuyucu; üzerine yazıp çizebilirsin. Hesap gerekmez, açık kaynak: $url';
   }
 
   @override
@@ -1171,4 +1171,51 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get copyText => 'Metni kopyala';
+
+  @override
+  String get bugReport => 'Hata bildir';
+
+  @override
+  String get bugReportTitle => 'Hatayı nasıl bildirmek istersin?';
+
+  @override
+  String get bugReportEmail => 'E-posta ile';
+
+  @override
+  String bugReportEmailHint(String email) {
+    return '$email adresine. Hesap gerekmez; ekran görüntüsü de ekleyebilirsin.';
+  }
+
+  @override
+  String get bugReportGitHub => 'GitHub\'da';
+
+  @override
+  String get bugReportGitHubHint =>
+      'GitHub hesabı gerekir. Bildirim herkese açık görünür, gelişmesini oradan izleyebilirsin.';
+
+  @override
+  String get bugReportSubject => 'Inken PDF hata bildirimi';
+
+  @override
+  String get bugReportWhat => 'Ne oldu?';
+
+  @override
+  String get bugReportExpected => 'Ne olmasını bekliyordun?';
+
+  @override
+  String get bugReportSteps => 'Nasıl tekrarlanır?';
+
+  @override
+  String bugReportCopiedEmail(String email) {
+    return 'E-posta uygulaması açılamadı. Bildirim metni panoya kopyalandı; $email adresine gönderebilirsin.';
+  }
+
+  @override
+  String bugReportCopiedGitHub(String url) {
+    return 'Tarayıcı açılamadı. Bildirim metni panoya kopyalandı; $url/issues adresine yapıştırabilirsin.';
+  }
+
+  @override
+  String get aboutPrivacy =>
+      'Gizlilik: Inken PDF hiçbir veri toplamaz ve internete bağlanmaz. Ayarların, son belgelerin ve yedeklerin yalnızca bu cihazda kalır.';
 }

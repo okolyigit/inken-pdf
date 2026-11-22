@@ -18,6 +18,7 @@ import '../viewer/page_scrollbar.dart';
 import '../viewer/quick_bar.dart';
 import '../../theme/ui_scale.dart';
 import 'app_info.dart';
+import 'bug_report.dart';
 import 'share_app.dart';
 import 'language.dart';
 import 'shortcuts.dart';
@@ -556,6 +557,7 @@ class _AboutSection extends ConsumerWidget {
     final c = context.colors;
     final version = ref.watch(appVersionProvider).value;
     final versionText = versionLabel(l10n, version);
+    final infoRows = _currentInfoRows(context, ref);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -640,6 +642,12 @@ class _AboutSection extends ConsumerWidget {
         ),
         const SizedBox(height: Space.s2),
         Text(
+          l10n.aboutPrivacy,
+          key: const ValueKey('about-privacy'),
+          style: InkenText.label.copyWith(color: c.inkMuted),
+        ),
+        const SizedBox(height: Space.s2),
+        Text(
           l10n.aboutFonts,
           style: InkenText.label.copyWith(color: c.inkMuted),
         ),
@@ -648,6 +656,13 @@ class _AboutSection extends ConsumerWidget {
           spacing: Space.s3,
           runSpacing: Space.s3,
           children: [
+            OutlinedButton.icon(
+              key: const ValueKey('about-bug-report'),
+              icon: const Icon(LucideIcons.bug, size: 18),
+              label: Text(l10n.bugReport),
+              onPressed: () =>
+                  reportBug(context, appInfoText(l10n.appTitle, infoRows)),
+            ),
             OutlinedButton.icon(
               key: const ValueKey('about-share-app'),
               icon: const Icon(LucideIcons.share2, size: 18),
@@ -703,6 +718,19 @@ class _AboutSection extends ConsumerWidget {
   }
 }
 
+/// Bu cihazdaki uygulama bilgileri (Uygulama bilgileri sekmesi ve hata
+/// bildirimi).
+List<(String, String)> _currentInfoRows(BuildContext context, WidgetRef ref) =>
+    appInfoRows(
+      AppLocalizations.of(context),
+      version: ref.watch(appVersionProvider).value,
+      dataFolder: ref.watch(dataFolderProvider).value,
+      tools: ref.watch(toolProvider),
+      screen: MediaQuery.sizeOf(context),
+      pixelRatio: MediaQuery.devicePixelRatioOf(context),
+      locale: Localizations.localeOf(context).toLanguageTag(),
+    );
+
 /// Uygulama bilgileri: sürüm, platform, PDF motoru, kayıt formatı, veri
 /// klasörü… Hata bildirirken "Kopyala" ile panoya alınır.
 class _InfoSection extends ConsumerWidget {
@@ -712,15 +740,7 @@ class _InfoSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final c = context.colors;
-    final rows = appInfoRows(
-      l10n,
-      version: ref.watch(appVersionProvider).value,
-      dataFolder: ref.watch(dataFolderProvider).value,
-      tools: ref.watch(toolProvider),
-      screen: MediaQuery.sizeOf(context),
-      pixelRatio: MediaQuery.devicePixelRatioOf(context),
-      locale: Localizations.localeOf(context).toLanguageTag(),
-    );
+    final rows = _currentInfoRows(context, ref);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -758,17 +778,32 @@ class _InfoSection extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: Space.s4),
-        FilledButton.icon(
-          key: const ValueKey('info-copy'),
-          icon: const Icon(LucideIcons.copy, size: 18),
-          label: Text(l10n.infoCopy),
-          onPressed: () async {
-            final messenger = ScaffoldMessenger.of(context);
-            await Clipboard.setData(
-              ClipboardData(text: appInfoText(l10n.appTitle, rows)),
-            );
-            messenger.showSnackBar(SnackBar(content: Text(l10n.infoCopied)));
-          },
+        Wrap(
+          spacing: Space.s3,
+          runSpacing: Space.s3,
+          children: [
+            FilledButton.icon(
+              key: const ValueKey('info-copy'),
+              icon: const Icon(LucideIcons.copy, size: 18),
+              label: Text(l10n.infoCopy),
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                await Clipboard.setData(
+                  ClipboardData(text: appInfoText(l10n.appTitle, rows)),
+                );
+                messenger.showSnackBar(
+                  SnackBar(content: Text(l10n.infoCopied)),
+                );
+              },
+            ),
+            OutlinedButton.icon(
+              key: const ValueKey('info-bug-report'),
+              icon: const Icon(LucideIcons.bug, size: 18),
+              label: Text(l10n.bugReport),
+              onPressed: () =>
+                  reportBug(context, appInfoText(l10n.appTitle, rows)),
+            ),
+          ],
         ),
       ],
     );

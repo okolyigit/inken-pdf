@@ -416,9 +416,9 @@
   "shortcutZoomWheel": "Yakınlaştır / uzaklaştır",
   "shortcutEscape": "Paneli kapat, seçimi bırak, spot ışığını / perdeyi kapat, tam ekrandan çık",
   "shortcutsNote": "Çoğu kısayol belge açıkken çalışır (Ctrl+O ve Ctrl+, her yerde). Metin yazarken tek harfli kısayollar devre dışıdır.",
-  "aboutDescription": "Öğretmenler için PDF üzerinde ders anlatma uygulaması. Çizimler PDF'in içine, her okuyucuda görünecek biçimde kaydedilir.",
+  "aboutDescription": "Hafif ve hızlı bir PDF okuyucu; üzerine yazıp çizebilirsin. Çizimler PDF'in içine, her okuyucuda görünecek biçimde kaydedilir. Ücretsiz, hesap gerekmez.",
   "aboutFonts": "Yazı tipleri: Figtree, Fraunces, JetBrains Mono (SIL Open Font License) ve DejaVu Sans (Bitstream Vera lisansı).",
-  "aboutAppLicense": "Inken PDF özgür yazılımdır: GNU Genel Kamu Lisansı sürüm 3 ya da sonraki sürümleri (GPL-3.0-or-later) koşullarıyla kullanabilir, değiştirebilir ve dağıtabilirsin. Hiçbir garanti verilmez.",
+  "aboutAppLicense": "Inken PDF özgür yazılımdır: GNU Genel Kamu Lisansı sürüm 3 ya da sonraki sürümleri (GPL-3.0-or-later) koşullarıyla kullanabilir, değiştirebilir ve dağıtabilirsin. Hiçbir garanti verilmez. Deneme sürümüdür; önemli dosyalarının bir kopyasını ayrıca sakla.",
   "@aboutAppLicense": {
     "description": "Hakkında: uygulamanın kendi lisansı."
   },
@@ -520,7 +520,7 @@
   "aboutRepository": "GitHub'da Inken PDF",
   "aboutRepositoryHint": "Kaynak, sürümler ve geri bildirim",
   "shareApp": "Inken PDF'i paylaş",
-  "shareAppText": "Inken PDF: öğretmenler için PDF üzerinde ders anlatma uygulaması. Ücretsiz ve açık kaynak: {url}",
+  "shareAppText": "Inken PDF: hafif, hızlı ve ücretsiz PDF okuyucu; üzerine yazıp çizebilirsin. Hesap gerekmez, açık kaynak: {url}",
   "@shareAppText": {
     "placeholders": {
       "url": {
@@ -633,5 +633,39 @@
   "toolTextSelect": "Metin seç",
   "textCopied": "Metin kopyalandı",
   "textCopyNotAllowed": "Bu belge metin kopyalamaya izin vermiyor.",
-  "copyText": "Metni kopyala"
+  "copyText": "Metni kopyala",
+  "bugReport": "Hata bildir",
+  "bugReportTitle": "Hatayı nasıl bildirmek istersin?",
+  "bugReportEmail": "E-posta ile",
+  "bugReportEmailHint": "{email} adresine. Hesap gerekmez; ekran görüntüsü de ekleyebilirsin.",
+  "@bugReportEmailHint": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "bugReportGitHub": "GitHub'da",
+  "bugReportGitHubHint": "GitHub hesabı gerekir. Bildirim herkese açık görünür, gelişmesini oradan izleyebilirsin.",
+  "bugReportSubject": "Inken PDF hata bildirimi",
+  "bugReportWhat": "Ne oldu?",
+  "bugReportExpected": "Ne olmasını bekliyordun?",
+  "bugReportSteps": "Nasıl tekrarlanır?",
+  "bugReportCopiedEmail": "E-posta uygulaması açılamadı. Bildirim metni panoya kopyalandı; {email} adresine gönderebilirsin.",
+  "@bugReportCopiedEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "bugReportCopiedGitHub": "Tarayıcı açılamadı. Bildirim metni panoya kopyalandı; {url}/issues adresine yapıştırabilirsin.",
+  "@bugReportCopiedGitHub": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutPrivacy": "Gizlilik: Inken PDF hiçbir veri toplamaz ve internete bağlanmaz. Ayarların, son belgelerin ve yedeklerin yalnızca bu cihazda kalır."
 }

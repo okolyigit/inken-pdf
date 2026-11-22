@@ -1397,7 +1397,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutDescription.
   ///
   /// In tr, this message translates to:
-  /// **'Öğretmenler için PDF üzerinde ders anlatma uygulaması. Çizimler PDF\'in içine, her okuyucuda görünecek biçimde kaydedilir.'**
+  /// **'Hafif ve hızlı bir PDF okuyucu; üzerine yazıp çizebilirsin. Çizimler PDF\'in içine, her okuyucuda görünecek biçimde kaydedilir. Ücretsiz, hesap gerekmez.'**
   String get aboutDescription;
 
   /// No description provided for @aboutFonts.
@@ -1409,7 +1409,7 @@ abstract class AppLocalizations {
   /// Hakkında: uygulamanın kendi lisansı.
   ///
   /// In tr, this message translates to:
-  /// **'Inken PDF özgür yazılımdır: GNU Genel Kamu Lisansı sürüm 3 ya da sonraki sürümleri (GPL-3.0-or-later) koşullarıyla kullanabilir, değiştirebilir ve dağıtabilirsin. Hiçbir garanti verilmez.'**
+  /// **'Inken PDF özgür yazılımdır: GNU Genel Kamu Lisansı sürüm 3 ya da sonraki sürümleri (GPL-3.0-or-later) koşullarıyla kullanabilir, değiştirebilir ve dağıtabilirsin. Hiçbir garanti verilmez. Deneme sürümüdür; önemli dosyalarının bir kopyasını ayrıca sakla.'**
   String get aboutAppLicense;
 
   /// No description provided for @aboutLicenses.
@@ -1715,7 +1715,7 @@ abstract class AppLocalizations {
   /// No description provided for @shareAppText.
   ///
   /// In tr, this message translates to:
-  /// **'Inken PDF: öğretmenler için PDF üzerinde ders anlatma uygulaması. Ücretsiz ve açık kaynak: {url}'**
+  /// **'Inken PDF: hafif, hızlı ve ücretsiz PDF okuyucu; üzerine yazıp çizebilirsin. Hesap gerekmez, açık kaynak: {url}'**
   String shareAppText(String url);
 
   /// No description provided for @shareAppCopied.
@@ -2185,6 +2185,84 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Metni kopyala'**
   String get copyText;
+
+  /// No description provided for @bugReport.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hata bildir'**
+  String get bugReport;
+
+  /// No description provided for @bugReportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hatayı nasıl bildirmek istersin?'**
+  String get bugReportTitle;
+
+  /// No description provided for @bugReportEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta ile'**
+  String get bugReportEmail;
+
+  /// No description provided for @bugReportEmailHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'{email} adresine. Hesap gerekmez; ekran görüntüsü de ekleyebilirsin.'**
+  String bugReportEmailHint(String email);
+
+  /// No description provided for @bugReportGitHub.
+  ///
+  /// In tr, this message translates to:
+  /// **'GitHub\'da'**
+  String get bugReportGitHub;
+
+  /// No description provided for @bugReportGitHubHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'GitHub hesabı gerekir. Bildirim herkese açık görünür, gelişmesini oradan izleyebilirsin.'**
+  String get bugReportGitHubHint;
+
+  /// No description provided for @bugReportSubject.
+  ///
+  /// In tr, this message translates to:
+  /// **'Inken PDF hata bildirimi'**
+  String get bugReportSubject;
+
+  /// No description provided for @bugReportWhat.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne oldu?'**
+  String get bugReportWhat;
+
+  /// No description provided for @bugReportExpected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne olmasını bekliyordun?'**
+  String get bugReportExpected;
+
+  /// No description provided for @bugReportSteps.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nasıl tekrarlanır?'**
+  String get bugReportSteps;
+
+  /// No description provided for @bugReportCopiedEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta uygulaması açılamadı. Bildirim metni panoya kopyalandı; {email} adresine gönderebilirsin.'**
+  String bugReportCopiedEmail(String email);
+
+  /// No description provided for @bugReportCopiedGitHub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tarayıcı açılamadı. Bildirim metni panoya kopyalandı; {url}/issues adresine yapıştırabilirsin.'**
+  String bugReportCopiedGitHub(String url);
+
+  /// No description provided for @aboutPrivacy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik: Inken PDF hiçbir veri toplamaz ve internete bağlanmaz. Ayarların, son belgelerin ve yedeklerin yalnızca bu cihazda kalır.'**
+  String get aboutPrivacy;
 }
 
 class _AppLocalizationsDelegate

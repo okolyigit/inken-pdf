@@ -5,7 +5,7 @@
 <h1 align="center">Inken PDF</h1>
 
 <p align="center">
-  <b>Öğretmenler için PDF üzerinde ders anlatma uygulaması.</b><br>
+  <b>Hafif, hızlı, ücretsiz PDF okuyucu; üzerine yazıp çizebildiğin.</b><br>
   Windows · Linux (Pardus, Debian, Ubuntu, Arch) · Android
 </p>
 
@@ -19,11 +19,17 @@
   <img src="docs/screenshots/ders.png" alt="Inken PDF ile ders anlatımı: fosforlu, şekiller ve çözüm" width="900">
 </p>
 
-Ders kitabını, çalışma kâğıdını ya da sunumunu PDF olarak aç; kalemle, fosforluyla, şekil ve metinle üzerinde anlat. Çizimler **PDF'in içine**, her PDF okuyucuda görünecek biçimde kaydedilir ve Inken'de yeniden açınca düzenlenebilir kalır. Orijinal dosyanın üzerine sessizce yazılmaz.
+Inken PDF her gün kullanacağın PDF okuyucu olarak tasarlandı. Hızlı açılır, telefonu yormaz, üzerine yazıp çizmek de bir dokunuş uzakta.
 
-Akıllı tahtada, dizüstünde ya da kalemli tablette aynı uygulama. Ücretsiz ve açık kaynak.
+- **Herkes için:** hafif ve hızlı bir PDF okuyucu. Kurulum paketi yaklaşık 15 MB; büyük dosyalar bile beklemeden açılır, sayfalar akıcı kayar. Metinde arama, içindekiler ve parolalı PDF'ler de var.
+- **Öğrenciler için:** ders notunun önemli yerini fosforluyla işaretle, kenarına not al, çalışma kâğıdındaki soruyu doğrudan üzerinde çöz. Cetvel, gönye, iletki, pergel ve koordinat düzlemi geometri ve grafik sorularında hazır.
+- **Öğretmenler için:** akıllı tahtada PDF üzerinde ders anlat. Spot ışığı, perde, tam ekran ve gerçek boyutlu ölçme araçları ders sırasında hazır.
 
-> **Deneme sürümü.** Inken PDF beta aşamasında. Karşılaştığın sorunları [Issues](https://github.com/okolyigit/inken-pdf/issues) bölümüne yazarsan çok sevinirim.
+Çizimler **PDF'in içine**, her PDF okuyucuda görünecek biçimde kaydedilir ve Inken'de yeniden açınca düzenlenebilir kalır. Orijinal dosyanın üzerine sessizce yazılmaz.
+
+**Tamamen ücretsiz ve açık kaynak.** Hesap açman ya da oturum açman gerekmez. Reklam yok, veri toplama yok; uygulama internete bile bağlanmaz, dosyaların cihazında kalır. Telefonda, tablette, dizüstünde ve akıllı tahtada aynı uygulama.
+
+> **Deneme sürümü.** Inken PDF beta aşamasında ve hatalar olabilir. Uygulama orijinal dosyanın üzerine sessizce yazmaz ve otomatik yedek alır; yine de önemli dosyalarının bir kopyasını ayrıca sakla. Inken PDF **hiçbir garanti olmadan** sunulur; dosya ya da veri kaybından geliştirici sorumlu tutulamaz ([GPL-3.0](LICENSE), madde 15–16). Karşılaştığın sorunları uygulamada **Ayarlar → Hakkında → Hata bildir** ile ya da [Issues](https://github.com/okolyigit/inken-pdf/issues) bölümünden bildirirsen çok sevinirim.
 
 ## Neler yapabilirsin
 
@@ -94,6 +100,10 @@ cd apps/inken && flutter test
 cd apps/inken && flutter run -d linux
 ```
 
+## Gizlilik
+
+Inken PDF hiçbir kişisel veri toplamaz ve internete bağlanmaz; ayarların, son belgelerin ve yedeklerin yalnızca cihazında kalır. Ayrıntı: [Gizlilik Politikası](PRIVACY.md).
+
 ## Lisans
 
 Inken PDF özgür yazılımdır: [GNU Genel Kamu Lisansı sürüm 3](LICENSE) ya da (seçiminize göre) sonraki sürümleri (GPL-3.0-or-later) koşullarıyla kullanabilir, değiştirebilir ve dağıtabilirsiniz. Değiştirilmiş sürümleri dağıtan, kaynak kodunu da aynı lisansla vermelidir. Uygulamaya gömülü yazı tipleri kendi lisanslarıyladır (SIL Open Font License, Bitstream Vera; `apps/inken/assets/fonts/`).
@@ -104,15 +114,21 @@ Inken PDF özgür yazılımdır: [GNU Genel Kamu Lisansı sürüm 3](LICENSE) ya
 
 ## English
 
-**Inken PDF is an app for teaching on top of PDFs.** Open a textbook page, a worksheet or slides as a PDF and teach on it with a pen, highlighter, shapes and text. Your annotations are saved **inside the PDF**, so they show up in any PDF reader, and they stay editable when you reopen the file in Inken. The original file is never overwritten silently.
+**Inken PDF is a light, fast, free PDF reader that you can also write and draw on.**
 
-It runs on Windows, Linux and Android, and works on interactive whiteboards, laptops and pen tablets. Free and open source. The interface is available in English and Turkish.
+- **For everyone:** a lightweight PDF reader. The installer is about 15 MB, large files open without waiting and pages scroll smoothly. Text search, outline and password-protected PDFs are included.
+- **For students:** highlight the key parts of your notes, write in the margins, solve worksheet problems right on the page. Ruler, set square, protractor, compass and a coordinate plane are ready for geometry and graphs.
+- **For teachers:** teach on a PDF on an interactive whiteboard, with spotlight, curtain, full screen and real-size measuring tools.
+
+Your annotations are saved **inside the PDF**, so they show up in any PDF reader, and they stay editable when you reopen the file in Inken. The original file is never overwritten silently.
+
+**Completely free and open source.** No account, no sign-in, no ads, no data collection; the app doesn't even connect to the internet, and your files stay on your device. It runs on Windows, Linux and Android: phones, tablets, laptops and interactive whiteboards. The interface is available in English and Turkish.
 
 <p align="center">
   <img src="docs/screenshots/lesson.png" alt="Inken PDF in English" width="900">
 </p>
 
-> **Beta.** Inken PDF is in beta. Please report problems in [Issues](https://github.com/okolyigit/inken-pdf/issues).
+> **Beta.** Inken PDF is in beta and may have bugs. The app never silently overwrites the original file and keeps automatic backups; still, keep a separate copy of important files. Inken PDF comes **without any warranty**; the developer cannot be held liable for lost files or data ([GPL-3.0](LICENSE), sections 15–16). Please report problems from **Settings → About → Report a bug** in the app, or in [Issues](https://github.com/okolyigit/inken-pdf/issues).
 
 ### Features
 
@@ -137,6 +153,10 @@ Download the file for your system from the [latest release](https://github.com/o
 ### File format
 
 A file saved by Inken is a regular PDF. Every drawing is written as a PDF annotation with its own appearance stream, so other readers display it. Inken also embeds its editable layer as a PDF attachment. Details (in Turkish): [`docs/format.md`](docs/format.md).
+
+### Privacy
+
+Inken PDF collects no personal data and doesn't connect to the internet; your settings, recent documents and backups stay on your device. Details: [Privacy Policy](PRIVACY.md#privacy-policy--inken-pdf).
 
 ### License
 
