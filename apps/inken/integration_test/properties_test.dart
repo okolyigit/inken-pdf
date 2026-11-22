@@ -122,5 +122,22 @@ void main() {
     await _settle(t);
     expect(inDialog('4'), findsOneWidget);
     expect(inDialog('297 × 210 mm (A4, Yatay)'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('properties-close')));
+    await _settle(t);
+
+    // 3) Telefon: etiket değerin üstünde, aynı soldan başlar.
+    await t.binding.setSurfaceSize(null);
+    t.view.physicalSize = const Size(400, 800);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    await _settle(t);
+    await t.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await t.sendKeyEvent(LogicalKeyboardKey.keyD);
+    await t.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await _until(t, () => inDialog('Işık ve Gölge').evaluate().isNotEmpty);
+    final label = t.getRect(inDialog('Başlık'));
+    final value = t.getRect(inDialog('Işık ve Gölge'));
+    expect(label.bottom, lessThanOrEqualTo(value.top));
+    expect(label.left, moreOrLessEquals(value.left, epsilon: 1));
   });
 }

@@ -173,41 +173,64 @@ class _Heading extends StatelessWidget {
 }
 
 /// Etiket / değer satırları; boş değer "—". Değerler seçilip kopyalanabilir.
+/// Genişte etiket solda sabit sütunda; darda (telefon) etiket küçük ve
+/// soluk olarak üstte, değer altında.
 class _Rows extends StatelessWidget {
   const _Rows({required this.rows});
   final List<(String, String)> rows;
 
+  /// Bu genişliğin altında etiket değerin üstüne geçer.
+  static const double stackBelow = 420;
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (final (label, value) in rows)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 150,
-                  child: Text(
-                    label,
-                    style: InkenText.body.copyWith(color: c.inkMuted),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stacked = constraints.maxWidth < stackBelow;
+        Widget value(String v) => SelectableText(
+          v.isEmpty ? '—' : v,
+          style: InkenText.body.copyWith(color: v.isEmpty ? c.inkFaint : c.ink),
+        );
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final (label, v) in rows)
+              if (stacked)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: Space.s3),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: InkenText.caption.copyWith(color: c.inkMuted),
+                      ),
+                      const SizedBox(height: 2),
+                      value(v),
+                    ],
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        child: Text(
+                          label,
+                          style: InkenText.body.copyWith(color: c.inkMuted),
+                        ),
+                      ),
+                      Expanded(child: value(v)),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: SelectableText(
-                    value.isEmpty ? '—' : value,
-                    style: InkenText.body.copyWith(
-                      color: value.isEmpty ? c.inkFaint : c.ink,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
