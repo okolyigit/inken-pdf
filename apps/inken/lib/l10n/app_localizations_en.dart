@@ -1578,7 +1578,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportFormatImagesHint =>
-      'Each page becomes a PNG image; several pages go into one ZIP file.';
+      'Each page becomes an image (PNG or JPEG); several pages go into one ZIP file.';
 
   @override
   String get exportPages => 'Pages';
@@ -1646,4 +1646,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String exportPageOf(int page) {
     return 'Page $page of the document';
   }
+
+  @override
+  String get exportFileType => 'File type';
+
+  @override
+  String get exportFileTypeHint =>
+      'PNG is sharp; JPEG is much smaller for scanned and photo pages.';
 }

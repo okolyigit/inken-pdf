@@ -831,7 +831,7 @@
   "exportFormatImages": "Görsel",
   "exportFormatFlattenedHint": "Çizimler sayfaya gömülür; her okuyucuda aynı görünür. Öğrencilerle paylaşmak ve yazdırmak için.",
   "exportFormatEditableHint": "Çizimler Inken'de düzenlenmeye devam eder; başka okuyucularda da görünür.",
-  "exportFormatImagesHint": "Her sayfa bir PNG görseli; birden çok sayfa tek ZIP dosyasında.",
+  "exportFormatImagesHint": "Her sayfa bir görsel (PNG ya da JPEG); birden çok sayfa tek ZIP dosyasında.",
   "exportPages": "Sayfalar",
   "exportPagesAll": "Tümü",
   "exportPagesCurrent": "Bu sayfa",
@@ -879,5 +879,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "exportFileType": "Dosya türü",
+  "exportFileTypeHint": "PNG keskin; JPEG taranmış ve fotoğraflı sayfalarda çok daha küçük."
 }

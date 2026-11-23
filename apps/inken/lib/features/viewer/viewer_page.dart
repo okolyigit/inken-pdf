@@ -775,11 +775,20 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       ),
       ExportFormat.images => await _pickTarget(
         suggestedName: single
-            ? _captureName(choice.pages.single)
+            ? _captureName(
+                choice.pages.single,
+                extension: choice.encoding == ImageEncoding.jpeg
+                    ? 'jpg'
+                    : 'png',
+              )
             : safeFileName(l10n.pagesZipName(base), extension: 'zip'),
         allowed: (t) => !samePath(t, widget.document.path),
         rejected: l10n.exportOntoOpenFile,
-        format: single ? SaveFormat.png : SaveFormat.zip,
+        format: !single
+            ? SaveFormat.zip
+            : choice.encoding == ImageEncoding.jpeg
+            ? SaveFormat.jpeg
+            : SaveFormat.png,
       ),
     };
     if (target == null || !mounted) return;
@@ -810,6 +819,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
             document: document,
             dpi: choice.dpi,
             grayscale: choice.grayscale,
+            encoding: choice.encoding,
           );
           await ref
               .read(documentIoProvider)
@@ -861,7 +871,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
         region,
         scale: size.scale,
         grayscale: grayscale,
-      )).png;
+      )).bytes;
     } finally {
       await imager.dispose();
     }
@@ -1248,12 +1258,18 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     setState(() => _capturing = false);
   }
 
-  /// Yakalanan alanın dosya adı: `Belge - sayfa 3.png`.
-  String _captureName(int page) => safeFileName(
-    AppLocalizations.of(context)
-        .captureFileName(withoutPdfExtension(widget.document.name), page + 1),
-    extension: 'png',
-  );
+  /// Yakalanan alanın dosya adı: `Belge - sayfa 3.png` ([extension]
+  /// verilirse o uzantıyla).
+  String _captureName(int page, {String extension = 'png'}) {
+    final name = AppLocalizations.of(context)
+        .captureFileName(withoutPdfExtension(widget.document.name), page + 1);
+    return safeFileName(
+      name.toLowerCase().endsWith('.png')
+          ? name.substring(0, name.length - 4)
+          : name,
+      extension: extension,
+    );
+  }
 
   /// [sel]'i çizimleri gömülü olarak PNG'ye çevirir; uzun kenar en çok
   /// [maxPixels].
@@ -1294,16 +1310,16 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       done = switch (action) {
         CaptureAction.newPage => await _captureToNewPage(session, sel),
         CaptureAction.copy => await _copyImage(
-          (await _renderCapture(session, sel)).png,
+          (await _renderCapture(session, sel)).bytes,
         ),
         CaptureAction.save => await _saveImage(
-          (await _renderCapture(session, sel)).png,
+          (await _renderCapture(session, sel)).bytes,
           _captureName(sel.page),
         ),
         CaptureAction.share => await _shareImages([
           (
             name: _captureName(sel.page),
-            bytes: (await _renderCapture(session, sel)).png,
+            bytes: (await _renderCapture(session, sel)).bytes,
           ),
         ], _captureName(sel.page)),
       };
@@ -1407,7 +1423,12 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     InkenDocument? document,
     int dpi = 200,
     bool grayscale = false,
+    ImageEncoding encoding = ImageEncoding.png,
   }) async {
+    final extension = switch (encoding) {
+      ImageEncoding.png => 'png',
+      ImageEncoding.jpeg => 'jpg',
+    };
     document ??= session.document;
     final subset = pageSubset(document, pages);
     final imager = await ref
@@ -1421,7 +1442,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       return [
         for (final (i, page) in pages.indexed)
           (
-            name: _captureName(page),
+            name: _captureName(page, extension: extension),
             bytes: (await imager.render(
               i,
               wholePage(subset.pages[i]),
@@ -1431,7 +1452,8 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                 maxPixels: maxExportPixels,
               ).scale,
               grayscale: grayscale,
-            )).png,
+              encoding: encoding,
+            )).bytes,
           ),
       ];
     } finally {
@@ -1498,7 +1520,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
   ) async {
     if (!session.canChangePages) return false;
     final image = await _renderCapture(session, sel, maxPixels: maxImageSide);
-    final prepared = await prepareImage(image.png);
+    final prepared = await prepareImage(image.bytes);
     if (prepared == null) throw StateError('Görsel hazırlanamadı');
     if (!mounted ||
         !identical(session, _session) ||

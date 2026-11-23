@@ -2849,7 +2849,7 @@ abstract class AppLocalizations {
   /// No description provided for @exportFormatImagesHint.
   ///
   /// In tr, this message translates to:
-  /// **'Her sayfa bir PNG görseli; birden çok sayfa tek ZIP dosyasında.'**
+  /// **'Her sayfa bir görsel (PNG ya da JPEG); birden çok sayfa tek ZIP dosyasında.'**
   String get exportFormatImagesHint;
 
   /// No description provided for @exportPages.
@@ -2953,6 +2953,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Belgede {page}. sayfa'**
   String exportPageOf(int page);
+
+  /// No description provided for @exportFileType.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dosya türü'**
+  String get exportFileType;
+
+  /// No description provided for @exportFileTypeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'PNG keskin; JPEG taranmış ve fotoğraflı sayfalarda çok daha küçük.'**
+  String get exportFileTypeHint;
 }
 
 class _AppLocalizationsDelegate

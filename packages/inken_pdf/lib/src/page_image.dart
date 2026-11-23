@@ -1,14 +1,30 @@
+import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:image/image.dart' as img;
 import 'package:inken_core/inken_core.dart';
 import 'package:pdfrx/pdfrx.dart';
 
 import 'print_raster.dart' show toGrayscale;
 
-/// Bir sayfanın (ya da bölgesinin) görüntüsü: PNG baytları ve boyutu.
-typedef PageImage = ({Uint8List png, int width, int height});
+/// Görüntünün dosya biçimi.
+enum ImageEncoding {
+  /// Kayıpsız; metin ve çizim keskin. Varsayılan.
+  png,
+
+  /// Kayıplı, çok daha küçük (taranmış ve fotoğraflı sayfalar); saydamlık
+  /// yok (zemin zaten beyaz).
+  jpeg,
+}
+
+/// JPEG'in varsayılan kalitesi (1–100): metin okunur, dosya küçük.
+const int defaultJpegQuality = 85;
+
+/// Bir sayfanın (ya da bölgesinin) görüntüsü: dosya baytları (PNG ya da
+/// JPEG) ve piksel boyutu.
+typedef PageImage = ({Uint8List bytes, int width, int height});
 
 /// PDF sayfalarından görüntü (PNG) üretir: bölge yakalama ve sayfaları
 /// görsel olarak dışa aktarma. Sayfadaki açıklamalar görüntüye girer;
@@ -39,12 +55,15 @@ class PdfPageImager {
 
   /// [index]'inci sayfanın (0'dan) [region] bölgesini (pt, sayfa uzayı)
   /// [scale] piksel / pt ölçeğiyle çizer. Zemin beyazdır; [grayscale]
-  /// gri tonlamalı.
+  /// gri tonlamalı. [encoding]: PNG ya da JPEG ([quality] 1–100; JPEG
+  /// ayrı isolate'te kodlanır, arayüz takılmasın).
   Future<PageImage> render(
     int index,
     PageRegion region, {
     required double scale,
     bool grayscale = false,
+    ImageEncoding encoding = ImageEncoding.png,
+    int quality = defaultJpegQuality,
   }) async {
     final page = _doc.pages[index];
     final x = (region.left * scale).round();
@@ -71,11 +90,13 @@ class PdfPageImager {
       image.dispose();
     }
     if (grayscale) toGrayscale(bgra);
-    return (
-      png: await _encodePng(bgra, width, height),
-      width: width,
-      height: height,
-    );
+    final bytes = switch (encoding) {
+      ImageEncoding.png => await _encodePng(bgra, width, height),
+      ImageEncoding.jpeg => await Isolate.run(
+        () => encodeJpegBgra(bgra, width, height, quality: quality),
+      ),
+    };
+    return (bytes: bytes, width: width, height: height);
   }
 
   Future<void> dispose() => _doc.dispose();
@@ -102,4 +123,23 @@ Future<Uint8List> _encodePng(Uint8List bgra, int width, int height) async {
     descriptor.dispose();
     buffer.dispose();
   }
+}
+
+/// BGRA8888 pikselleri ([width] × [height], üstten aşağı) JPEG'e çevirir.
+/// Saydamlık atılır (sayfa zemini beyazdır).
+Uint8List encodeJpegBgra(
+  Uint8List bgra,
+  int width,
+  int height, {
+  int quality = defaultJpegQuality,
+}) {
+  final image = img.Image.fromBytes(
+    width: width,
+    height: height,
+    bytes: bgra.buffer,
+    bytesOffset: bgra.offsetInBytes,
+    numChannels: 4,
+    order: img.ChannelOrder.bgra,
+  );
+  return img.encodeJpg(image, quality: quality.clamp(1, 100));
 }

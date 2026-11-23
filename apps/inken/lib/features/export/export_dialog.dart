@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inken_core/inken_core.dart';
+import 'package:inken_pdf/inken_pdf.dart' show ImageEncoding;
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -15,7 +16,8 @@ typedef ExportChoice = ({
   /// Dışa aktarılacak sayfalar (0'dan, sırayla).
   List<int> pages,
 
-  /// Görselde çözünürlük ve gri tonlama.
+  /// Görselde dosya türü, çözünürlük ve gri tonlama.
+  ImageEncoding encoding,
   int dpi,
   bool grayscale,
 });
@@ -117,6 +119,11 @@ class ExportDialogState extends State<ExportDialog> {
   };
   late bool skipBlank = _flag('skipBlank', false);
   late bool grayscale = _flag('grayscale', false);
+  late ImageEncoding encoding = _pick(
+    'encoding',
+    ImageEncoding.values,
+    ImageEncoding.png,
+  );
   late int dpi = switch (_saved['dpi']) {
     final int d when exportDpis.contains(d) => d,
     _ => defaultExportDpi,
@@ -176,6 +183,7 @@ class ExportDialogState extends State<ExportDialog> {
   });
   void setGrayscale(bool v) => setState(() => grayscale = v);
   void setDpi(int v) => setState(() => dpi = v);
+  void setEncoding(ImageEncoding v) => setState(() => encoding = v);
   void showPage(int at) => setState(() => previewAt = at);
 
   void _submit() {
@@ -187,10 +195,12 @@ class ExportDialogState extends State<ExportDialog> {
       'skipBlank': skipBlank,
       'grayscale': grayscale,
       'dpi': dpi,
+      'encoding': encoding.name,
     });
     Navigator.pop<ExportChoice>(context, (
       format: format,
       pages: list,
+      encoding: encoding,
       dpi: dpi,
       grayscale: grayscale,
     ));
@@ -202,7 +212,7 @@ class ExportDialogState extends State<ExportDialog> {
       ExportFormat.flattened => l10n.exportFormatFlattened,
       ExportFormat.editable => l10n.exportFormatEditable,
       ExportFormat.images => [
-        'PNG',
+        _encodingName(encoding),
         l10n.dpiLabel(dpi),
         if (count > 1) l10n.exportSummaryZip,
       ].join(' · '),
@@ -536,6 +546,17 @@ class _Settings extends StatelessWidget {
           ),
         if (state.format == ExportFormat.images) ...[
           const SizedBox(height: Space.s2),
+          label(l10n.exportFileType),
+          Segmented<ImageEncoding>(
+            key: const ValueKey('export-encoding'),
+            value: state.encoding,
+            onChanged: state.setEncoding,
+            options: [
+              for (final e in ImageEncoding.values) (e, null, _encodingName(e)),
+            ],
+          ),
+          hint(l10n.exportFileTypeHint),
+          gap,
           label(l10n.exportResolution),
           Segmented<int>(
             key: const ValueKey('export-dpi'),
@@ -680,3 +701,8 @@ class _FormatOption extends StatelessWidget {
     );
   }
 }
+
+String _encodingName(ImageEncoding e) => switch (e) {
+  ImageEncoding.png => 'PNG',
+  ImageEncoding.jpeg => 'JPEG',
+};

@@ -277,8 +277,8 @@ void main() {
       return data!.buffer.asUint8List();
     }
 
-    final a = await rgba(full.png);
-    final b = await rgba(part.png);
+    final a = await rgba(full.bytes);
+    final b = await rgba(part.bytes);
     var diff = 0, ink = 0, samples = 0;
     for (var y = 0; y < part.height; y += 3) {
       for (var x = 0; x < part.width; x += 3) {
@@ -294,7 +294,7 @@ void main() {
 
     // Gri tonlama: her pikselde R = G = B.
     final gray = await rgba(
-      (await imager.render(0, region, scale: 1, grayscale: true)).png,
+      (await imager.render(0, region, scale: 1, grayscale: true)).bytes,
     );
     for (var i = 0; i + 3 < gray.length; i += 4 * 97) {
       expect(gray[i], gray[i + 1]);

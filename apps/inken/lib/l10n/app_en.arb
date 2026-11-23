@@ -458,7 +458,7 @@
   "exportFormatImages": "Images",
   "exportFormatFlattenedHint": "Drawings are embedded in the page and look the same in every reader. For sharing with students and printing.",
   "exportFormatEditableHint": "Drawings stay editable in Inken and also show in other readers.",
-  "exportFormatImagesHint": "Each page becomes a PNG image; several pages go into one ZIP file.",
+  "exportFormatImagesHint": "Each page becomes an image (PNG or JPEG); several pages go into one ZIP file.",
   "exportPages": "Pages",
   "exportPagesAll": "All",
   "exportPagesCurrent": "This page",
@@ -475,5 +475,7 @@
   "exportCopyFileName": "{base} (editable).pdf",
   "exporting": "Exporting…",
   "dpiLabel": "{dpi} dpi",
-  "exportPageOf": "Page {page} of the document"
+  "exportPageOf": "Page {page} of the document",
+  "exportFileType": "File type",
+  "exportFileTypeHint": "PNG is sharp; JPEG is much smaller for scanned and photo pages."
 }

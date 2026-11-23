@@ -1537,7 +1537,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get exportFormatImagesHint =>
-      'Her sayfa bir PNG görseli; birden çok sayfa tek ZIP dosyasında.';
+      'Her sayfa bir görsel (PNG ya da JPEG); birden çok sayfa tek ZIP dosyasında.';
 
   @override
   String get exportPages => 'Sayfalar';
@@ -1605,4 +1605,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String exportPageOf(int page) {
     return 'Belgede $page. sayfa';
   }
+
+  @override
+  String get exportFileType => 'Dosya türü';
+
+  @override
+  String get exportFileTypeHint =>
+      'PNG keskin; JPEG taranmış ve fotoğraflı sayfalarda çok daha küçük.';
 }

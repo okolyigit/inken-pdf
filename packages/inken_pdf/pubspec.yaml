@@ -12,6 +12,7 @@ dependencies:
   ffi: ^2.2.0
   flutter:
     sdk: flutter
+  image: ^4.13.1
   inken_core:
     path: ../inken_core
   pdfium_dart: 0.4.1

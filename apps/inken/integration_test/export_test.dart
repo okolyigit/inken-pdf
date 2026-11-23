@@ -89,9 +89,13 @@ String _summary(WidgetTester t) =>
     t.widget<Text>(find.byKey(const ValueKey('export-summary'))).data!;
 
 Future<void> _segment(WidgetTester t, String key, String label) async {
-  await t.tap(
-    find.descendant(of: find.byKey(ValueKey(key)), matching: find.text(label)),
+  final target = find.descendant(
+    of: find.byKey(ValueKey(key)),
+    matching: find.text(label),
   );
+  await t.ensureVisible(target);
+  await t.pumpAndSettle();
+  await t.tap(target);
   await t.pump();
 }
 
@@ -176,6 +180,8 @@ void main() {
     await _shot(t, 'export_pencere');
 
     // Boş eklenen sayfayı atla → 2; yalnızca çizimli → 1.
+    await t.ensureVisible(find.byKey(const ValueKey('export-skip-blank')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(const ValueKey('export-skip-blank')));
     await t.pump();
     expect(_summary(t), '2 sayfa · Çizimli PDF');
@@ -211,6 +217,18 @@ void main() {
     final zip = File('${dir.path}/out/ders - sayfalar.zip');
     await _until(t, zip.existsSync);
     expect(_zipCount(zip.readAsBytesSync()), 2);
+
+    // Görsel, JPEG, bu sayfa: tek .jpg dosyası.
+    await _ctrlE(t);
+    await _segment(t, 'export-encoding', 'JPEG');
+    await _segment(t, 'export-pages', 'Bu sayfa');
+    expect(_summary(t), '1 sayfa · JPEG · 96 dpi');
+    await t.tap(find.byKey(const ValueKey('export-submit')));
+    await t.pumpAndSettle();
+    expect(io.asked.last, ('ders - sayfa 1.jpg', SaveFormat.jpeg));
+    final jpg = File('${dir.path}/out/ders - sayfa 1.jpg');
+    await _until(t, jpg.existsSync);
+    expect(jpg.readAsBytesSync().sublist(0, 2), [0xFF, 0xD8]);
 
     // 3) Düzenlenebilir PDF, aralık "2": inken.json var, tek sayfa.
     await _ctrlE(t);
