@@ -16,6 +16,10 @@
 </p>
 
 <p align="center">
+  <a href="https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB"><img src="https://get.microsoft.com/images/tr%20dark.svg" width="200" alt="Microsoft'tan edinin"></a>
+</p>
+
+<p align="center">
   <img src="docs/screenshots/ders.png" alt="Inken PDF ile ders anlatımı: fosforlu, şekiller ve çözüm" width="900">
 </p>
 
@@ -67,10 +71,11 @@ Inken PDF her gün kullanacağın PDF okuyucu olarak tasarlandı. Hızlı açıl
 
 ## Kurulum
 
-[Son sürüm sayfasından](https://github.com/okolyigit/inken-pdf/releases/latest) sistemine uygun dosyayı indir.
+Windows'ta en kolayı [Microsoft Store](https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB). Diğer sistemler için [son sürüm sayfasından](https://github.com/okolyigit/inken-pdf/releases/latest) sistemine uygun dosyayı indir.
 
 | Sistem | Dosya | Kurulum |
 |---|---|---|
+| **Windows** 10 / 11 | [Microsoft Store](https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB) | Önerilen: tek tıkla kurulur, güncellemeler kendiliğinden gelir. |
 | **Windows** 10 / 11 | `InkenPDF-Kurulum-*.exe` | Çalıştır. Windows "bilgisayarınızı korudu" derse **Ek bilgi → Yine de çalıştır**. Kurulum istemiyorsan `InkenPDF-tasinabilir-*.zip`. |
 | **Pardus / Debian / Ubuntu** | `inken-pdf_*_amd64.deb` | `sudo apt install ./inken-pdf_*_amd64.deb` |
 | **Arch / CachyOS** | `inken-pdf-*.pkg.tar.zst` | `sudo pacman -U inken-pdf-*.pkg.tar.zst` |
@@ -141,10 +146,13 @@ Your annotations are saved **inside the PDF**, so they show up in any PDF reader
 
 ### Install
 
-Download the file for your system from the [latest release](https://github.com/okolyigit/inken-pdf/releases/latest).
+<a href="https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft"></a>
+
+On Windows, the easiest way is the [Microsoft Store](https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB). For other systems, download the file from the [latest release](https://github.com/okolyigit/inken-pdf/releases/latest).
 
 | System | File | How |
 |---|---|---|
+| **Windows** 10 / 11 | [Microsoft Store](https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB) | Recommended: one-click install, automatic updates. |
 | **Windows** 10 / 11 | `InkenPDF-Kurulum-*.exe` | Run it. If Windows SmartScreen warns you, choose **More info → Run anyway**. For a portable copy, use `InkenPDF-tasinabilir-*.zip`. |
 | **Debian / Ubuntu / Pardus** | `inken-pdf_*_amd64.deb` | `sudo apt install ./inken-pdf_*_amd64.deb` |
 | **Arch / CachyOS** | `inken-pdf-*.pkg.tar.zst` | `sudo pacman -U inken-pdf-*.pkg.tar.zst` |
