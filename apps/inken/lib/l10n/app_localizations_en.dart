@@ -671,6 +671,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get printDocument => 'Print…';
 
   @override
+  String appendPage(String template) {
+    return 'Add page at the end: $template';
+  }
+
+  @override
   String get insertPage => 'Insert page';
 
   @override

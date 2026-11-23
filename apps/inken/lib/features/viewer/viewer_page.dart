@@ -442,6 +442,17 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
 
   void _setNewColor(PageColor c) => setState(() => _newColor = c);
 
+  /// Son eklenen sayfanın zemini: "Sona ekle" (+) bununla ekler; belge
+  /// açık kaldıkça hatırlanır.
+  PageTemplate _lastTemplate = PageTemplate.blank;
+
+  /// Belgenin sonuna son seçilen zemin, yön ve renkle sayfa ekler.
+  void _appendPage() {
+    final session = _session;
+    if (session == null || !session.canChangePages) return;
+    _insertPageAt(session.document.pages.length, _lastTemplate);
+  }
+
   /// Geçerli sayfanın arkasına [template] zeminli sayfa ekler.
   void _insertPage(PageTemplate template) {
     final session = _session;
@@ -457,6 +468,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     final pages = session.document.pages;
     final at = index.clamp(0, pages.length);
     final like = (at - 1).clamp(0, pages.length - 1);
+    _lastTemplate = template;
     _targetPage = at;
     session.insertPage(
       at,
@@ -1431,6 +1443,8 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     nextPage: () => _goPage(1),
     goToPage: _askGoToPage,
     insertPage: session != null && session.canChangePages ? _insertPage : null,
+    appendPage: session != null && session.canChangePages ? _appendPage : null,
+    newPageTemplate: _lastTemplate,
     newPageOrientation: _effectiveOrientation(session),
     setNewPageOrientation: _setNewOrientation,
     newPageColor: _newColor,

@@ -1061,8 +1061,7 @@ class _PageTile extends StatelessWidget {
 /// Bir sayfanın çizimleri, küçük resmin boyutuna ölçeklenmiş. Metin font
 /// olmadan (küçük boyda fark edilmez).
 class _LayerPainter extends CustomPainter {
-  _LayerPainter(this.layer, this.images, this.recolor)
-    : super(repaint: images);
+  _LayerPainter(this.layer, this.images, this.recolor) : super(repaint: images);
 
   /// Gece modunda çizim renkleri.
   final InkRecolor? recolor;

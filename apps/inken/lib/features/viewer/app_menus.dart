@@ -249,6 +249,8 @@ class DocumentMenuActions {
     this.print,
     this.share,
     this.insertPage,
+    this.appendPage,
+    this.newPageTemplate = PageTemplate.blank,
     this.newPageOrientation = PageOrientation.portrait,
     this.setNewPageOrientation,
     this.newPageColor = PageColor.white,
@@ -292,6 +294,13 @@ class DocumentMenuActions {
 
   /// Geçerli sayfanın arkasına seçilen zeminle sayfa ekler.
   final ValueChanged<PageTemplate>? insertPage;
+
+  /// Belgenin sonuna [newPageTemplate] zeminli, seçili yön ve renkte sayfa
+  /// ekler (hızlı erişim çubuğundaki +).
+  final VoidCallback? appendPage;
+
+  /// Son eklenen sayfanın zemini; [appendPage] bununla ekler.
+  final PageTemplate newPageTemplate;
 
   /// Eklenecek sayfanın yönü ve değiştirilmesi ("Sayfa ekle" menüsünde).
   final PageOrientation newPageOrientation;

@@ -73,6 +73,30 @@ class QuickBar extends StatelessWidget {
       ),
     );
 
+    // Çerçeveli grubun içindeki düğme: köşesiz, grubun boyunda.
+    Widget groupButton(
+      String id,
+      IconData icon,
+      String label,
+      VoidCallback? onPressed, {
+      required double width,
+    }) => IconButton(
+      key: ValueKey('quick-$id'),
+      tooltip: label,
+      icon: Icon(icon, size: 20),
+      onPressed: onPressed,
+      style: IconButton.styleFrom(
+        foregroundColor: c.ink,
+        disabledForegroundColor: c.inkFaint,
+        hoverColor: c.surfaceHover,
+        fixedSize: Size(width, Sizes.target - Space.s2),
+        minimumSize: Size.zero,
+        padding: EdgeInsets.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: const RoundedRectangleBorder(),
+      ),
+    );
+
     Widget divider() => Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: Space.s2,
@@ -103,23 +127,52 @@ class QuickBar extends StatelessWidget {
                   a.print,
                 ),
                 divider(),
-                MenuAnchor(
-                  menuChildren: pageInsertMenuChildren(
-                    l10n,
-                    orientation: a.newPageOrientation,
-                    onOrientation: a.setNewPageOrientation,
-                    color: a.newPageColor,
-                    onColor: a.setNewPageColor,
-                    onInsert: a.insertPage,
-                    keyPrefix: 'quick-insert',
+                // Sayfa ekle: solda menü (zemin, yön, renk; geçerli
+                // sayfanın arkasına), sağda + (son seçimlerle belgenin
+                // sonuna). İkisi tek çerçevede.
+                Container(
+                  key: const ValueKey('quick-insert-group'),
+                  height: Sizes.target - Space.s2,
+                  margin: const EdgeInsets.symmetric(horizontal: Space.s1),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(Radii.md),
+                    border: Border.all(color: c.line),
                   ),
-                  builder: (context, menu, _) => button(
-                    'insert-page',
-                    LucideIcons.filePlus2,
-                    l10n.insertPage,
-                    a.insertPage == null
-                        ? null
-                        : () => menu.isOpen ? menu.close() : menu.open(),
+                  clipBehavior: Clip.antiAlias,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MenuAnchor(
+                        menuChildren: pageInsertMenuChildren(
+                          l10n,
+                          orientation: a.newPageOrientation,
+                          onOrientation: a.setNewPageOrientation,
+                          color: a.newPageColor,
+                          onColor: a.setNewPageColor,
+                          onInsert: a.insertPage,
+                          keyPrefix: 'quick-insert',
+                        ),
+                        builder: (context, menu, _) => groupButton(
+                          'insert-page',
+                          LucideIcons.filePlus2,
+                          l10n.insertPage,
+                          a.insertPage == null
+                              ? null
+                              : () => menu.isOpen ? menu.close() : menu.open(),
+                          width: Sizes.target,
+                        ),
+                      ),
+                      VerticalDivider(width: 1, thickness: 1, color: c.line),
+                      groupButton(
+                        'append-page',
+                        LucideIcons.plus,
+                        l10n.appendPage(
+                          pageTemplateLabel(l10n, a.newPageTemplate),
+                        ),
+                        a.appendPage,
+                        width: Sizes.caret + Space.s2,
+                      ),
+                    ],
                   ),
                 ),
                 button(

@@ -187,6 +187,7 @@
   "settings": "Settings",
   "settingsMenu": "Settings…",
   "printDocument": "Print…",
+  "appendPage": "Add page at the end: {template}",
   "insertPage": "Insert page",
   "deletePage": "Delete page",
   "rotatePage": "Rotate page",

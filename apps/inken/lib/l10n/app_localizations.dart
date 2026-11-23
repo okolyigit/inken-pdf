@@ -1220,6 +1220,12 @@ abstract class AppLocalizations {
   /// **'Yazdır…'**
   String get printDocument;
 
+  /// No description provided for @appendPage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sona sayfa ekle: {template}'**
+  String appendPage(String template);
+
   /// No description provided for @insertPage.
   ///
   /// In tr, this message translates to:

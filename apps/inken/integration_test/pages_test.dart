@@ -130,6 +130,25 @@ void main() {
     expect(session.document.pages[0].items, hasLength(1));
     await _shot(t, 'sayfa-1-eklendi');
 
+    // 1b) + : son seçimlerle (kareli) belgenin sonuna; geri alınır.
+    await t.tap(find.byKey(const ValueKey('quick-append-page')));
+    await t.pump();
+    await settled(4);
+    expect(session.document.pages.map((p) => p.sourceIndex), [
+      0,
+      null,
+      1,
+      null,
+    ]);
+    expect(session.document.pages[3].template, PageTemplate.grid);
+    expect(viewer.currentPage, 3, reason: 'eklenen sayfaya geçer');
+    session.undo();
+    await t.pump();
+    await settled(3);
+    expect(session.document.pages.map((p) => p.sourceIndex), [0, null, 1]);
+    await viewer.jumpToPage(1);
+    await t.pump();
+
     // 2) Yeni sayfaya çiz.
     await drawOn(1);
     expect(session.document.pages[1].items, hasLength(1));

@@ -640,6 +640,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String get printDocument => 'Yazdır…';
 
   @override
+  String appendPage(String template) {
+    return 'Sona sayfa ekle: $template';
+  }
+
+  @override
   String get insertPage => 'Sayfa ekle';
 
   @override

@@ -366,6 +366,12 @@
   "settings": "Ayarlar",
   "settingsMenu": "Ayarlar…",
   "printDocument": "Yazdır…",
+  "appendPage": "Sona sayfa ekle: {template}",
+  "@appendPage": {
+    "placeholders": {
+      "template": {"type": "String"}
+    }
+  },
   "insertPage": "Sayfa ekle",
   "deletePage": "Sayfayı sil",
   "rotatePage": "Sayfayı döndür",
