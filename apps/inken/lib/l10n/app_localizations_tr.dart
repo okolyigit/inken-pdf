@@ -414,6 +414,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get colorBrick => 'Kiremit';
 
   @override
+  String get menuBars => 'Çubuklar ve paneller';
+
+  @override
   String get toolDock => 'Araç kutusu';
 
   @override

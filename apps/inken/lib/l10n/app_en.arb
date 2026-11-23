@@ -120,6 +120,7 @@
   "windowTitle": "{name} – Inken PDF",
   "goToPageTitle": "Go to page",
   "colorBrick": "Brick",
+  "menuBars": "Toolbars and panels",
   "toolDock": "Toolbox",
   "dockTop": "Top",
   "dockLeft": "Left",

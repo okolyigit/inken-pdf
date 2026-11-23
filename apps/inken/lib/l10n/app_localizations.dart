@@ -818,6 +818,12 @@ abstract class AppLocalizations {
   /// **'Kiremit'**
   String get colorBrick;
 
+  /// No description provided for @menuBars.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çubuklar ve paneller'**
+  String get menuBars;
+
   /// No description provided for @toolDock.
   ///
   /// In tr, this message translates to:

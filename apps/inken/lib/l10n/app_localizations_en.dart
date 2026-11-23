@@ -439,6 +439,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorBrick => 'Brick';
 
   @override
+  String get menuBars => 'Toolbars and panels';
+
+  @override
   String get toolDock => 'Toolbox';
 
   @override

@@ -235,6 +235,8 @@ ThemeData inkenTheme(Brightness brightness) {
     ),
     menuButtonTheme: MenuButtonThemeData(
       style: ButtonStyle(
+        // Odaklı satır arka planıyla belli olur; ayrıca çerçeve yok.
+        side: const WidgetStatePropertyAll(BorderSide.none),
         minimumSize: const WidgetStatePropertyAll(Size(0, Sizes.menuRow)),
         padding: const WidgetStatePropertyAll(
           EdgeInsets.symmetric(horizontal: Space.s3),

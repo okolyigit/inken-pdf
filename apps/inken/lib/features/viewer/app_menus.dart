@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,6 +41,54 @@ List<(ThemeMode, String)> themeChoices(AppLocalizations l10n) => [
 /// kaydırma çubuğu, soldurma. Açılış ekranında da kullanılır (belge
 /// açmadan ayarlara ulaşılsın).
 List<Widget> viewSettingsMenuItems(WidgetRef ref, AppLocalizations l10n) => [
+  // Çubuklar ve paneller tek alt menüde: Görünüm menüsü kısa kalsın. En
+  // üstte: alt menü aşağıya sığsın (sığmazsa Flutter satırın üstüne açar).
+  SubmenuButton(
+    key: const ValueKey('menu-bars'),
+    leadingIcon: const Icon(LucideIcons.panelsTopLeft),
+    menuChildren: [
+      SubmenuButton(
+        menuChildren: [
+          for (final (edge, _, label) in dockEdgeChoices(l10n))
+            RadioMenuButton<DockEdge>(
+              value: edge,
+              groupValue: ref.watch(toolDockProvider),
+              onChanged: (e) => ref.read(toolDockProvider.notifier).set(e!),
+              child: Text(label),
+            ),
+        ],
+        child: Text(l10n.toolDock),
+      ),
+      menuSeparator,
+      CheckboxMenuButton(
+        value: ref.watch(quickBarProvider),
+        onChanged: (v) => ref.read(quickBarProvider.notifier).set(v!),
+        child: Text(l10n.quickBar),
+      ),
+      CheckboxMenuButton(
+        key: const ValueKey('menu-page-panel'),
+        value: ref.watch(pagePanelProvider),
+        onChanged: (v) => ref.read(pagePanelProvider.notifier).set(v!),
+        child: Text(l10n.pagePanel),
+      ),
+      CheckboxMenuButton(
+        value: ref.watch(pageScrollbarProvider),
+        onChanged: (v) => ref.read(pageScrollbarProvider.notifier).set(v!),
+        child: Text(l10n.pageScrollbar),
+      ),
+      CheckboxMenuButton(
+        value: ref.watch(floatingFadeProvider),
+        onChanged: (v) => ref.read(floatingFadeProvider.notifier).set(v!),
+        child: Text(l10n.fadeFloating),
+      ),
+      CheckboxMenuButton(
+        value: ref.watch(homeIntroProvider),
+        onChanged: (v) => ref.read(homeIntroProvider.notifier).set(v!),
+        child: Text(l10n.introShowSetting),
+      ),
+    ],
+    child: Text(l10n.menuBars),
+  ),
   SubmenuButton(
     leadingIcon: const Icon(LucideIcons.palette),
     menuChildren: [
@@ -89,45 +139,6 @@ List<Widget> viewSettingsMenuItems(WidgetRef ref, AppLocalizations l10n) => [
     ],
     child: Text(l10n.language),
   ),
-  SubmenuButton(
-    leadingIcon: const Icon(LucideIcons.panelsTopLeft),
-    menuChildren: [
-      for (final (edge, _, label) in dockEdgeChoices(l10n))
-        RadioMenuButton<DockEdge>(
-          value: edge,
-          groupValue: ref.watch(toolDockProvider),
-          onChanged: (e) => ref.read(toolDockProvider.notifier).set(e!),
-          child: Text(label),
-        ),
-    ],
-    child: Text(l10n.toolDock),
-  ),
-  CheckboxMenuButton(
-    value: ref.watch(quickBarProvider),
-    onChanged: (v) => ref.read(quickBarProvider.notifier).set(v!),
-    child: Text(l10n.quickBar),
-  ),
-  CheckboxMenuButton(
-    key: const ValueKey('menu-page-panel'),
-    value: ref.watch(pagePanelProvider),
-    onChanged: (v) => ref.read(pagePanelProvider.notifier).set(v!),
-    child: Text(l10n.pagePanel),
-  ),
-  CheckboxMenuButton(
-    value: ref.watch(pageScrollbarProvider),
-    onChanged: (v) => ref.read(pageScrollbarProvider.notifier).set(v!),
-    child: Text(l10n.pageScrollbar),
-  ),
-  CheckboxMenuButton(
-    value: ref.watch(floatingFadeProvider),
-    onChanged: (v) => ref.read(floatingFadeProvider.notifier).set(v!),
-    child: Text(l10n.fadeFloating),
-  ),
-  CheckboxMenuButton(
-    value: ref.watch(homeIntroProvider),
-    onChanged: (v) => ref.read(homeIntroProvider.notifier).set(v!),
-    child: Text(l10n.introShowSetting),
-  ),
 ];
 
 /// Klasik menü çubuğu (tasarım sistemi → MenuBar): solda 28 px logo ve
@@ -143,6 +154,7 @@ class AppMenuBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final menuTheme = MenuTheme.of(context);
     final barStyle = ButtonStyle(
       minimumSize: const WidgetStatePropertyAll(Size(0, Sizes.menubarItem)),
       maximumSize: const WidgetStatePropertyAll(
@@ -155,17 +167,17 @@ class AppMenuBar extends StatelessWidget {
       shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.sm)),
       ),
-      foregroundColor: WidgetStateProperty.resolveWith(
-        (s) => s.contains(WidgetState.focused) ? c.brand : c.ink,
-      ),
+      // Açık menünün başlığı üzerine gelinmiş gibi sade görünür; ayrıca
+      // vurgu rengi ya da odak çerçevesi yok.
+      foregroundColor: WidgetStatePropertyAll(c.ink),
       backgroundColor: WidgetStateProperty.resolveWith(
-        (s) => s.contains(WidgetState.focused)
-            ? c.brandTint
-            : s.contains(WidgetState.hovered)
+        (s) =>
+            s.contains(WidgetState.focused) || s.contains(WidgetState.hovered)
             ? c.surfaceHover
             : null,
       ),
       overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      side: const WidgetStatePropertyAll(BorderSide.none),
     );
     const flat = MenuStyle(
       elevation: WidgetStatePropertyAll(0),
@@ -185,7 +197,26 @@ class AppMenuBar extends StatelessWidget {
             padding: EdgeInsets.only(left: Space.s1, right: Space.s2),
             child: InkenLogo(size: 28),
           ),
-          MenuBar(style: flat, children: menus(barStyle)),
+          // Uzun menü (Görünüm) alçak pencerede yukarı kayıp başlığını
+          // örtmesin: boyu çubuğun altında kalan alanla sınırlı, gerisi kayar.
+          MenuTheme(
+            data: MenuThemeData(
+              style: (menuTheme.style ?? const MenuStyle()).copyWith(
+                maximumSize: WidgetStatePropertyAll(
+                  Size(
+                    double.infinity,
+                    math.max(
+                      Sizes.menuRow * 3,
+                      MediaQuery.sizeOf(context).height -
+                          Sizes.menubar -
+                          Space.s4,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            child: MenuBar(style: flat, children: menus(barStyle)),
+          ),
           const Spacer(),
           ?trailing,
         ],
@@ -522,20 +553,6 @@ List<Widget> appMenus(
         sep,
         ...viewSettingsMenuItems(ref, l10n),
         sep,
-        CheckboxMenuButton(
-          value: cover == StageCover.spotlight,
-          shortcut: key(LogicalKeyboardKey.keyS),
-          onChanged: a.spotlight == null ? null : (_) => a.spotlight!(),
-          trailingIcon: Icon(stageCoverIcon(StageCover.spotlight), size: 18),
-          child: Text(l10n.spotlight),
-        ),
-        CheckboxMenuButton(
-          value: cover == StageCover.curtain,
-          shortcut: key(LogicalKeyboardKey.keyC),
-          onChanged: a.curtain == null ? null : (_) => a.curtain!(),
-          trailingIcon: Icon(stageCoverIcon(StageCover.curtain), size: 18),
-          child: Text(l10n.curtain),
-        ),
         MenuItemButton(
           leadingIcon: const Icon(LucideIcons.maximize),
           shortcut: key(LogicalKeyboardKey.f11),
@@ -615,6 +632,22 @@ List<Widget> appMenus(
       style: barStyle,
       menuChildren: [
         for (final t in Tool.values) toolItem(t),
+        sep,
+        // Ders anlatımı: sayfanın bir yerini aydınlat / yanıtı sakla.
+        CheckboxMenuButton(
+          value: cover == StageCover.spotlight,
+          shortcut: key(LogicalKeyboardKey.keyS),
+          onChanged: a.spotlight == null ? null : (_) => a.spotlight!(),
+          trailingIcon: Icon(stageCoverIcon(StageCover.spotlight), size: 18),
+          child: Text(l10n.spotlight),
+        ),
+        CheckboxMenuButton(
+          value: cover == StageCover.curtain,
+          shortcut: key(LogicalKeyboardKey.keyC),
+          onChanged: a.curtain == null ? null : (_) => a.curtain!(),
+          trailingIcon: Icon(stageCoverIcon(StageCover.curtain), size: 18),
+          child: Text(l10n.curtain),
+        ),
         sep,
         SubmenuButton(
           menuChildren: [

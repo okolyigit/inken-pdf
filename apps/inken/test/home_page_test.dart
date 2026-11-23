@@ -296,6 +296,8 @@ void main() {
     // Görünüm menüsünden geri gelir.
     await t.tap(_menu('Görünüm'));
     await t.pumpAndSettle();
+    await t.tap(find.byKey(const ValueKey('menu-bars')));
+    await t.pumpAndSettle();
     await t.tap(find.text('Açılışta tanıtımı göster'));
     await t.pumpAndSettle();
     expect(find.byKey(const ValueKey('home-intro')), findsOneWidget);
