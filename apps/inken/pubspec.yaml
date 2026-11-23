@@ -79,6 +79,9 @@ flutter:
   # Tasarım sistemi: marka çizimleri ve gömülü fontlar (OFL; lisanslar
   # assets/fonts/OFL-*.txt). Çevrimdışı çalışsın diye google_fonts yok.
   assets:
+    # Hakkında'daki sürüm buradan okunur (Flutter'ın version.json'u
+    # Android ve Windows derlemelerine girmiyor).
+    - pubspec.yaml
     - assets/brand/
     # Başlarken kılavuzu (docs/baslarken/build.sh üretir).
     - assets/guide/

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inken/features/ink/tool_state.dart';
@@ -9,20 +11,26 @@ import 'package:inken_core/inken_core.dart' show currentFormatVersion;
 void main() {
   final AppLocalizations l10n = AppLocalizationsTr();
 
-  test('version.json okunur; bozuksa null', () {
+  test('pubspec sürümü okunur; yoksa null', () {
     expect(
-      parseVersionJson(
-        '{"app_name":"inken","version":"0.1.0","build_number":"3"}',
-      ),
-      (version: '0.1.0', build: '3'),
+      parsePubspecVersion('name: inken\nversion: 0.1.0+11\n\nenvironment:\n'),
+      (version: '0.1.0', build: '11'),
     );
-    expect(parseVersionJson('{"version":"1.2.0"}'), (
+    expect(parsePubspecVersion("version: '1.2.0' # yorum"), (
       version: '1.2.0',
       build: '',
     ));
-    expect(parseVersionJson('{"build_number":"3"}'), isNull);
-    expect(parseVersionJson('bozuk'), isNull);
-    expect(parseVersionJson('[1]'), isNull);
+    expect(parsePubspecVersion('version: 1.0.0-rc.1+12'), (
+      version: '1.0.0-rc.1',
+      build: '12',
+    ));
+    expect(parsePubspecVersion('  version: 9.9.9\nname: x'), isNull);
+    expect(parsePubspecVersion('bozuk'), isNull);
+  });
+
+  test('uygulamanın pubspec sürümü okunur', () {
+    final v = parsePubspecVersion(File('pubspec.yaml').readAsStringSync());
+    expect(v?.build, isNotEmpty);
   });
 
   test('sürüm etiketi', () {

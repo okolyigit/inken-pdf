@@ -88,7 +88,7 @@ void main() {
     await _shot(t, 'home-ayarlar-kisayollar');
     await t.tap(find.byKey(const ValueKey('settings-tab-about')));
     await t.pumpAndSettle();
-    // Sürüm derlemedeki version.json'dan (pubspec'teki sürüm).
+    // Sürüm varlıklardaki pubspec.yaml'dan.
     final pubspec = File('pubspec.yaml').readAsStringSync();
     final version = RegExp(
       r'^version: (\S+)\+(\S+)$',

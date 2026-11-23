@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -17,24 +16,21 @@ const repositoryUrl = 'https://github.com/okolyigit/inken-pdf';
 /// sürüm 0.1.0, derleme 3).
 typedef AppVersion = ({String version, String build});
 
-/// Flutter'ın her derlemede varlıklara koyduğu `version.json`'dan okunur
-/// (ek eklenti gerekmez). Okunamazsa `null`.
-AppVersion? parseVersionJson(String text) {
-  try {
-    final json = jsonDecode(text);
-    if (json is! Map<String, Object?>) return null;
-    final version = json['version'];
-    if (version is! String || version.isEmpty) return null;
-    final build = json['build_number'];
-    return (version: version, build: build is String ? build : '');
-  } on FormatException {
-    return null;
-  }
+/// Varlıklara konan `pubspec.yaml`'ın `version:` satırından okunur (ek
+/// eklenti gerekmez; Flutter'ın `version.json`'u Android ve Windows
+/// derlemelerine girmiyor). Okunamazsa `null`.
+AppVersion? parsePubspecVersion(String text) {
+  final match = RegExp(
+    r'''^version:[ \t]*['"]?([0-9A-Za-z.\-]+)(?:\+([0-9A-Za-z.\-]+))?''',
+    multiLine: true,
+  ).firstMatch(text);
+  if (match == null) return null;
+  return (version: match[1]!, build: match[2] ?? '');
 }
 
 final appVersionProvider = FutureProvider<AppVersion?>((ref) async {
   try {
-    return parseVersionJson(await rootBundle.loadString('version.json'));
+    return parsePubspecVersion(await rootBundle.loadString('pubspec.yaml'));
   } on Object {
     return null;
   }
