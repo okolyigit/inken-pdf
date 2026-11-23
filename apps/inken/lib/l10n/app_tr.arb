@@ -109,7 +109,6 @@
   "recoveryRestore": "Geri yükle",
   "recoveryDelete": "Yedeği sil",
   "recoveryLater": "Sonra",
-  "exportFlattened": "Çizimleri gömerek dışa aktar…",
   "exportFileName": "{base} (çizimli).pdf",
   "@exportFileName": {
     "placeholders": {
@@ -347,7 +346,7 @@
   "introHand": "Sayfayı sürükleyerek kaydır. Başka araçtayken boşluğu basılı tut: geçici olarak kaydırır.",
   "introUndo": "Her adım geri alınır; kaydettikten sonra da.",
   "introSave": "Çizimler PDF'in içine kaydedilir ve her PDF okuyucuda görünür. Orijinal dosyanın üzerine yazılmaz.",
-  "introExport": "Çizimleri sayfaya gömülü bir kopya oluşturur; öğrencilerle paylaşmak ve yazdırmak için.",
+  "introExport": "Çizimli PDF (öğrencilerle paylaşmak ve yazdırmak için), düzenlenebilir PDF ya da sayfa görselleri; tüm sayfalar, çizimli sayfalar ya da bir aralık.",
   "introBackupTitle": "Otomatik yedek",
   "introBackup": "Kaydedilmemiş çizimler dakikada bir yedeklenir; uygulama kapanırsa açılışta geri yüklenir.",
   "introFullscreen": "Menüler gizlenir, yalnızca sayfa ve araç kutusu kalır. Esc ile çıkılır.",
@@ -823,5 +822,62 @@
   "zipFileType": "ZIP arşivi",
   "jpegFileType": "JPEG görseli",
   "copyOnePageOnly": "Kopyala (tek sayfa)",
-  "preparingImages": "Görseller hazırlanıyor…"
+  "preparingImages": "Görseller hazırlanıyor…",
+  "exportMenu": "Dışa aktar…",
+  "exportTitle": "Dışa aktar",
+  "exportFormat": "Biçim",
+  "exportFormatFlattened": "Çizimli PDF",
+  "exportFormatEditable": "Düzenlenebilir PDF",
+  "exportFormatImages": "Görsel",
+  "exportFormatFlattenedHint": "Çizimler sayfaya gömülür; her okuyucuda aynı görünür. Öğrencilerle paylaşmak ve yazdırmak için.",
+  "exportFormatEditableHint": "Çizimler Inken'de düzenlenmeye devam eder; başka okuyucularda da görünür.",
+  "exportFormatImagesHint": "Her sayfa bir PNG görseli; birden çok sayfa tek ZIP dosyasında.",
+  "exportPages": "Sayfalar",
+  "exportPagesAll": "Tümü",
+  "exportPagesCurrent": "Bu sayfa",
+  "exportPagesDrawn": "Çizimli",
+  "exportPagesRange": "Aralık",
+  "exportPagesDrawnHint": "Üzerinde çizim, yazı ya da görsel olan sayfalar",
+  "exportNoPages": "Seçimde dışa aktarılacak sayfa yok.",
+  "exportSkipBlank": "Boş eklenen sayfaları atla",
+  "exportResolution": "Çözünürlük",
+  "exportResolutionHint": "150 dpi paylaşmak için, 300 dpi baskı için.",
+  "exportGray": "Gri tonlamalı",
+  "exportSummary": "{count, plural, =1{1 sayfa} other{{count} sayfa}} · {format}",
+  "@exportSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "exportSummaryZip": "ZIP",
+  "exportCopyFileName": "{base} (düzenlenebilir).pdf",
+  "@exportCopyFileName": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      }
+    }
+  },
+  "exporting": "Dışa aktarılıyor…",
+  "dpiLabel": "{dpi} dpi",
+  "@dpiLabel": {
+    "placeholders": {
+      "dpi": {
+        "type": "int"
+      }
+    }
+  },
+  "exportPageOf": "Belgede {page}. sayfa",
+  "@exportPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  }
 }

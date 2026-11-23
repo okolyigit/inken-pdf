@@ -380,12 +380,6 @@ abstract class AppLocalizations {
   /// **'Sonra'**
   String get recoveryLater;
 
-  /// No description provided for @exportFlattened.
-  ///
-  /// In tr, this message translates to:
-  /// **'Çizimleri gömerek dışa aktar…'**
-  String get exportFlattened;
-
   /// No description provided for @exportFileName.
   ///
   /// In tr, this message translates to:
@@ -1109,7 +1103,7 @@ abstract class AppLocalizations {
   /// No description provided for @introExport.
   ///
   /// In tr, this message translates to:
-  /// **'Çizimleri sayfaya gömülü bir kopya oluşturur; öğrencilerle paylaşmak ve yazdırmak için.'**
+  /// **'Çizimli PDF (öğrencilerle paylaşmak ve yazdırmak için), düzenlenebilir PDF ya da sayfa görselleri; tüm sayfalar, çizimli sayfalar ya da bir aralık.'**
   String get introExport;
 
   /// No description provided for @introBackupTitle.
@@ -2803,6 +2797,162 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Görseller hazırlanıyor…'**
   String get preparingImages;
+
+  /// No description provided for @exportMenu.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dışa aktar…'**
+  String get exportMenu;
+
+  /// No description provided for @exportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dışa aktar'**
+  String get exportTitle;
+
+  /// No description provided for @exportFormat.
+  ///
+  /// In tr, this message translates to:
+  /// **'Biçim'**
+  String get exportFormat;
+
+  /// No description provided for @exportFormatFlattened.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çizimli PDF'**
+  String get exportFormatFlattened;
+
+  /// No description provided for @exportFormatEditable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenlenebilir PDF'**
+  String get exportFormatEditable;
+
+  /// No description provided for @exportFormatImages.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görsel'**
+  String get exportFormatImages;
+
+  /// No description provided for @exportFormatFlattenedHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çizimler sayfaya gömülür; her okuyucuda aynı görünür. Öğrencilerle paylaşmak ve yazdırmak için.'**
+  String get exportFormatFlattenedHint;
+
+  /// No description provided for @exportFormatEditableHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çizimler Inken\'de düzenlenmeye devam eder; başka okuyucularda da görünür.'**
+  String get exportFormatEditableHint;
+
+  /// No description provided for @exportFormatImagesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her sayfa bir PNG görseli; birden çok sayfa tek ZIP dosyasında.'**
+  String get exportFormatImagesHint;
+
+  /// No description provided for @exportPages.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayfalar'**
+  String get exportPages;
+
+  /// No description provided for @exportPagesAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümü'**
+  String get exportPagesAll;
+
+  /// No description provided for @exportPagesCurrent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sayfa'**
+  String get exportPagesCurrent;
+
+  /// No description provided for @exportPagesDrawn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çizimli'**
+  String get exportPagesDrawn;
+
+  /// No description provided for @exportPagesRange.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aralık'**
+  String get exportPagesRange;
+
+  /// No description provided for @exportPagesDrawnHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Üzerinde çizim, yazı ya da görsel olan sayfalar'**
+  String get exportPagesDrawnHint;
+
+  /// No description provided for @exportNoPages.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçimde dışa aktarılacak sayfa yok.'**
+  String get exportNoPages;
+
+  /// No description provided for @exportSkipBlank.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boş eklenen sayfaları atla'**
+  String get exportSkipBlank;
+
+  /// No description provided for @exportResolution.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çözünürlük'**
+  String get exportResolution;
+
+  /// No description provided for @exportResolutionHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'150 dpi paylaşmak için, 300 dpi baskı için.'**
+  String get exportResolutionHint;
+
+  /// No description provided for @exportGray.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gri tonlamalı'**
+  String get exportGray;
+
+  /// No description provided for @exportSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count, plural, =1{1 sayfa} other{{count} sayfa}} · {format}'**
+  String exportSummary(int count, String format);
+
+  /// No description provided for @exportSummaryZip.
+  ///
+  /// In tr, this message translates to:
+  /// **'ZIP'**
+  String get exportSummaryZip;
+
+  /// No description provided for @exportCopyFileName.
+  ///
+  /// In tr, this message translates to:
+  /// **'{base} (düzenlenebilir).pdf'**
+  String exportCopyFileName(String base);
+
+  /// No description provided for @exporting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dışa aktarılıyor…'**
+  String get exporting;
+
+  /// No description provided for @dpiLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{dpi} dpi'**
+  String dpiLabel(int dpi);
+
+  /// No description provided for @exportPageOf.
+  ///
+  /// In tr, this message translates to:
+  /// **'Belgede {page}. sayfa'**
+  String exportPageOf(int page);
 }
 
 class _AppLocalizationsDelegate

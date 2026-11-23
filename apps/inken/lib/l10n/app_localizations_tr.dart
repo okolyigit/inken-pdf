@@ -174,9 +174,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get recoveryLater => 'Sonra';
 
   @override
-  String get exportFlattened => 'Çizimleri gömerek dışa aktar…';
-
-  @override
   String exportFileName(String base) {
     return '$base (çizimli).pdf';
   }
@@ -579,7 +576,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get introExport =>
-      'Çizimleri sayfaya gömülü bir kopya oluşturur; öğrencilerle paylaşmak ve yazdırmak için.';
+      'Çizimli PDF (öğrencilerle paylaşmak ve yazdırmak için), düzenlenebilir PDF ya da sayfa görselleri; tüm sayfalar, çizimli sayfalar ya da bir aralık.';
 
   @override
   String get introBackupTitle => 'Otomatik yedek';
@@ -1511,4 +1508,101 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get preparingImages => 'Görseller hazırlanıyor…';
+
+  @override
+  String get exportMenu => 'Dışa aktar…';
+
+  @override
+  String get exportTitle => 'Dışa aktar';
+
+  @override
+  String get exportFormat => 'Biçim';
+
+  @override
+  String get exportFormatFlattened => 'Çizimli PDF';
+
+  @override
+  String get exportFormatEditable => 'Düzenlenebilir PDF';
+
+  @override
+  String get exportFormatImages => 'Görsel';
+
+  @override
+  String get exportFormatFlattenedHint =>
+      'Çizimler sayfaya gömülür; her okuyucuda aynı görünür. Öğrencilerle paylaşmak ve yazdırmak için.';
+
+  @override
+  String get exportFormatEditableHint =>
+      'Çizimler Inken\'de düzenlenmeye devam eder; başka okuyucularda da görünür.';
+
+  @override
+  String get exportFormatImagesHint =>
+      'Her sayfa bir PNG görseli; birden çok sayfa tek ZIP dosyasında.';
+
+  @override
+  String get exportPages => 'Sayfalar';
+
+  @override
+  String get exportPagesAll => 'Tümü';
+
+  @override
+  String get exportPagesCurrent => 'Bu sayfa';
+
+  @override
+  String get exportPagesDrawn => 'Çizimli';
+
+  @override
+  String get exportPagesRange => 'Aralık';
+
+  @override
+  String get exportPagesDrawnHint =>
+      'Üzerinde çizim, yazı ya da görsel olan sayfalar';
+
+  @override
+  String get exportNoPages => 'Seçimde dışa aktarılacak sayfa yok.';
+
+  @override
+  String get exportSkipBlank => 'Boş eklenen sayfaları atla';
+
+  @override
+  String get exportResolution => 'Çözünürlük';
+
+  @override
+  String get exportResolutionHint =>
+      '150 dpi paylaşmak için, 300 dpi baskı için.';
+
+  @override
+  String get exportGray => 'Gri tonlamalı';
+
+  @override
+  String exportSummary(int count, String format) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sayfa',
+      one: '1 sayfa',
+    );
+    return '$_temp0 · $format';
+  }
+
+  @override
+  String get exportSummaryZip => 'ZIP';
+
+  @override
+  String exportCopyFileName(String base) {
+    return '$base (düzenlenebilir).pdf';
+  }
+
+  @override
+  String get exporting => 'Dışa aktarılıyor…';
+
+  @override
+  String dpiLabel(int dpi) {
+    return '$dpi dpi';
+  }
+
+  @override
+  String exportPageOf(int page) {
+    return 'Belgede $page. sayfa';
+  }
 }

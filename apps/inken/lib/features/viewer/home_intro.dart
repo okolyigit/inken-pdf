@@ -147,7 +147,7 @@ class HomeIntro extends ConsumerWidget {
       ),
       (
         icon: LucideIcons.fileDown,
-        title: l10n.exportFlattened,
+        title: l10n.exportMenu,
         keys: null,
         body: l10n.introExport,
         key: const ValueKey('intro-export'),

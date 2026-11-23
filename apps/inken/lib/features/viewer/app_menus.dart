@@ -431,9 +431,11 @@ List<Widget> appMenus(
           child: Text(l10n.saveAs),
         ),
         MenuItemButton(
+          key: const ValueKey('menu-export'),
           leadingIcon: const Icon(LucideIcons.fileDown),
+          shortcut: key(LogicalKeyboardKey.keyE, control: true),
           onPressed: a.export,
-          child: Text(l10n.exportFlattened),
+          child: Text(l10n.exportMenu),
         ),
         MenuItemButton(
           leadingIcon: const Icon(LucideIcons.printer),

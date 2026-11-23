@@ -187,9 +187,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recoveryLater => 'Later';
 
   @override
-  String get exportFlattened => 'Export with drawings embedded…';
-
-  @override
   String exportFileName(String base) {
     return '$base (annotated).pdf';
   }
@@ -610,7 +607,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get introExport =>
-      'Makes a copy with drawings merged into the page, for sharing with students and printing.';
+      'A PDF with the drawings merged in (for sharing with students and printing), an editable PDF or page images; all pages, pages with drawings or a range.';
 
   @override
   String get introBackupTitle => 'Automatic backup';
@@ -1552,4 +1549,101 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get preparingImages => 'Preparing images…';
+
+  @override
+  String get exportMenu => 'Export…';
+
+  @override
+  String get exportTitle => 'Export';
+
+  @override
+  String get exportFormat => 'Format';
+
+  @override
+  String get exportFormatFlattened => 'PDF with drawings';
+
+  @override
+  String get exportFormatEditable => 'Editable PDF';
+
+  @override
+  String get exportFormatImages => 'Images';
+
+  @override
+  String get exportFormatFlattenedHint =>
+      'Drawings are embedded in the page and look the same in every reader. For sharing with students and printing.';
+
+  @override
+  String get exportFormatEditableHint =>
+      'Drawings stay editable in Inken and also show in other readers.';
+
+  @override
+  String get exportFormatImagesHint =>
+      'Each page becomes a PNG image; several pages go into one ZIP file.';
+
+  @override
+  String get exportPages => 'Pages';
+
+  @override
+  String get exportPagesAll => 'All';
+
+  @override
+  String get exportPagesCurrent => 'This page';
+
+  @override
+  String get exportPagesDrawn => 'With drawings';
+
+  @override
+  String get exportPagesRange => 'Range';
+
+  @override
+  String get exportPagesDrawnHint =>
+      'Pages with drawings, text or images on them';
+
+  @override
+  String get exportNoPages => 'No pages to export in this selection.';
+
+  @override
+  String get exportSkipBlank => 'Skip blank added pages';
+
+  @override
+  String get exportResolution => 'Resolution';
+
+  @override
+  String get exportResolutionHint =>
+      '150 dpi for sharing, 300 dpi for printing.';
+
+  @override
+  String get exportGray => 'Grayscale';
+
+  @override
+  String exportSummary(int count, String format) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages',
+      one: '1 page',
+    );
+    return '$_temp0 · $format';
+  }
+
+  @override
+  String get exportSummaryZip => 'ZIP';
+
+  @override
+  String exportCopyFileName(String base) {
+    return '$base (editable).pdf';
+  }
+
+  @override
+  String get exporting => 'Exporting…';
+
+  @override
+  String dpiLabel(int dpi) {
+    return '$dpi dpi';
+  }
+
+  @override
+  String exportPageOf(int page) {
+    return 'Page $page of the document';
+  }
 }

@@ -11,6 +11,7 @@ enum AppShortcut {
   open,
   save,
   saveAs,
+  export,
   print,
   close,
   documentProperties,
@@ -59,6 +60,7 @@ const Map<AppShortcut, List<SingleActivator>> shortcutKeys = {
   AppShortcut.saveAs: [
     SingleActivator(LogicalKeyboardKey.keyS, control: true, shift: true),
   ],
+  AppShortcut.export: [SingleActivator(LogicalKeyboardKey.keyE, control: true)],
   AppShortcut.print: [SingleActivator(LogicalKeyboardKey.keyP, control: true)],
   AppShortcut.close: [SingleActivator(LogicalKeyboardKey.keyW, control: true)],
   AppShortcut.documentProperties: [
@@ -154,6 +156,7 @@ List<(String, List<ShortcutRow>)> shortcutGroups(AppLocalizations l10n) {
         row(AppShortcut.open, l10n.openPdf),
         row(AppShortcut.save, l10n.save),
         row(AppShortcut.saveAs, l10n.saveAs),
+        row(AppShortcut.export, l10n.exportTitle),
         row(AppShortcut.print, l10n.printDocument),
         row(AppShortcut.documentProperties, l10n.propertiesTitle),
         row(AppShortcut.close, l10n.closeDocument),

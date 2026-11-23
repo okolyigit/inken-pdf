@@ -13,6 +13,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../l10n/app_localizations.dart';
 import '../backup/backup_store.dart';
 import '../capture/capture_layer.dart';
+import '../export/export_dialog.dart';
 import '../files/document_io.dart';
 import '../files/document_properties.dart';
 import '../files/guide.dart';
@@ -738,45 +739,131 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     return target != null && await _save(target: target);
   }
 
-  /// Çizimleri sayfaya gömülü bir kopyaya dışa aktarır; yeri kullanıcı seçer.
+  /// Dışa aktarma penceresini açar; seçilen biçimde (çizimli PDF,
+  /// düzenlenebilir PDF, görsel) seçilen sayfaları kullanıcının seçtiği
+  /// yere yazar. Açık belge değişmez.
   Future<void> _export() async {
     final session = _session;
     if (session == null || _exporting) return;
+    final document = session.document;
+    // Alttaki bildirim pencerenin düğmelerini örtmesin (telefonda tam ekran).
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    final choice = await showExportDialog(
+      context,
+      document: document,
+      currentPage: _currentIndex(session),
+      renderPreview: (page, {required grayscale}) =>
+          _renderPreview(session, document, page, grayscale: grayscale),
+      settings: ref.read(settingsStoreProvider),
+    );
+    if (choice == null || !mounted || !identical(session, _session)) return;
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final notifier = ref.read(openDocumentProvider.notifier);
-    final path = widget.document.path;
-    final target = await _pickTarget(
-      suggestedName: l10n.exportFileName(
-        withoutPdfExtension(widget.document.name),
-      ),
-      allowed: (t) => !samePath(t, path),
-      rejected: l10n.exportOntoOpenFile,
-    );
-    if (target == null) return;
-    setState(() => _exporting = true);
-    try {
-      final document = session.document;
-      final skipped = await notifier.exportFlattened(
-        document,
-        target.location,
-        images: await _imagesFor(session, document),
-      );
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            skipped == 0
-                ? l10n.exportedTo(target.name)
-                : l10n.exportedWithSkipped(target.name, skipped),
-          ),
+    final base = withoutPdfExtension(widget.document.name);
+    final subset = pageSubset(document, choice.pages);
+    final single = choice.pages.length == 1;
+    final DocTarget? target = switch (choice.format) {
+      ExportFormat.flattened || ExportFormat.editable => await _pickTarget(
+        suggestedName: safeFileName(
+          choice.format == ExportFormat.flattened
+              ? l10n.exportFileName(base)
+              : l10n.exportCopyFileName(base),
         ),
-      );
+        allowed: (t) => !samePath(t, widget.document.path),
+        rejected: l10n.exportOntoOpenFile,
+      ),
+      ExportFormat.images => await _pickTarget(
+        suggestedName: single
+            ? _captureName(choice.pages.single)
+            : safeFileName(l10n.pagesZipName(base), extension: 'zip'),
+        allowed: (t) => !samePath(t, widget.document.path),
+        rejected: l10n.exportOntoOpenFile,
+        format: single ? SaveFormat.png : SaveFormat.zip,
+      ),
+    };
+    if (target == null || !mounted) return;
+    setState(() => _exporting = true);
+    messenger
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(l10n.exporting)));
+    try {
+      final images = await _imagesFor(session, subset);
+      var skipped = 0;
+      switch (choice.format) {
+        case ExportFormat.flattened:
+          skipped = await notifier.exportFlattened(
+            subset,
+            target.location,
+            images: images,
+          );
+        case ExportFormat.editable:
+          skipped = await notifier.exportCopy(
+            subset,
+            target.location,
+            images: images,
+          );
+        case ExportFormat.images:
+          final files = await _renderPages(
+            session,
+            choice.pages,
+            document: document,
+            dpi: choice.dpi,
+            grayscale: choice.grayscale,
+          );
+          await ref
+              .read(documentIoProvider)
+              .write(
+                target.location,
+                single ? files.single.bytes : storeZip(files),
+              );
+      }
+      messenger
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              skipped == 0
+                  ? l10n.exportedTo(target.name)
+                  : l10n.exportedWithSkipped(target.name, skipped),
+            ),
+          ),
+        );
     } on Object catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.exportFailed(e.toString()))),
-      );
+      messenger
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(l10n.exportFailed(e.toString()))),
+        );
     } finally {
       if (mounted) setState(() => _exporting = false);
+    }
+  }
+
+  /// Dışa aktarma önizlemesi: [document]'in [page] sayfası, çizimleri
+  /// gömülü, uzun kenarı 1000 px.
+  Future<Uint8List> _renderPreview(
+    InkSession session,
+    InkenDocument document,
+    int page, {
+    required bool grayscale,
+  }) async {
+    final imager = await ref.read(openDocumentProvider.notifier).openPageImages(
+      document,
+      [page],
+      images: await _imagesFor(session, pageSubset(document, [page])),
+    );
+    try {
+      final region = wholePage(document.pages[page]);
+      final size = captureSize(region, maxPixels: 1000);
+      return (await imager.render(
+        0,
+        region,
+        scale: size.scale,
+        grayscale: grayscale,
+      )).png;
+    } finally {
+      await imager.dispose();
     }
   }
 
@@ -1312,12 +1399,16 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
   }
 
   /// [pages] sayfalarının tamamı, çizimleri gömülü PNG olarak (sırayla):
-  /// tek düzleştirme, her sayfa 200 dpi (uzun kenar en çok 4096 px).
+  /// tek düzleştirme, [dpi] çözünürlükte (uzun kenar en çok
+  /// [maxExportPixels]). [document] verilmezse oturumdaki belge.
   Future<List<ZipEntry>> _renderPages(
     InkSession session,
-    List<int> pages,
-  ) async {
-    final document = session.document;
+    List<int> pages, {
+    InkenDocument? document,
+    int dpi = 200,
+    bool grayscale = false,
+  }) async {
+    document ??= session.document;
     final subset = pageSubset(document, pages);
     final imager = await ref
         .read(openDocumentProvider.notifier)
@@ -1334,7 +1425,12 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
             bytes: (await imager.render(
               i,
               wholePage(subset.pages[i]),
-              scale: captureSize(wholePage(subset.pages[i])).scale,
+              scale: captureSize(
+                wholePage(subset.pages[i]),
+                dpi: dpi.toDouble(),
+                maxPixels: maxExportPixels,
+              ).scale,
+              grayscale: grayscale,
             )).png,
           ),
       ];
@@ -2134,7 +2230,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                         ),
                         item(
                           LucideIcons.fileDown,
-                          l10n.exportFlattened,
+                          l10n.exportMenu,
                           session == null || _exporting ? null : _export,
                         ),
                         item(
@@ -2676,6 +2772,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     AppShortcut.cut: _cut,
     AppShortcut.selectAll: _selectAll,
     AppShortcut.find: _openSearch,
+    AppShortcut.export: _export,
     AppShortcut.capture: _startCapture,
     AppShortcut.documentProperties: _showProperties,
     AppShortcut.toolPen: () => _selectTool(Tool.pen),

@@ -9,6 +9,7 @@ library;
 export 'src/appearance.dart';
 export 'src/colors.dart';
 export 'src/coordinate_plane.dart';
+export 'src/export_options.dart';
 export 'src/instruments.dart';
 export 'src/backup.dart';
 export 'src/capture.dart';
