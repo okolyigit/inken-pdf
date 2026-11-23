@@ -1085,9 +1085,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get uiScaleLarge => 'Büyük';
 
   @override
-  String get uiScaleLarger => 'Akıllı tahta';
-
-  @override
   String get pagePanelClose => 'Sayfa panelini kapat';
 
   @override
@@ -1641,4 +1638,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get exportHiddenImages => 'görseller gizli';
+
+  @override
+  String get exportFormatFlattenedShort => 'Çizimli PDF';
+
+  @override
+  String get exportFormatEditableShort => 'Düzenlenebilir';
 }

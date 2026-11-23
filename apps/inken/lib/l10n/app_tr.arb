@@ -615,7 +615,6 @@
   "uiScale": "Arayüz boyutu",
   "uiScaleNormal": "Normal",
   "uiScaleLarge": "Büyük",
-  "uiScaleLarger": "Akıllı tahta",
   "pagePanelClose": "Sayfa panelini kapat",
   "pagePanelOpen": "Sayfa panelini aç",
   "documentProperties": "Belge özellikleri…",
@@ -901,5 +900,7 @@
       }
     }
   },
-  "exportHiddenImages": "görseller gizli"
+  "exportHiddenImages": "görseller gizli",
+  "exportFormatFlattenedShort": "Çizimli PDF",
+  "exportFormatEditableShort": "Düzenlenebilir"
 }

@@ -2006,12 +2006,6 @@ abstract class AppLocalizations {
   /// **'Büyük'**
   String get uiScaleLarge;
 
-  /// No description provided for @uiScaleLarger.
-  ///
-  /// In tr, this message translates to:
-  /// **'Akıllı tahta'**
-  String get uiScaleLarger;
-
   /// No description provided for @pagePanelClose.
   ///
   /// In tr, this message translates to:
@@ -3001,6 +2995,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'görseller gizli'**
   String get exportHiddenImages;
+
+  /// No description provided for @exportFormatFlattenedShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çizimli PDF'**
+  String get exportFormatFlattenedShort;
+
+  /// No description provided for @exportFormatEditableShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenlenebilir'**
+  String get exportFormatEditableShort;
 }
 
 class _AppLocalizationsDelegate

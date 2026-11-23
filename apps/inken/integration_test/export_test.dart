@@ -249,7 +249,7 @@ void main() {
     // tüm sayfalar (boş atlanır) → 2 PNG tek ZIP.
     await _ctrlE(t);
     expect(_summary(t), '1 sayfa · Çizimli PDF');
-    await t.tap(find.byKey(const ValueKey('export-format-images')));
+    await t.tap(find.byKey(const ValueKey('seg-ExportFormat.images')));
     await t.pump();
     await _segment(t, 'export-dpi', '96 dpi');
     await _segment(t, 'export-pages', 'Tümü');
@@ -275,7 +275,7 @@ void main() {
 
     // 3) Düzenlenebilir PDF, aralık "2": inken.json var, tek sayfa.
     await _ctrlE(t);
-    await t.tap(find.byKey(const ValueKey('export-format-editable')));
+    await t.tap(find.byKey(const ValueKey('seg-ExportFormat.editable')));
     await t.pump();
     await _segment(t, 'export-pages', 'Aralık');
     await t.enterText(find.byKey(const ValueKey('export-range')), '9');
@@ -301,7 +301,7 @@ void main() {
 
     // Öğrenci kopyası: kırmızı gizli → çıktıda kırmızı yok, siyah var.
     await _ctrlE(t);
-    await t.tap(find.byKey(const ValueKey('export-format-flattened')));
+    await t.tap(find.byKey(const ValueKey('seg-ExportFormat.flattened')));
     await t.pump();
     await _segment(t, 'export-pages', 'Bu sayfa');
     final red = find.byKey(const ValueKey('export-hide-d42a3f'));
@@ -356,7 +356,7 @@ void main() {
     await t.tap(find.widgetWithText(ListTile, 'Dışa aktar…'));
     await t.pumpAndSettle();
     expect(find.byType(ExportDialog), findsOneWidget);
-    await t.tap(find.byKey(const ValueKey('export-format-images')));
+    await t.tap(find.byKey(const ValueKey('seg-ExportFormat.images')));
     await t.pumpAndSettle();
     await _shot(t, 'export_telefon');
     await t.tap(find.byKey(const ValueKey('export-cancel')));

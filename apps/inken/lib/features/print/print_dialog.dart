@@ -9,6 +9,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../platform/print_service.dart';
+import '../../theme/dialog_form.dart';
 import '../../theme/tokens.dart';
 import '../ink/tool_options.dart' show Segmented;
 import '../settings/settings_store.dart';
@@ -50,7 +51,7 @@ Future<PrintChoice?> showPrintDialog(
       return Dialog(
         insetPadding: const EdgeInsets.all(Space.s6),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 960, maxHeight: 680),
+          constraints: const BoxConstraints(maxWidth: 960, maxHeight: 760),
           child: dialog,
         ),
       );
@@ -438,7 +439,12 @@ class PrintDialogState extends State<PrintDialog> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(Space.s6),
+      padding: const EdgeInsets.fromLTRB(
+        Space.s6,
+        Space.s4,
+        Space.s4,
+        Space.s4,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -460,21 +466,21 @@ class PrintDialogState extends State<PrintDialog> {
               ),
             ],
           ),
-          const SizedBox(height: Space.s4),
+          const SizedBox(height: Space.s3),
           Expanded(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(flex: 10, child: preview),
+                Expanded(flex: 9, child: preview),
                 const SizedBox(width: Space.s6),
                 Expanded(
-                  flex: 8,
+                  flex: 10,
                   child: SingleChildScrollView(child: settings),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: Space.s4),
+          const SizedBox(height: Space.s3),
           Row(
             children: [
               Expanded(
@@ -670,18 +676,6 @@ class _Settings extends StatelessWidget {
     final service = state.widget.service;
     final full = service.choosesPrinter;
 
-    Widget label(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: Space.s2),
-      child: Text(
-        text,
-        style: InkenText.label.copyWith(
-          color: c.inkMuted,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-    const gap = SizedBox(height: Space.s4);
-
     final printers = state._printers;
     final selected = printers.where((p) => p.name == state.printer).firstOrNull;
 
@@ -690,135 +684,132 @@ class _Settings extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (full) ...[
-          label(l10n.printPrinter),
-          if (state._loadingPrinters)
-            const LinearProgressIndicator()
-          else if (printers.isEmpty)
-            Text(
-              l10n.printNoPrinter,
-              key: const ValueKey('print-no-printer'),
-              style: InkenText.body.copyWith(color: c.danger),
-            )
-          else ...[
-            DropdownButtonFormField<String>(
-              key: const ValueKey('print-printer'),
-              initialValue: state.printer,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                isDense: true,
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                for (final p in printers)
-                  DropdownMenuItem(
-                    value: p.name,
-                    child: Text(p.name, overflow: TextOverflow.ellipsis),
-                  ),
-              ],
-              onChanged: (v) =>
-                  // ignore: invalid_use_of_protected_member
-                  state.setState(() => state._printer = v),
-            ),
-            if (selected != null &&
-                (selected.isDefault || selected.status != null))
-              Padding(
-                padding: const EdgeInsets.only(top: Space.s1),
-                child: Text(
-                  [
+          FormRow(
+            label: l10n.printPrinter,
+            hint:
+                selected != null &&
+                    (selected.isDefault || selected.status != null)
+                ? [
                     ?selected.status,
                     if (selected.isDefault) l10n.printDefaultPrinter,
-                  ].join(' · '),
-                  style: InkenText.caption.copyWith(color: c.inkMuted),
-                ),
-              ),
-          ],
-          gap,
-          Row(
-            children: [
-              Expanded(child: label(l10n.printCopies)),
-              IconButton(
-                key: const ValueKey('print-copies-down'),
-                tooltip: l10n.printDecrease,
-                icon: const Icon(LucideIcons.minus),
-                onPressed: state.copies > 1
-                    ? () => state.setCopies(state.copies - 1)
-                    : null,
-              ),
-              SizedBox(
-                width: 36,
-                child: Text(
-                  '${state.copies}',
-                  key: const ValueKey('print-copies'),
-                  textAlign: TextAlign.center,
-                  style: InkenText.numeric.copyWith(color: c.ink),
-                ),
-              ),
-              IconButton(
-                key: const ValueKey('print-copies-up'),
-                tooltip: l10n.printIncrease,
-                icon: const Icon(LucideIcons.plus),
-                onPressed: state.copies < 99
-                    ? () => state.setCopies(state.copies + 1)
-                    : null,
-              ),
-            ],
+                  ].join(' · ')
+                : null,
+            child: state._loadingPrinters
+                ? const LinearProgressIndicator()
+                : printers.isEmpty
+                ? Text(
+                    l10n.printNoPrinter,
+                    key: const ValueKey('print-no-printer'),
+                    style: InkenText.body.copyWith(color: c.danger),
+                  )
+                : DropdownButtonFormField<String>(
+                    key: const ValueKey('print-printer'),
+                    initialValue: state.printer,
+                    isExpanded: true,
+                    isDense: true,
+                    style: InkenText.menu.copyWith(color: c.ink),
+                    decoration: denseFieldDecoration,
+                    items: [
+                      for (final p in printers)
+                        DropdownMenuItem(
+                          value: p.name,
+                          child: Text(p.name, overflow: TextOverflow.ellipsis),
+                        ),
+                    ],
+                    onChanged: (v) =>
+                        // ignore: invalid_use_of_protected_member
+                        state.setState(() => state._printer = v),
+                  ),
           ),
-          gap,
-        ],
-        label(l10n.printPages),
-        Segmented<PrintPages>(
-          value: state.pagesMode,
-          onChanged: state.setPagesMode,
-          options: [
-            (PrintPages.all, null, l10n.printPagesAll),
-            (
-              PrintPages.current,
-              null,
-              state.widget.phone
-                  ? l10n.printPagesCurrentShort
-                  : l10n.printPagesCurrent,
+          FormRow(
+            label: l10n.printCopies,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  key: const ValueKey('print-copies-down'),
+                  tooltip: l10n.printDecrease,
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(LucideIcons.minus, size: 18),
+                  onPressed: state.copies > 1
+                      ? () => state.setCopies(state.copies - 1)
+                      : null,
+                ),
+                SizedBox(
+                  width: 36,
+                  child: Text(
+                    '${state.copies}',
+                    key: const ValueKey('print-copies'),
+                    textAlign: TextAlign.center,
+                    style: InkenText.numeric.copyWith(color: c.ink),
+                  ),
+                ),
+                IconButton(
+                  key: const ValueKey('print-copies-up'),
+                  tooltip: l10n.printIncrease,
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(LucideIcons.plus, size: 18),
+                  onPressed: state.copies < 99
+                      ? () => state.setCopies(state.copies + 1)
+                      : null,
+                ),
+              ],
             ),
-            (PrintPages.range, null, l10n.printPagesRange),
-          ],
-        ),
-        if (state.pagesMode == PrintPages.range) ...[
-          const SizedBox(height: Space.s2),
-          TextField(
-            key: const ValueKey('print-range'),
-            controller: state._range,
-            autofocus: true,
-            style: InkenText.numeric.copyWith(color: c.ink),
-            decoration: InputDecoration(
-              isDense: true,
-              hintText: l10n.printRangeHint,
-              border: const OutlineInputBorder(),
-              errorText:
-                  state._range.text.trim().isNotEmpty && state.pages == null
-                  ? l10n.printRangeInvalid(state.widget.pageCount)
-                  : null,
-            ),
-            onChanged: (_) => state.setPagesMode(PrintPages.range),
           ),
         ],
-        if (full) ...[
-          gap,
-          label(l10n.printSize),
-          Segmented<bool>(
-            value: state.fit,
-            onChanged: state.setFit,
+        FormRow(
+          label: l10n.printPages,
+          below: state.pagesMode == PrintPages.range
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: Space.s1),
+                  child: TextField(
+                    key: const ValueKey('print-range'),
+                    controller: state._range,
+                    autofocus: true,
+                    style: InkenText.numeric.copyWith(color: c.ink),
+                    decoration: denseFieldDecoration.copyWith(
+                      hintText: l10n.printRangeHint,
+                      errorText:
+                          state._range.text.trim().isNotEmpty &&
+                              state.pages == null
+                          ? l10n.printRangeInvalid(state.widget.pageCount)
+                          : null,
+                    ),
+                    onChanged: (_) => state.setPagesMode(PrintPages.range),
+                  ),
+                )
+              : null,
+          child: Segmented<PrintPages>(
+            dense: true,
+            value: state.pagesMode,
+            onChanged: state.setPagesMode,
             options: [
-              (true, null, l10n.printFit),
-              (false, null, l10n.printActual),
+              (PrintPages.all, null, l10n.printPagesAll),
+              (PrintPages.current, null, l10n.printPagesCurrentShort),
+              (PrintPages.range, null, l10n.printPagesRange),
             ],
           ),
-        ],
-        const SizedBox(height: Space.s2),
-        SwitchListTile(
-          key: const ValueKey('print-drawings'),
-          contentPadding: EdgeInsets.zero,
-          title: Text(l10n.printDrawings),
-          value: state.drawings,
-          onChanged: state.setDrawings,
+        ),
+        if (full)
+          FormRow(
+            label: l10n.printSize,
+            child: Segmented<bool>(
+              dense: true,
+              value: state.fit,
+              onChanged: state.setFit,
+              options: [
+                (true, null, l10n.printFit),
+                (false, null, l10n.printActual),
+              ],
+            ),
+          ),
+        FormRow(
+          label: l10n.printDrawings,
+          child: FormSwitch(
+            key: const ValueKey('print-drawings'),
+            value: state.drawings,
+            onChanged: state.setDrawings,
+          ),
         ),
         if (!full)
           Text(
@@ -826,7 +817,7 @@ class _Settings extends StatelessWidget {
             style: InkenText.caption.copyWith(color: c.inkMuted),
           ),
         if (full) ...[
-          Divider(height: Space.s4, color: c.line),
+          Divider(height: Space.s3, color: c.line),
           _MoreOptions(state: state),
         ],
       ],
@@ -847,17 +838,6 @@ class _MoreOptions extends StatelessWidget {
     void update(VoidCallback f) =>
         // ignore: invalid_use_of_protected_member
         state.setState(f);
-
-    Widget label(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: Space.s2, top: Space.s3),
-      child: Text(
-        text,
-        style: InkenText.label.copyWith(
-          color: c.inkMuted,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
 
     final summary = [
       state.grayscale ? l10n.printGray : l10n.printColorOn,
@@ -881,7 +861,7 @@ class _MoreOptions extends StatelessWidget {
           borderRadius: BorderRadius.circular(Radii.md),
           onTap: () => update(() => state.more = !state.more),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: Sizes.target),
+            constraints: const BoxConstraints(minHeight: FormRow.height),
             child: Row(
               children: [
                 Icon(
@@ -917,112 +897,117 @@ class _MoreOptions extends StatelessWidget {
           ),
         ),
         if (state.more) ...[
-          label(l10n.printColor),
-          Segmented<bool>(
-            value: state.grayscale,
-            onChanged: state.setGrayscale,
-            options: [
-              (false, null, l10n.printColorOn),
-              (true, null, l10n.printGray),
-            ],
-          ),
-          label(l10n.printDuplex),
-          DropdownButtonFormField<PrintDuplex>(
-            key: const ValueKey('print-duplex'),
-            initialValue: state.duplex,
-            isExpanded: true,
-            decoration: const InputDecoration(
-              isDense: true,
-              border: OutlineInputBorder(),
+          const SizedBox(height: Space.s1),
+          FormRow(
+            label: l10n.printColor,
+            child: Segmented<bool>(
+              dense: true,
+              value: state.grayscale,
+              onChanged: state.setGrayscale,
+              options: [
+                (false, null, l10n.printColorOn),
+                (true, null, l10n.printGray),
+              ],
             ),
-            items: [
-              DropdownMenuItem(
-                value: PrintDuplex.off,
-                child: Text(l10n.printDuplexOff),
-              ),
-              DropdownMenuItem(
-                value: PrintDuplex.longEdge,
-                child: Text(l10n.printDuplexLong),
-              ),
-              DropdownMenuItem(
-                value: PrintDuplex.shortEdge,
-                child: Text(l10n.printDuplexShort),
-              ),
-            ],
-            onChanged: (v) => update(() => state.duplex = v ?? PrintDuplex.off),
           ),
-          label(l10n.printPaper),
-          DropdownButtonFormField<PaperSize>(
-            key: const ValueKey('print-paper-size'),
-            initialValue: state.paper,
-            isExpanded: true,
-            decoration: const InputDecoration(
+          FormRow(
+            label: l10n.printDuplex,
+            child: DropdownButtonFormField<PrintDuplex>(
+              key: const ValueKey('print-duplex'),
+              initialValue: state.duplex,
+              isExpanded: true,
               isDense: true,
-              border: OutlineInputBorder(),
-            ),
-            items: [
-              for (final p in PaperSize.values)
+              style: InkenText.menu.copyWith(color: c.ink),
+              decoration: denseFieldDecoration,
+              items: [
                 DropdownMenuItem(
-                  value: p,
-                  child: Text(
-                    '${_paperName(p)} (${_mm(p.widthMm)} × ${_mm(p.heightMm)} mm)',
-                  ),
+                  value: PrintDuplex.off,
+                  child: Text(l10n.printDuplexOff),
                 ),
-            ],
-            onChanged: (v) => state.setPaper(v ?? PaperSize.a4),
-          ),
-          label(l10n.printOrientation),
-          Segmented<PrintOrientation>(
-            value: state.orientation,
-            onChanged: state.setOrientation,
-            options: [
-              (PrintOrientation.auto, null, l10n.printOrientationAuto),
-              (PrintOrientation.portrait, null, l10n.printPortrait),
-              (PrintOrientation.landscape, null, l10n.printLandscape),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: Space.s1),
-            child: Text(
-              l10n.printOrientationHint,
-              style: InkenText.caption.copyWith(color: c.inkMuted),
+                DropdownMenuItem(
+                  value: PrintDuplex.longEdge,
+                  child: Text(l10n.printDuplexLong),
+                ),
+                DropdownMenuItem(
+                  value: PrintDuplex.shortEdge,
+                  child: Text(l10n.printDuplexShort),
+                ),
+              ],
+              onChanged: (v) =>
+                  update(() => state.duplex = v ?? PrintDuplex.off),
             ),
           ),
-          const SizedBox(height: Space.s2),
-          CheckboxListTile(
-            key: const ValueKey('print-collate'),
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-            title: Text(l10n.printCollate),
-            value: state.collate,
-            onChanged: (v) => update(() => state.collate = v ?? true),
+          FormRow(
+            label: l10n.printPaper,
+            child: DropdownButtonFormField<PaperSize>(
+              key: const ValueKey('print-paper-size'),
+              initialValue: state.paper,
+              isExpanded: true,
+              isDense: true,
+              style: InkenText.menu.copyWith(color: c.ink),
+              decoration: denseFieldDecoration,
+              items: [
+                for (final p in PaperSize.values)
+                  DropdownMenuItem(
+                    value: p,
+                    child: Text(
+                      '${_paperName(p)} (${_mm(p.widthMm)} × ${_mm(p.heightMm)} mm)',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+              onChanged: (v) => state.setPaper(v ?? PaperSize.a4),
+            ),
           ),
-          CheckboxListTile(
-            key: const ValueKey('print-reverse'),
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-            title: Text(l10n.printReverse),
-            value: state.reverse,
-            onChanged: (v) => update(() => state.reverse = v ?? false),
+          FormRow(
+            label: l10n.printOrientation,
+            hint: l10n.printOrientationHint,
+            child: Segmented<PrintOrientation>(
+              dense: true,
+              value: state.orientation,
+              onChanged: state.setOrientation,
+              options: [
+                (PrintOrientation.auto, null, l10n.printOrientationAuto),
+                (PrintOrientation.portrait, null, l10n.printPortrait),
+                (PrintOrientation.landscape, null, l10n.printLandscape),
+              ],
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: FormCheck(
+                  key: const ValueKey('print-collate'),
+                  label: l10n.printCollate,
+                  value: state.collate,
+                  onChanged: (v) => update(() => state.collate = v),
+                ),
+              ),
+              Expanded(
+                child: FormCheck(
+                  key: const ValueKey('print-reverse'),
+                  label: l10n.printReverse,
+                  value: state.reverse,
+                  onChanged: (v) => update(() => state.reverse = v),
+                ),
+              ),
+            ],
           ),
           if (state.widget.service.hasPrinterProperties &&
-              state.printer != null) ...[
-            const SizedBox(height: Space.s2),
-            OutlinedButton.icon(
-              key: const ValueKey('print-properties'),
-              icon: const Icon(LucideIcons.printer, size: 18),
-              label: Text(l10n.printProperties),
-              onPressed: () =>
-                  state.widget.service.printerProperties(state.printer!),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: Space.s1),
-              child: Text(
-                l10n.printPropertiesHint,
-                style: InkenText.caption.copyWith(color: c.inkMuted),
+              state.printer != null)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Tooltip(
+                message: l10n.printPropertiesHint,
+                child: TextButton.icon(
+                  key: const ValueKey('print-properties'),
+                  icon: const Icon(LucideIcons.printer, size: 18),
+                  label: Text(l10n.printProperties),
+                  onPressed: () =>
+                      state.widget.service.printerProperties(state.printer!),
+                ),
               ),
             ),
-          ],
         ],
       ],
     );

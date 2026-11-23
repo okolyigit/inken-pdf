@@ -5,6 +5,7 @@ import 'package:inken_pdf/inken_pdf.dart' show ImageEncoding;
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../theme/dialog_form.dart';
 import '../../theme/tokens.dart';
 import '../ink/tool_options.dart' show Segmented, colorNames;
 import '../ink/tool_state.dart';
@@ -63,7 +64,7 @@ Future<ExportChoice?> showExportDialog(
       return Dialog(
         insetPadding: const EdgeInsets.all(Space.s6),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 960, maxHeight: 680),
+          constraints: const BoxConstraints(maxWidth: 960, maxHeight: 760),
           child: dialog,
         ),
       );
@@ -334,7 +335,12 @@ class ExportDialogState extends State<ExportDialog> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(Space.s6),
+      padding: const EdgeInsets.fromLTRB(
+        Space.s6,
+        Space.s4,
+        Space.s4,
+        Space.s4,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -356,21 +362,21 @@ class ExportDialogState extends State<ExportDialog> {
               ),
             ],
           ),
-          const SizedBox(height: Space.s4),
+          const SizedBox(height: Space.s3),
           Expanded(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(flex: 10, child: preview),
+                Expanded(flex: 9, child: preview),
                 const SizedBox(width: Space.s6),
                 Expanded(
-                  flex: 8,
+                  flex: 10,
                   child: SingleChildScrollView(child: settings),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: Space.s4),
+          const SizedBox(height: Space.s3),
           Row(
             children: [
               Expanded(child: summary),
@@ -528,244 +534,165 @@ class _Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final c = context.colors;
-
-    Widget label(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: Space.s2),
-      child: Text(
-        text,
-        style: InkenText.label.copyWith(
-          color: c.inkMuted,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-    Widget hint(String text) => Padding(
-      padding: const EdgeInsets.only(top: Space.s1),
-      child: Text(text, style: InkenText.caption.copyWith(color: c.inkMuted)),
-    );
-    const gap = SizedBox(height: Space.s4);
     final list = state.pages;
+    final images = state.format == ExportFormat.images;
+    final phone = state.widget.phone;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        label(l10n.exportFormat),
-        for (final (format, icon, title, text) in [
-          (
-            ExportFormat.flattened,
-            LucideIcons.fileCheck,
-            l10n.exportFormatFlattened,
-            l10n.exportFormatFlattenedHint,
-          ),
-          (
-            ExportFormat.editable,
-            LucideIcons.filePen,
-            l10n.exportFormatEditable,
-            l10n.exportFormatEditableHint,
-          ),
-          (
-            ExportFormat.images,
-            LucideIcons.fileImage,
-            l10n.exportFormatImages,
-            l10n.exportFormatImagesHint,
-          ),
-        ])
-          Padding(
-            padding: const EdgeInsets.only(bottom: Space.s2),
-            child: _FormatOption(
-              key: ValueKey('export-format-${format.name}'),
-              icon: icon,
-              title: title,
-              hint: text,
-              selected: state.format == format,
-              onTap: () => state.setFormat(format),
-            ),
-          ),
-        if (state.format == ExportFormat.images) ...[
-          const SizedBox(height: Space.s2),
-          label(l10n.exportFileType),
-          Segmented<ImageEncoding>(
-            key: const ValueKey('export-encoding'),
-            value: state.encoding,
-            onChanged: state.setEncoding,
+        FormRow(
+          label: l10n.exportFormat,
+          hint: switch (state.format) {
+            ExportFormat.flattened => l10n.exportFormatFlattenedHint,
+            ExportFormat.editable => l10n.exportFormatEditableHint,
+            ExportFormat.images => l10n.exportFormatImagesHint,
+          },
+          child: Segmented<ExportFormat>(
+            dense: true,
+            value: state.format,
+            onChanged: state.setFormat,
             options: [
-              for (final e in ImageEncoding.values) (e, null, _encodingName(e)),
+              (
+                ExportFormat.flattened,
+                phone ? null : LucideIcons.fileCheck,
+                l10n.exportFormatFlattenedShort,
+              ),
+              (
+                ExportFormat.editable,
+                phone ? null : LucideIcons.filePen,
+                l10n.exportFormatEditableShort,
+              ),
+              (
+                ExportFormat.images,
+                phone ? null : LucideIcons.fileImage,
+                l10n.exportFormatImages,
+              ),
             ],
           ),
-          hint(l10n.exportFileTypeHint),
-          gap,
-          label(l10n.exportResolution),
-          Segmented<int>(
-            key: const ValueKey('export-dpi'),
-            value: state.dpi,
-            onChanged: state.setDpi,
-            options: [for (final d in exportDpis) (d, null, l10n.dpiLabel(d))],
-          ),
-          hint(l10n.exportResolutionHint),
-          SwitchListTile(
-            key: const ValueKey('export-gray'),
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.exportGray),
-            value: state.grayscale,
-            onChanged: state.setGrayscale,
-          ),
-        ],
-        if (state.colors.isNotEmpty || state.images) ...[
-          gap,
-          label(l10n.exportHide),
-          Wrap(
-            key: const ValueKey('export-hide'),
-            spacing: Space.s1,
-            runSpacing: Space.s1,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              for (final rgb in state.colors)
-                _HideToggle(
-                  key: ValueKey('export-hide-${rgb.toRadixString(16)}'),
-                  label: l10n.exportHideColor(_colorName(l10n, rgb)),
-                  hidden: state.hiddenColors.contains(rgb),
-                  onTap: () => state.toggleColor(rgb),
-                  color: Color(0xFF000000 | rgb),
-                ),
-              if (state.images)
-                _HideToggle(
-                  key: const ValueKey('export-hide-images'),
-                  label: l10n.exportHideImages,
-                  hidden: state.hideImages,
-                  onTap: state.toggleImages,
-                  icon: LucideIcons.image,
-                  text: l10n.exportHideImages,
-                ),
-            ],
-          ),
-          hint(l10n.exportHideHint),
-        ],
-        gap,
-        label(l10n.exportPages),
-        Segmented<ExportPageSet>(
-          key: const ValueKey('export-pages'),
-          value: state.pageSet,
-          onChanged: state.setPageSet,
-          options: [
-            (ExportPageSet.all, null, l10n.exportPagesAll),
-            (ExportPageSet.current, null, l10n.exportPagesCurrent),
-            (ExportPageSet.drawn, null, l10n.exportPagesDrawn),
-            (ExportPageSet.range, null, l10n.exportPagesRange),
-          ],
         ),
-        if (state.pageSet == ExportPageSet.drawn)
-          hint(l10n.exportPagesDrawnHint),
-        if (state.pageSet == ExportPageSet.range) ...[
-          const SizedBox(height: Space.s2),
-          TextField(
-            key: const ValueKey('export-range'),
-            controller: state._range,
-            autofocus: true,
-            style: InkenText.numeric.copyWith(color: c.ink),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9,;\-– ]')),
-            ],
-            decoration: InputDecoration(
-              isDense: true,
-              hintText: l10n.printRangeHint,
-              border: const OutlineInputBorder(),
-              errorText: state._range.text.trim().isNotEmpty && list == null
-                  ? l10n.printRangeInvalid(state.widget.document.pages.length)
-                  : null,
+        if (images) ...[
+          FormRow(
+            label: l10n.exportFileType,
+            hint: l10n.exportFileTypeHint,
+            child: Segmented<ImageEncoding>(
+              key: const ValueKey('export-encoding'),
+              dense: true,
+              value: state.encoding,
+              onChanged: state.setEncoding,
+              options: [
+                for (final e in ImageEncoding.values)
+                  (e, null, _encodingName(e)),
+              ],
             ),
-            onChanged: (_) => state.setPageSet(ExportPageSet.range),
+          ),
+          FormRow(
+            label: l10n.exportResolution,
+            hint: l10n.exportResolutionHint,
+            child: Segmented<int>(
+              key: const ValueKey('export-dpi'),
+              dense: true,
+              value: state.dpi,
+              onChanged: state.setDpi,
+              options: [
+                for (final d in exportDpis) (d, null, l10n.dpiLabel(d)),
+              ],
+            ),
+          ),
+          FormRow(
+            label: l10n.exportGray,
+            child: FormSwitch(
+              key: const ValueKey('export-gray'),
+              value: state.grayscale,
+              onChanged: state.setGrayscale,
+            ),
           ),
         ],
-        CheckboxListTile(
-          key: const ValueKey('export-skip-blank'),
-          contentPadding: EdgeInsets.zero,
-          controlAffinity: ListTileControlAffinity.leading,
-          title: Text(l10n.exportSkipBlank),
-          value: state.skipBlank,
-          onChanged: (v) => state.setSkipBlank(v ?? false),
+        if (state.colors.isNotEmpty || state.images)
+          FormRow(
+            label: l10n.exportHide,
+            hint: l10n.exportHideHint,
+            child: Wrap(
+              key: const ValueKey('export-hide'),
+              spacing: Space.s1,
+              runSpacing: Space.s1,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                for (final rgb in state.colors)
+                  _HideToggle(
+                    key: ValueKey('export-hide-${rgb.toRadixString(16)}'),
+                    label: l10n.exportHideColor(_colorName(l10n, rgb)),
+                    hidden: state.hiddenColors.contains(rgb),
+                    onTap: () => state.toggleColor(rgb),
+                    color: Color(0xFF000000 | rgb),
+                  ),
+                if (state.images)
+                  _HideToggle(
+                    key: const ValueKey('export-hide-images'),
+                    label: l10n.exportHideImages,
+                    hidden: state.hideImages,
+                    onTap: state.toggleImages,
+                    icon: LucideIcons.image,
+                    text: l10n.exportHideImages,
+                  ),
+              ],
+            ),
+          ),
+        FormRow(
+          label: l10n.exportPages,
+          hint: state.pageSet == ExportPageSet.drawn
+              ? l10n.exportPagesDrawnHint
+              : null,
+          below: state.pageSet == ExportPageSet.range
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: Space.s1),
+                  child: TextField(
+                    key: const ValueKey('export-range'),
+                    controller: state._range,
+                    autofocus: true,
+                    style: InkenText.numeric.copyWith(color: c.ink),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9,;\-– ]')),
+                    ],
+                    decoration: denseFieldDecoration.copyWith(
+                      hintText: l10n.printRangeHint,
+                      errorText:
+                          state._range.text.trim().isNotEmpty && list == null
+                          ? l10n.printRangeInvalid(
+                              state.widget.document.pages.length,
+                            )
+                          : null,
+                    ),
+                    onChanged: (_) => state.setPageSet(ExportPageSet.range),
+                  ),
+                )
+              : null,
+          child: Segmented<ExportPageSet>(
+            key: const ValueKey('export-pages'),
+            dense: true,
+            value: state.pageSet,
+            onChanged: state.setPageSet,
+            options: [
+              (ExportPageSet.all, null, l10n.exportPagesAll),
+              (ExportPageSet.current, null, l10n.exportPagesCurrent),
+              (ExportPageSet.drawn, null, l10n.exportPagesDrawn),
+              (ExportPageSet.range, null, l10n.exportPagesRange),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(
+            left: phone ? 0 : FormRow.labelWidth + Space.s2,
+          ),
+          child: FormCheck(
+            key: const ValueKey('export-skip-blank'),
+            label: l10n.exportSkipBlank,
+            value: state.skipBlank,
+            onChanged: state.setSkipBlank,
+          ),
         ),
       ],
-    );
-  }
-}
-
-/// Biçim seçeneği: ikon, ad ve kısa açıklama; seçiliyken marka renginde
-/// halka ve zemin (seçim yalnızca renkle gösterilmez: halka + onay).
-class _FormatOption extends StatelessWidget {
-  const _FormatOption({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.hint,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String hint;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Semantics(
-      selected: selected,
-      button: true,
-      child: Material(
-        color: selected ? c.brandTint : c.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(Radii.md),
-          side: BorderSide(
-            color: selected ? c.brand : c.line,
-            width: selected ? 2 : 1,
-          ),
-        ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(Radii.md),
-          onTap: onTap,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: Sizes.target),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Space.s3,
-                vertical: Space.s2,
-              ),
-              child: Row(
-                children: [
-                  Icon(icon, size: 20, color: selected ? c.brand : c.inkMuted),
-                  const SizedBox(width: Space.s3),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          title,
-                          style: InkenText.menu.copyWith(
-                            color: c.ink,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          hint,
-                          style: InkenText.caption.copyWith(color: c.inkMuted),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (selected) ...[
-                    const SizedBox(width: Space.s2),
-                    Icon(LucideIcons.circleCheck, size: 20, color: c.brand),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -817,7 +744,7 @@ class _HideToggle extends StatelessWidget {
     final Widget body;
     if (swatch != null) {
       body = SizedBox.square(
-        dimension: Sizes.swatch,
+        dimension: 26,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -873,8 +800,8 @@ class _HideToggle extends StatelessWidget {
                   borderRadius: BorderRadius.circular(Radii.pill),
                 ),
           child: Container(
-            width: round ? Sizes.target : null,
-            height: Sizes.target,
+            width: round ? 36 : null,
+            height: 36,
             padding: round
                 ? null
                 : const EdgeInsets.symmetric(horizontal: Space.s3),

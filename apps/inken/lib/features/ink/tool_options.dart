@@ -816,7 +816,11 @@ class Segmented<T> extends StatelessWidget {
     required this.onChanged,
     required this.options,
     this.iconOnly = false,
+    this.dense = false,
   });
+
+  /// Sıkı boy (32 px): pencerelerdeki form satırları için.
+  final bool dense;
 
   /// Yalnızca ikon gösterilir (dar yerde çok seçenek); etiket erişilebilirlik
   /// için kalır.
@@ -859,7 +863,7 @@ class Segmented<T> extends StatelessWidget {
                     hoverColor: c.surfaceHover,
                     onTap: () => onChanged(v),
                     child: SizedBox(
-                      height: 44,
+                      height: dense ? 32 : 44,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

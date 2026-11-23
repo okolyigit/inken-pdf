@@ -465,16 +465,16 @@ void main() {
     testWidgets('arayüz boyutu: her şey büyür, dokunuşlar doğru yere', (
       t,
     ) async {
-      // Akıllı tahta: 1920 geniş ekran, %150 → 1280 mantıksal (masaüstü).
-      final settings = SettingsStore.memory({'uiScale': 'larger'});
+      // Büyük: 1920 geniş ekran, %125 → 1536 mantıksal (masaüstü).
+      final settings = SettingsStore.memory({'uiScale': 'large'});
       final c = await pump(t, settings: settings, size: const Size(1920, 1080));
-      // Ekranda 1,5 kat: 48'lik düğme 72.
+      // Ekranda 1,25 kat: 48'lik düğme 60.
       final save = t.getRect(find.byKey(const ValueKey('quick-save')));
-      expect(save.height, closeTo(72, 0.01));
-      // Uyarlanabilir yerleşim küçülen mantıksal genişliğe göre: 1920 / 1,5.
+      expect(save.height, closeTo(60, 0.01));
+      // Uyarlanabilir yerleşim küçülen mantıksal genişliğe göre: 1920 / 1,25.
       final ctx = t.element(find.byKey(const ValueKey('quick-save')));
-      expect(MediaQuery.sizeOf(ctx).width, closeTo(1920 / 1.5, 0.01));
-      expect(MediaQuery.devicePixelRatioOf(ctx), closeTo(1.5, 0.01));
+      expect(MediaQuery.sizeOf(ctx).width, closeTo(1920 / 1.25, 0.01));
+      expect(MediaQuery.devicePixelRatioOf(ctx), closeTo(1.25, 0.01));
       // Dokunma ters dönüşümle: ayarlar açılır.
       await t.tap(find.byKey(const ValueKey('quick-settings')));
       await t.pumpAndSettle();
@@ -490,6 +490,12 @@ void main() {
         t.getRect(find.byKey(const ValueKey('quick-save'))).height,
         closeTo(48, 0.01),
       );
+    });
+
+    testWidgets('kaldırılan akıllı tahta ayarı Büyük olarak açılır', (t) async {
+      final settings = SettingsStore.memory({'uiScale': 'larger'});
+      final c = await pump(t, settings: settings, size: const Size(1920, 1080));
+      expect(c.read(uiScaleProvider), UiScale.large);
     });
 
     testWidgets('Yardım menüsü: kısayollar, bilgiler, hakkında', (t) async {

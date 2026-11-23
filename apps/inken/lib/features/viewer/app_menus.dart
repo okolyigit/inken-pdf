@@ -740,5 +740,4 @@ List<Widget> helpMenuItems(
 List<(UiScale, String)> uiScaleChoices(AppLocalizations l10n) => [
   (UiScale.normal, l10n.uiScaleNormal),
   (UiScale.large, l10n.uiScaleLarge),
-  (UiScale.larger, l10n.uiScaleLarger),
 ];

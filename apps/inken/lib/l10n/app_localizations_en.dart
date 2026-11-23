@@ -1126,9 +1126,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get uiScaleLarge => 'Large';
 
   @override
-  String get uiScaleLarger => 'Smart board';
-
-  @override
   String get pagePanelClose => 'Close page panel';
 
   @override
@@ -1682,4 +1679,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportHiddenImages => 'images hidden';
+
+  @override
+  String get exportFormatFlattenedShort => 'With drawings';
+
+  @override
+  String get exportFormatEditableShort => 'Editable';
 }

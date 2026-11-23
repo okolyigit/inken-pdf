@@ -174,7 +174,7 @@ void main() {
     // 4. Dışa aktar (menüden): yeni URI, inken.json yok.
     saf.nextSave.add((location: exported, name: 'ders (çizimli).pdf'));
     await fileCommand(t, 'Dışa aktar…');
-    await t.tap(find.byKey(const ValueKey('export-format-flattened')));
+    await t.tap(find.byKey(const ValueKey('seg-ExportFormat.flattened')));
     await t.pump();
     await t.tap(find.byKey(const ValueKey('export-submit')));
     await _until(t, () async => saf.files.containsKey(exported));

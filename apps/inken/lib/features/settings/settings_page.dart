@@ -344,7 +344,6 @@ class _AppearanceSection extends ConsumerWidget {
                   switch (s) {
                     UiScale.normal => LucideIcons.monitor,
                     UiScale.large => LucideIcons.zoomIn,
-                    UiScale.larger => LucideIcons.presentation,
                   },
                   label,
                 ),

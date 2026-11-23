@@ -1,4 +1,4 @@
-// Arayüz boyutu gerçek uygulamada: akıllı tahta ölçeğinde (%150) çizgi
+// Arayüz boyutu gerçek uygulamada: Büyük ölçekte (%125) çizgi
 // sayfada dokunulan yere düşer, seçim tutamağı tutulur, sayfa keskin
 // çizilir (ekran görüntüsü). Çalıştır:
 // flutter test integration_test/ui_scale_test.dart -d linux
@@ -34,7 +34,7 @@ Future<void> _until(WidgetTester t, bool Function() done) async {
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('akıllı tahta ölçeğinde çizim yerinde', (t) async {
+  testWidgets('büyük ölçekte çizim yerinde', (t) async {
     await initInkenPdf();
     t.platformDispatcher.localesTestValue = const [Locale('tr')];
     addTearDown(t.platformDispatcher.clearLocalesTestValue);
@@ -50,7 +50,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         settingsStoreProvider.overrideWithValue(
-          SettingsStore.memory({'uiScale': 'larger'}),
+          SettingsStore.memory({'uiScale': 'large'}),
         ),
         recentStoreProvider.overrideWithValue(
           await RecentStore.load(directory: dir),
@@ -83,9 +83,9 @@ void main() {
     final layer = t.widget<InkLayer>(find.byType(InkLayer));
     final session = layer.session;
     final view = layer.geometry.viewportOf(0)!;
-    // Katmanın yerel (ölçeklenmemiş) koordinatından ekrana: ×1,5.
+    // Katmanın yerel (ölçeklenmemiş) koordinatından ekrana: ×1,25.
     final box = t.getRect(find.byType(InkLayer));
-    const scale = 1.5;
+    const scale = 1.25;
     Offset screen(Offset page) => box.topLeft + view.toView(page) * scale;
 
     final g = await t.startGesture(
@@ -112,7 +112,7 @@ void main() {
           _shotKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       final image = await boundary.toImage();
       final data = await image.toByteData(format: ui.ImageByteFormat.png);
-      File('$_shotDir/olcek-150.png')
+      File('$_shotDir/olcek-125.png')
           .writeAsBytesSync(data!.buffer.asUint8List());
     }
   });

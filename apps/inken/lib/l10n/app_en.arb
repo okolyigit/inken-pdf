@@ -318,7 +318,6 @@
   "uiScale": "Interface size",
   "uiScaleNormal": "Normal",
   "uiScaleLarge": "Large",
-  "uiScaleLarger": "Smart board",
   "pagePanelClose": "Close page panel",
   "pagePanelOpen": "Open page panel",
   "documentProperties": "Document properties…",
@@ -483,5 +482,7 @@
   "exportHideImages": "Images",
   "exportHideColor": "Hide {color}",
   "exportHiddenColors": "{count, plural, =1{1 color hidden} other{{count} colors hidden}}",
-  "exportHiddenImages": "images hidden"
+  "exportHiddenImages": "images hidden",
+  "exportFormatFlattenedShort": "With drawings",
+  "exportFormatEditableShort": "Editable"
 }

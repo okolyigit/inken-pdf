@@ -4,13 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/settings/settings_store.dart';
 
-/// Arayüz boyutu: akıllı tahtada (büyük ve yüksek çözünürlüklü ekran,
-/// uzaktan bakılır, parmakla dokunulur) her şey orantılı büyür: düğmeler,
-/// menüler, paneller, pencereler, dokunma alanları.
+/// Arayüz boyutu: büyük ve yüksek çözünürlüklü ekranda her şey orantılı
+/// büyür: düğmeler, menüler, paneller, pencereler, dokunma alanları.
+/// ("Akıllı tahta" %150 kaldırıldı, 23 Kasım 2026: arayüz Normal'de büyük
+/// ekranda da rahat kullanılıyor.)
 enum UiScale {
   normal(1),
-  large(1.25),
-  larger(1.5);
+  large(1.25);
 
   const UiScale(this.factor);
   final double factor;
@@ -19,9 +19,12 @@ enum UiScale {
 /// Seçilen arayüz boyutu; kalıcı (`settings.json` → `uiScale`).
 class UiScaleNotifier extends Notifier<UiScale> {
   @override
-  UiScale build() => ref
-      .read(settingsStoreProvider)
-      .getEnum('uiScale', UiScale.values, UiScale.normal);
+  UiScale build() {
+    final settings = ref.read(settingsStoreProvider);
+    // Kaldırılan "Akıllı tahta" (%150) seçilmişse en yakını: Büyük.
+    if (settings.get<String>('uiScale') == 'larger') return UiScale.large;
+    return settings.getEnum('uiScale', UiScale.values, UiScale.normal);
+  }
 
   void set(UiScale scale) {
     state = scale;

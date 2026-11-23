@@ -15,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:inken/features/files/open_document.dart';
 import 'package:inken/features/ink/ink_layer.dart';
 import 'package:inken/features/print/print_dialog.dart';
+import 'package:inken/theme/dialog_form.dart';
 import 'package:inken/features/viewer/viewer_page.dart';
 import 'package:inken/l10n/app_localizations.dart';
 import 'package:inken/platform/print_service.dart';
@@ -256,9 +257,7 @@ void main() {
         .removeCurrentSnackBar();
     await openDialog(() => t.tap(find.byKey(const ValueKey('quick-print'))));
     expect(
-      t
-          .widget<SwitchListTile>(find.byKey(const ValueKey('print-drawings')))
-          .value,
+      t.widget<FormSwitch>(find.byKey(const ValueKey('print-drawings'))).value,
       isFalse,
     );
     await t.tap(find.byKey(const ValueKey('print-cancel')));
