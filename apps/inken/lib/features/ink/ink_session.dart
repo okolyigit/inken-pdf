@@ -990,6 +990,18 @@ class InkSession extends ChangeNotifier {
     _changed();
   }
 
+  /// [indexes] sayfalarını (kendi aralarındaki sırayla) taşır: taşınan ilk
+  /// sayfa [to] konumuna gelir ([MovePages]). Tek geri alma adımı; sıra
+  /// değişmiyorsa hiçbir şey yapılmaz.
+  void movePages(Set<int> indexes, int to) {
+    if (!canChangePages || indexes.isEmpty) return;
+    final command = MovePages(document.pages.length, indexes, to);
+    if (command.isNoop) return;
+    clearSelection();
+    _history.execute(command);
+    _changed();
+  }
+
   /// [indexes] sayfalarını [turns] çeyrek tur saat yönünde (negatif: ters)
   /// döndürür; çizimler sayfayla döner. Tek geri alma adımı.
   void rotatePages(Set<int> indexes, int turns) {

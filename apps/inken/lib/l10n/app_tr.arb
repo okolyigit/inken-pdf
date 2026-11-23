@@ -381,6 +381,8 @@
   "orientationPortrait": "Dikey",
   "orientationLandscape": "Yatay",
   "insertPageBefore": "Önüne sayfa ekle",
+  "movePageUp": "Yukarı taşı",
+  "movePageDown": "Aşağı taşı",
   "insertPageAfter": "Arkasına sayfa ekle",
   "insertPageHere": "Buraya sayfa ekle",
   "pageActions": "Sayfa işlemleri",

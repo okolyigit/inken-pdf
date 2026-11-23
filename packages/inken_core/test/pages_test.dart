@@ -83,6 +83,69 @@ void main() {
     });
   });
 
+  group('sayfa taşıma', () {
+    List<int?> sources(InkenDocument d) =>
+        d.pages.map((p) => p.sourceIndex).toList();
+
+    test('tek sayfa yukarı / aşağı, sona, başa', () {
+      expect(MovePages(3, {2}, 1).order, [0, 2, 1]);
+      expect(MovePages(3, {0}, 1).order, [1, 0, 2]);
+      expect(MovePages(3, {0}, 2).order, [1, 2, 0]);
+      expect(MovePages(3, {2}, 0).order, [2, 0, 1]);
+    });
+
+    test('birden çok sayfa kendi sıralarıyla birlikte gider', () {
+      expect(MovePages(5, {3, 1}, 0).order, [1, 3, 0, 2, 4]);
+      expect(MovePages(5, {0, 2}, 3).order, [1, 3, 4, 0, 2]);
+    });
+
+    test('yerinde taşıma işlem sayılmaz; sınır dışı hata', () {
+      expect(MovePages(3, {1}, 1).isNoop, isTrue);
+      expect(() => MovePages(3, {3}, 0), throwsRangeError);
+      expect(() => MovePages(3, {0}, 3), throwsRangeError);
+    });
+
+    test('çizimler sayfayla gider; geri al / yinele', () {
+      final withInk = AddItems(2, [stroke]).apply(doc);
+      final h = EditHistory(withInk);
+      h.execute(MovePages(3, {2}, 0));
+      expect(sources(h.document), [2, 0, 1]);
+      expect(h.document.pages[0].items, [stroke]);
+      expect(
+        (h.document.pages[1].width, h.document.pages[1].height),
+        (595.0, 842.0),
+      );
+      h.undo();
+      expect(h.document, withInk);
+      h.redo();
+      expect(sources(h.document), [2, 0, 1]);
+    });
+
+    test('eklenen sayfa da taşınır; düzen anahtarı değişir', () {
+      final blank = newPageLike(doc, 0, PageTemplate.lined);
+      final inserted = InsertPage(3, blank).apply(doc);
+      final moved = MovePages(4, {3}, 1).apply(inserted);
+      expect(sources(moved), [0, null, 1, 2]);
+      expect(moved.pages[1].template, PageTemplate.lined);
+      expect(pageLayoutKey(moved), isNot(pageLayoutKey(inserted)));
+      expect(isSourceLayout(MovePages(3, {0}, 1).apply(doc), 3), isFalse);
+      expect(fitsSourcePages(moved, 3, allowRemoved: true), isTrue);
+      // Eklenen sayfanın yeri dosya sırasını bozmaz; dosya sayfası taşınınca
+      // kaydedilmiş dosyanın katmanı olarak geçmez.
+      expect(fitsSourcePages(moved, 3), isTrue);
+      expect(fitsSourcePages(MovePages(3, {0}, 1).apply(doc), 3), isFalse);
+    });
+
+    test('kayıt biçimi: taşınmış sayfa sırası gidiş-dönüşte korunur', () {
+      final moved = MovePages(3, {
+        0,
+      }, 2).apply(AddItems(0, [stroke]).apply(doc));
+      final back = decodeInkenDocument(encodeInkenDocument(moved));
+      expect(back, moved);
+      expect(sources(back), [1, 2, 0]);
+    });
+  });
+
   group('silinmiş sayfalı model ve dosya', () {
     final removed = RemovePage(1, doc.pages[1]).apply(doc);
 
@@ -90,10 +153,13 @@ void main() {
       expect(fitsSourcePages(removed, 3), isFalse);
       expect(fitsSourcePages(removed, 3, allowRemoved: true), isTrue);
       expect(fitsSourcePages(removed, 2, allowRemoved: true), isFalse);
-      final reversed = removed.copyWith(
-        pages: removed.pages.reversed.toList(),
+      final reversed = removed.copyWith(pages: removed.pages.reversed.toList());
+      // Taşınmış sayfalar: sıra değişebilir, ama bir sayfa iki kez olamaz.
+      expect(fitsSourcePages(reversed, 3, allowRemoved: true), isTrue);
+      final twice = removed.copyWith(
+        pages: [removed.pages[0], removed.pages[0]],
       );
-      expect(fitsSourcePages(reversed, 3, allowRemoved: true), isFalse);
+      expect(fitsSourcePages(twice, 3, allowRemoved: true), isFalse);
     });
 
     test('yedek sayfa sayısını saklar; eski yedek eski kuralla', () {

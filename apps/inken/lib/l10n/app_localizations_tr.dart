@@ -672,6 +672,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get insertPageBefore => 'Önüne sayfa ekle';
 
   @override
+  String get movePageUp => 'Yukarı taşı';
+
+  @override
+  String get movePageDown => 'Aşağı taşı';
+
+  @override
   String get insertPageAfter => 'Arkasına sayfa ekle';
 
   @override

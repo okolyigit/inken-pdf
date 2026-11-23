@@ -482,6 +482,15 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     );
   }
 
+  /// [pages] sayfalarını taşır (ilki [to] konumuna); görüntüleyici taşınan
+  /// ilk sayfaya gider.
+  void _movePages(Set<int> pages, int to) {
+    final session = _session;
+    if (session == null || !session.canChangePages || pages.isEmpty) return;
+    _targetPage = to;
+    session.movePages(pages, to);
+  }
+
   /// Geçerli sayfayı [turns] çeyrek tur döndürür (1 sağa, -1 sola).
   void _rotateCurrentPage(int turns) {
     final session = _session;
@@ -2219,6 +2228,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                       ? null
                       : PagePanelActions(
                           rotate: _rotatePages,
+                          move: _movePages,
                           insert: _insertPageAt,
                           delete: _deletePages,
                           orientation: _effectiveOrientation(session),

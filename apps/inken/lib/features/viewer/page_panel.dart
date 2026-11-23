@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,6 +40,7 @@ final pagePanelProvider = NotifierProvider<PagePanelNotifier, bool>(
 class PagePanelActions {
   const PagePanelActions({
     required this.rotate,
+    required this.move,
     required this.insert,
     required this.delete,
     required this.orientation,
@@ -46,6 +51,10 @@ class PagePanelActions {
 
   /// [pages] sayfalarını [turns] çeyrek tur döndürür (1 sağa, -1 sola).
   final void Function(Set<int> pages, int turns) rotate;
+
+  /// [pages] sayfalarını taşır: ilki [to] konumuna gelir (taşınanlar
+  /// çıkarıldıktan sonraki sıra; [MovePages]).
+  final void Function(Set<int> pages, int to) move;
 
   /// [index] konumuna [template] zeminli sayfa ekler.
   final void Function(int index, PageTemplate template) insert;
@@ -88,7 +97,12 @@ class _InsertMenu extends _PanelMenu {
 /// arkasına ekle, sil), sayfanın altındaki "+" (arkasına ekle). Ctrl ile
 /// dokunmak sayfayı seçime ekler / çıkarır, Shift aralık seçer; dokunmatikte
 /// uzun basış seçim kipini açar (sonraki dokunuşlar seçer). Seçim varken
-/// üstteki şeritten seçili sayfalar döndürülür ya da silinir.
+/// üstteki şeritten seçili sayfalar taşınır, döndürülür ya da silinir.
+///
+/// Sıralama: fareyle sayfa (seçiliyse seçimle birlikte) sürüklenip araya
+/// bırakılır; dokunmatikte ve kalemde uzun basış sayfayı kaldırır (hareket
+/// etmeden bırakılırsa seçim kipi açılır). Menüde ve şeritte yukarı / aşağı
+/// taşı.
 class PagePanel extends StatefulWidget {
   const PagePanel({
     super.key,
@@ -138,6 +152,19 @@ class _PagePanelState extends State<PagePanel> {
   int? _hover;
 
   _PanelMenu? _openMenu;
+
+  /// Sürüklenen sayfalar ve bırakılacak yer (0…sayfa sayısı: o sayfanın
+  /// önü; sayı: en son).
+  Set<int>? _dragging;
+  int? _dropSlot;
+
+  /// Son sürükleme bir yere bırakıldı mı (dokunmatikte bırakılmadıysa uzun
+  /// basış seçim kipini açar).
+  bool _dropped = false;
+
+  /// Sürüklerken liste kenarına gelince kendiliğinden kaydırma.
+  Timer? _edgeTimer;
+  double _edgeSpeed = 0;
 
   /// Gösterilen sekme: sayfalar ya da içindekiler.
   bool _outline = false;
@@ -198,6 +225,7 @@ class _PagePanelState extends State<PagePanel> {
   @override
   void dispose() {
     widget.viewer.removeListener(_follow);
+    _edgeTimer?.cancel();
     _scroll.dispose();
     super.dispose();
   }
@@ -265,9 +293,9 @@ class _PagePanelState extends State<PagePanel> {
     widget.viewer.goToPage(i);
   }
 
-  void _longPress(int i) {
+  void _longPress(int i, {bool haptic = true}) {
     if (widget.actions == null) return;
-    HapticFeedback.selectionClick();
+    if (haptic) HapticFeedback.selectionClick();
     setState(() {
       _selecting = true;
       _selected = {..._selected, i};
@@ -296,6 +324,97 @@ class _PagePanelState extends State<PagePanel> {
   void _delete(Set<int> pages) {
     widget.actions?.delete(pages);
     _clearSelection();
+  }
+
+  /// [pages] sayfalarını [slot] konumunun önüne taşır (0…sayfa sayısı).
+  /// Seçim varsa taşınan sayfalarda kalır (oklarla art arda taşınabilsin).
+  void _moveTo(Set<int> pages, int slot) {
+    final a = widget.actions;
+    if (a == null || !_canChange || pages.isEmpty) return;
+    final to = slot - pages.where((p) => p < slot).length;
+    a.move(pages, to);
+    setState(() {
+      if (_selected.isNotEmpty) {
+        _selected = {for (var k = 0; k < pages.length; k++) to + k};
+        _rangeStart = to;
+      }
+    });
+  }
+
+  /// Bir sıra yukarı ([dir] -1) ya da aşağı (1): sayfalar bitişik blok
+  /// olarak komşusunun öbür yanına geçer.
+  void _moveBy(Set<int> pages, int dir) {
+    final first = pages.reduce(math.min);
+    final last = pages.reduce(math.max);
+    _moveTo(pages, dir < 0 ? first - 1 : last + 2);
+  }
+
+  /// Sürükleme sırasında bırakma yeri: imleç sayfanın üst yarısındaysa
+  /// önü, alt yarısındaysa arkası.
+  void _dragOver(int i, BuildContext tile, Offset global) {
+    final box = tile.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return;
+    final y = box.globalToLocal(global).dy;
+    final slot = y < box.size.height / 2 ? i : i + 1;
+    if (slot != _dropSlot) setState(() => _dropSlot = slot);
+  }
+
+  void _dragStart(Set<int> pages) => setState(() {
+    _dragging = pages;
+    _dropSlot = null;
+    _dropped = false;
+    _openMenu = null;
+  });
+
+  void _dragEnd() {
+    _edgeTimer?.cancel();
+    _edgeTimer = null;
+    _edgeSpeed = 0;
+    if (_dragging == null && _dropSlot == null) return;
+    setState(() {
+      _dragging = null;
+      _dropSlot = null;
+    });
+  }
+
+  void _drop(Set<int> pages) {
+    final slot = _dropSlot;
+    final count = widget.viewer.pageCount;
+    // Kendi yerine bırakmak taşıma sayılmaz (dokunmatikte seçim kipi açılır).
+    _dropped =
+        slot != null &&
+        !MovePages(
+          count,
+          pages,
+          slot - pages.where((p) => p < slot).length,
+        ).isNoop;
+    _dragEnd();
+    if (_dropped) _moveTo(pages, slot!);
+  }
+
+  /// İmleç listenin üst / alt kenarına yakınsa liste o yöne kayar.
+  void _dragUpdate(Offset global) {
+    final box = _menuAnchor.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return;
+    final y = box.globalToLocal(global).dy;
+    const zone = Sizes.target;
+    final h = box.size.height;
+    _edgeSpeed = y < zone
+        ? -(zone - y.clamp(0, zone)) / zone
+        : y > h - zone
+        ? (y.clamp(h - zone, h) - (h - zone)) / zone
+        : 0;
+    if (_edgeSpeed == 0) {
+      _edgeTimer?.cancel();
+      _edgeTimer = null;
+      return;
+    }
+    _edgeTimer ??= Timer.periodic(const Duration(milliseconds: 16), (_) {
+      if (!_scroll.hasClients || _edgeSpeed == 0) return;
+      final pos = _scroll.position;
+      final to = (pos.pixels + _edgeSpeed * 14).clamp(0.0, pos.maxScrollExtent);
+      if (to != pos.pixels) _scroll.jumpTo(to);
+    });
   }
 
   List<Widget> _menuChildren(AppLocalizations l10n, int count) {
@@ -330,6 +449,21 @@ class _PagePanelState extends State<PagePanel> {
             leadingIcon: const Icon(LucideIcons.rotateCcw),
             onPressed: enabled ? () => _rotate(pages, -1) : null,
             child: Text(l10n.rotateLeft),
+          ),
+          menuSeparator,
+          MenuItemButton(
+            key: const ValueKey('panel-move-up'),
+            leadingIcon: const Icon(LucideIcons.arrowUp),
+            onPressed: enabled && first > 0 ? () => _moveBy(pages, -1) : null,
+            child: Text(l10n.movePageUp),
+          ),
+          MenuItemButton(
+            key: const ValueKey('panel-move-down'),
+            leadingIcon: const Icon(LucideIcons.arrowDown),
+            onPressed: enabled && last < count - 1
+                ? () => _moveBy(pages, 1)
+                : null,
+            child: Text(l10n.movePageDown),
           ),
           menuSeparator,
           SubmenuButton(
@@ -412,7 +546,8 @@ class _PagePanelState extends State<PagePanel> {
           itemExtentBuilder: (i, _) => _extentFor(_aspect(i)),
           itemBuilder: (context, i) {
             final current = viewer.currentPage == i;
-            return _PageTile(
+            final slot = _dropSlot;
+            final tile = _PageTile(
               index: i,
               current: current,
               selected: selected.contains(i),
@@ -430,7 +565,8 @@ class _PagePanelState extends State<PagePanel> {
               night: widget.night,
               session: session,
               onTap: () => _tap(i),
-              onLongPress: hasActions ? () => _longPress(i) : null,
+              // Dokunmatikte uzun basış sürükleyiciye ait ([_draggable]).
+              onLongPress: null,
               onHover: (on) {
                 if (on == (_hover == i)) return;
                 setState(() => _hover = on ? i : null);
@@ -441,7 +577,12 @@ class _PagePanelState extends State<PagePanel> {
               onAdd: hasActions
                   ? (at) => _showMenu(_InsertMenu(i + 1), at)
                   : null,
+              dropBefore: slot == i,
+              dropAfter: slot == count && i == count - 1,
+              dimmed: _dragging?.contains(i) ?? false,
             );
+            if (!hasActions) return tile;
+            return _draggable(i, count, viewer, tile);
           },
         );
         final body = MenuAnchor(
@@ -456,6 +597,9 @@ class _PagePanelState extends State<PagePanel> {
               count: selected.length,
               enabled: _canChange,
               canDelete: selected.length < count,
+              canMoveUp: selected.reduce(math.min) > 0,
+              canMoveDown: selected.reduce(math.max) < count - 1,
+              onMove: (dir) => _moveBy(selected, dir),
               onRotate: (turns) => _rotate(selected, turns),
               onDelete: () => _delete(selected),
               onClear: _clearSelection,
@@ -466,6 +610,190 @@ class _PagePanelState extends State<PagePanel> {
       },
     ),
   );
+}
+
+extension on _PagePanelState {
+  /// Sayfa kutusunu sürüklenebilir ve bırakma hedefi yapar. Fare: hemen
+  /// sürüklenir (seçiliyse seçimle). Dokunmatik ve kalem: uzun basış sayfayı
+  /// seçer ve kaldırır; kıpırdamadan bırakılırsa yalnızca seçim kalır.
+  Widget _draggable(
+    int i,
+    int count,
+    InkenViewerController viewer,
+    Widget tile,
+  ) {
+    final enabled = _canChange && count > 1;
+    final mouseData = _selected.contains(i) ? {..._selected} : {i};
+    final touchData = {..._selected, i};
+    Widget feedback(Set<int> pages) => _DragFeedback(
+      viewer: viewer,
+      page: i,
+      count: pages.length,
+      width: _PagePanelState._imageWidth * 0.7,
+      aspect: _aspect(i),
+      night: widget.night,
+    );
+    final target = Builder(
+      builder: (context) => DragTarget<Set<int>>(
+        onWillAcceptWithDetails: (_) => _canChange,
+        onMove: (d) => _dragOver(i, context, d.offset),
+        onAcceptWithDetails: (d) => _drop(d.data),
+        builder: (context, _, _) => tile,
+      ),
+    );
+    if (!enabled) {
+      return GestureDetector(
+        onLongPress: widget.actions == null ? null : () => _longPress(i),
+        child: target,
+      );
+    }
+    return _DeviceDraggable<Set<int>>(
+      data: mouseData,
+      devices: const {PointerDeviceKind.mouse},
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      feedback: feedback(mouseData),
+      onDragStarted: () => _dragStart(mouseData),
+      onDragUpdate: (d) => _dragUpdate(d.globalPosition),
+      onDragEnd: (_) => _dragEnd(),
+      onDraggableCanceled: (_, _) => _dragEnd(),
+      child: _DeviceDraggable<Set<int>>(
+        data: touchData,
+        devices: const {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.invertedStylus,
+        },
+        delay: kLongPressTimeout,
+        dragAnchorStrategy: pointerDragAnchorStrategy,
+        feedback: feedback(touchData),
+        // Seçim şeridi sürüklerken açılmaz (liste parmağın altında
+        // kaymasın): kıpırdamadan bırakılırsa bırakınca açılır.
+        onDragStarted: () {
+          HapticFeedback.selectionClick();
+          _dragStart(touchData);
+        },
+        onDragUpdate: (d) => _dragUpdate(d.globalPosition),
+        onDragEnd: (_) {
+          final moved = _dropped;
+          _dragEnd();
+          if (!moved) _longPress(i, haptic: false);
+        },
+        // Bırakma hedefi dışında bırakılırsa onDragEnd yine çağrılır.
+        onDraggableCanceled: (_, _) => _dragEnd(),
+        child: target,
+      ),
+    );
+  }
+}
+
+/// Yalnızca [devices] işaretçileriyle sürüklenen [Draggable]; [delay]
+/// verilirse uzun basışla başlar ([LongPressDraggable] gibi). Fare hemen
+/// sürüklesin, dokunmatik listeyi kaydırabilsin diye.
+class _DeviceDraggable<T extends Object> extends Draggable<T> {
+  const _DeviceDraggable({
+    required super.child,
+    required super.feedback,
+    required this.devices,
+    super.data,
+    super.dragAnchorStrategy,
+    super.onDragStarted,
+    super.onDragUpdate,
+    super.onDragEnd,
+    super.onDraggableCanceled,
+    this.delay,
+  });
+
+  final Set<PointerDeviceKind> devices;
+  final Duration? delay;
+
+  @override
+  MultiDragGestureRecognizer createRecognizer(
+    GestureMultiDragStartCallback onStart,
+  ) {
+    final delay = this.delay;
+    if (delay == null) {
+      return ImmediateMultiDragGestureRecognizer(supportedDevices: devices)
+        ..onStart = onStart;
+    }
+    return DelayedMultiDragGestureRecognizer(
+        delay: delay,
+        supportedDevices: devices,
+      )
+      // Titreşim seçimden gelir (_longPress).
+      ..onStart = onStart;
+  }
+}
+
+/// Sürüklenen sayfanın küçük resmi; birden çok sayfada sayısı.
+class _DragFeedback extends StatelessWidget {
+  const _DragFeedback({
+    required this.viewer,
+    required this.page,
+    required this.count,
+    required this.width,
+    required this.aspect,
+    required this.night,
+  });
+
+  final InkenViewerController viewer;
+  final int page;
+  final int count;
+  final double width;
+  final double aspect;
+  final bool night;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return FractionalTranslation(
+      // İmleç küçük resmin ortasında.
+      translation: const Offset(-0.5, -0.5),
+      child: Opacity(
+        opacity: 0.9,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: width,
+              height: width / aspect,
+              decoration: BoxDecoration(
+                border: Border.all(color: c.brand, width: 2),
+                borderRadius: BorderRadius.circular(Radii.sm),
+                boxShadow: c.shadowPop,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(Radii.sm - 2),
+                child: PageThumbnail(
+                  controller: viewer,
+                  pageIndex: page,
+                  colorFilter: night ? NightMode.pageFilter : null,
+                ),
+              ),
+            ),
+            if (count > 1)
+              Positioned(
+                right: -Space.s2,
+                top: -Space.s2,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Space.s2,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: c.brand,
+                    borderRadius: BorderRadius.circular(Radii.pill),
+                  ),
+                  child: Text(
+                    '$count',
+                    style: InkenText.caption.copyWith(color: c.onBrand),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 /// Panelin üstündeki sekmeler: sayfalar · içindekiler.
@@ -715,13 +1043,16 @@ class _OutlineRow extends StatelessWidget {
 /// Seçim varken panelin üstündeki şerit: kaç sayfa seçili; döndür, sil,
 /// seçimi kaldır.
 /// Seçim şeridindeki düğmelerin kenarı.
-const double _stripButton = 34;
+const double _stripButton = 30;
 
 class _SelectionStrip extends StatelessWidget {
   const _SelectionStrip({
     required this.count,
     required this.enabled,
     required this.canDelete,
+    required this.canMoveUp,
+    required this.canMoveDown,
+    required this.onMove,
     required this.onRotate,
     required this.onDelete,
     required this.onClear,
@@ -730,6 +1061,11 @@ class _SelectionStrip extends StatelessWidget {
   final int count;
   final bool enabled;
   final bool canDelete;
+  final bool canMoveUp;
+  final bool canMoveDown;
+
+  /// Bir sıra yukarı (-1) / aşağı (1).
+  final ValueChanged<int> onMove;
   final ValueChanged<int> onRotate;
   final VoidCallback onDelete;
   final VoidCallback onClear;
@@ -744,7 +1080,7 @@ class _SelectionStrip extends StatelessWidget {
           tooltip: tip,
           onPressed: on,
           icon: Icon(icon, size: 18),
-          // Dört düğme panelin iç genişliğine (~150 px) sığmalı; arayüz
+          // Beş düğme panelin iç genişliğine (~150 px) sığmalı; arayüz
           // boyutu büyüyünce de bütün düzen birlikte ölçeklenir.
           padding: EdgeInsets.zero,
           constraints: BoxConstraints.tight(const Size.square(_stripButton)),
@@ -765,14 +1101,33 @@ class _SelectionStrip extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.pagesSelected(count),
-            style: InkenText.caption.copyWith(color: c.ink),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.pagesSelected(count),
+                  style: InkenText.caption.copyWith(color: c.ink),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              button('clear', LucideIcons.x, l10n.clearPageSelection, onClear),
+            ],
           ),
           Row(
             children: [
+              button(
+                'move-up',
+                LucideIcons.arrowUp,
+                l10n.movePageUp,
+                enabled && canMoveUp ? () => onMove(-1) : null,
+              ),
+              button(
+                'move-down',
+                LucideIcons.arrowDown,
+                l10n.movePageDown,
+                enabled && canMoveDown ? () => onMove(1) : null,
+              ),
               button(
                 'rotate-left',
                 LucideIcons.rotateCcw,
@@ -791,8 +1146,6 @@ class _SelectionStrip extends StatelessWidget {
                 l10n.deletePages(count),
                 enabled && canDelete ? onDelete : null,
               ),
-              const Spacer(),
-              button('clear', LucideIcons.x, l10n.clearPageSelection, onClear),
             ],
           ),
         ],
@@ -889,7 +1242,18 @@ class _PageTile extends StatelessWidget {
     required this.onHover,
     required this.onMenu,
     required this.onAdd,
+    this.dropBefore = false,
+    this.dropAfter = false,
+    this.dimmed = false,
   });
+
+  /// Sürüklenen sayfalar bu sayfanın önüne / arkasına bırakılacak: kenarda
+  /// çizgi.
+  final bool dropBefore;
+  final bool dropAfter;
+
+  /// Sürüklenen sayfalardan biri: soluk.
+  final bool dimmed;
 
   final int index;
   final bool current;
@@ -954,7 +1318,15 @@ class _PageTile extends StatelessWidget {
 
     final onMenu = this.onMenu;
     final onAdd = this.onAdd;
-    return Semantics(
+    Widget line() => Container(
+      height: 3,
+      margin: const EdgeInsets.symmetric(horizontal: Space.s2),
+      decoration: BoxDecoration(
+        color: c.brand,
+        borderRadius: BorderRadius.circular(Radii.pill),
+      ),
+    );
+    final body = Semantics(
       button: true,
       selected: current || selected,
       label: l10n.pageThumbnail(index + 1),
@@ -1053,6 +1425,17 @@ class _PageTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+    return Opacity(
+      opacity: dimmed ? 0.4 : 1,
+      child: Stack(
+        children: [
+          body,
+          if (dropBefore) Positioned(left: 0, right: 0, top: 0, child: line()),
+          if (dropAfter)
+            Positioned(left: 0, right: 0, bottom: 0, child: line()),
+        ],
       ),
     );
   }

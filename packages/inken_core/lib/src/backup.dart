@@ -100,20 +100,31 @@ class InkenBackup {
 /// [document]'in sayfaları [pageCount] sayfalık bir dosyaya uyuyor mu?
 ///
 /// Dosyadan gelen sayfalar (`sourceIndex` dolu) sırayla 0…[pageCount]-1
-/// olmalı; araya eklenen sayfalar sayılmaz. [allowRemoved] ise aradan
-/// sayfa eksik olabilir (silinmiş), ama sıra yine artan olmalıdır. Uymayan
-/// modeli o dosyaya uygulamak çizimleri yanlış sayfalara taşırdı.
+/// olmalı; araya eklenen sayfalar sayılmaz. [allowRemoved] ise (kaydedilmemiş
+/// düzenleme, yedek) sayfa eksik olabilir (silinmiş) ve sıra değişmiş
+/// olabilir (taşınmış), ama her dosya sayfası en çok bir kez ve dosyada
+/// olmalıdır. Uymayan modeli o dosyaya uygulamak çizimleri yanlış
+/// sayfalara taşırdı.
 bool fitsSourcePages(
   InkenDocument document,
   int pageCount, {
   bool allowRemoved = false,
 }) {
+  if (allowRemoved) {
+    final seen = <int>{};
+    for (final page in document.pages) {
+      final index = page.sourceIndex;
+      if (index == null) continue;
+      if (index < 0 || index >= pageCount || !seen.add(index)) return false;
+    }
+    return true;
+  }
   var next = 0;
   for (final page in document.pages) {
     final index = page.sourceIndex;
     if (index == null) continue;
-    if (allowRemoved ? index < next : index != next) return false;
+    if (index != next) return false;
     next = index + 1;
   }
-  return allowRemoved ? next <= pageCount : next == pageCount;
+  return next == pageCount;
 }

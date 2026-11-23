@@ -197,6 +197,8 @@
   "orientationPortrait": "Portrait",
   "orientationLandscape": "Landscape",
   "insertPageBefore": "Insert page before",
+  "movePageUp": "Move up",
+  "movePageDown": "Move down",
   "insertPageAfter": "Insert page after",
   "insertPageHere": "Insert page here",
   "pageActions": "Page actions",

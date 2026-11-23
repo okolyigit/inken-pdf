@@ -1280,6 +1280,18 @@ abstract class AppLocalizations {
   /// **'Önüne sayfa ekle'**
   String get insertPageBefore;
 
+  /// No description provided for @movePageUp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yukarı taşı'**
+  String get movePageUp;
+
+  /// No description provided for @movePageDown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aşağı taşı'**
+  String get movePageDown;
+
   /// No description provided for @insertPageAfter.
   ///
   /// In tr, this message translates to:

@@ -703,6 +703,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get insertPageBefore => 'Insert page before';
 
   @override
+  String get movePageUp => 'Move up';
+
+  @override
+  String get movePageDown => 'Move down';
+
+  @override
   String get insertPageAfter => 'Insert page after';
 
   @override

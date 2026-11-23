@@ -464,6 +464,17 @@ class InkenViewerController extends ChangeNotifier
 
   int _generation = 0;
 
+  /// Kademeli yüklenen sayfaların boyutu gelince dinleyiciler haberdar olur
+  /// ([pageSizes] değişir; sayfa paneli satır yüksekliklerini yeniler).
+  StreamSubscription<PdfDocumentEvent>? _pageEvents;
+
+  void _watchPages(PdfDocument document) {
+    unawaited(_pageEvents?.cancel());
+    _pageEvents = document.events.listen((event) {
+      if (event is PdfDocumentPageStatusChangedEvent) notifyListeners();
+    });
+  }
+
   /// Her yeni yüklenen belgede artar (sayfa düzeni değişince görüntüleyici
   /// yeni kopyayı yükler); belgeye bağlı önbellekler bununla yenilenir.
   int get documentGeneration => _generation;
@@ -559,6 +570,7 @@ class InkenViewerController extends ChangeNotifier
     _ticker?.dispose();
     _search?.dispose();
     _pdf.removeListener(notifyListeners);
+    unawaited(_pageEvents?.cancel());
     super.dispose();
   }
 }
@@ -789,11 +801,38 @@ class InkenPdfViewer extends StatelessWidget {
         ),
         onViewerReady: (document, _) {
           controller._setReady(true);
-          onLoaded?.call(controller.pageSizes);
+          controller._watchPages(document);
+          _whenAllPagesLoaded(document, () {
+            // Bu arada başka bir kopya yüklendiyse onun hazır bildirimi gelir.
+            if (!controller._pdf.isReady ||
+                !identical(controller._pdf.document, document)) {
+              return;
+            }
+            onLoaded?.call(controller.pageSizes);
+          });
         },
       ),
     );
   }
+}
+
+/// [document]'in bütün sayfaları yüklenince [then]'i çağırır. pdfrx
+/// sayfaları kademeli yükler; yüklenmemiş sayfa geçici olarak ilk sayfanın
+/// boyutunu gösterir. Model gerçek boyutlarla kurulsun diye sayfa boyutları
+/// ancak hepsi yüklenince verilir.
+void _whenAllPagesLoaded(PdfDocument document, VoidCallback then) {
+  bool all() => document.pages.every((p) => p.isLoaded);
+  if (all()) {
+    then();
+    return;
+  }
+  late final StreamSubscription<PdfDocumentEvent> sub;
+  sub = document.events.listen((event) {
+    if (event is PdfDocumentPageStatusChangedEvent && all()) {
+      unawaited(sub.cancel());
+      then();
+    }
+  });
 }
 
 /// Görüntüleyicinin yüklediği belgeden tek bir sayfanın küçük resmi

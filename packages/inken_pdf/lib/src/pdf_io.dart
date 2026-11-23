@@ -604,13 +604,7 @@ void _addAnnotation(FPDF_PAGE page, AnnotationAppearance ap) {
 /// yoksa görselin kendisi.
 InkenImage _prepared(
   InkenImage image,
-  ({
-    String imageId,
-    PdfAffine matrix,
-    CropRect crop,
-    int turns,
-    double opacity,
-  })
+  ({String imageId, PdfAffine matrix, CropRect crop, int turns, double opacity})
   g,
 ) {
   if (image.width <= 0 || image.height <= 0) return image;
@@ -714,37 +708,46 @@ void _check(int ok, String what) {
 // ------------------------------------------------------------- sayfalar
 
 /// Dosyanın sayfalarını modelin düzenine getirir: modelde olmayan kaynak
-/// sayfaları siler, eklenen sayfaları oluşturur. Dönen katmanlarda
-/// `sourceIndex` kaydedilen dosyadaki sıradır.
+/// sayfaları siler, taşınanları yerine koyar (`FPDF_MovePages`: içerik,
+/// açıklamalar ve yer imleri sayfayla gider), eklenen sayfaları oluşturur.
+/// Dönen katmanlarda `sourceIndex` kaydedilen dosyadaki sıradır.
 ///
-/// Kaynak sayfalar artan sırada olmalıdır (silme ve araya ekleme var,
-/// taşıma yok); dosyada olmayan bir sayfa [StateError], bozuk sıra
-/// [UnsupportedError] verir.
+/// Her kaynak sayfa en çok bir kez olmalıdır; dosyada olmayan ya da iki
+/// kez geçen sayfa [StateError] verir.
 ///
 /// Silinen sayfa açıklamalarıyla birlikte gider. Form alanı varsa AcroForm
 /// listesindeki ilgili alan sahipsiz kalır; okuyucular bunu yok sayar.
 List<PageLayer> _arrangePages(FPDF_DOCUMENT doc, InkenDocument document) {
   final p = _p;
   final sourceCount = p.FPDF_GetPageCount(doc);
-  final kept = <int>{};
-  var previous = -1;
+  final wanted = <int>[];
   for (final layer in document.pages) {
     final src = layer.sourceIndex;
     if (src == null) continue;
-    if (src >= sourceCount) {
+    if (src < 0 || src >= sourceCount) {
       throw StateError('Sayfa $src dosyada yok ($sourceCount sayfa)');
     }
-    if (src <= previous) {
-      throw UnsupportedError(
-        'Sayfa sırası değişmiş ($previous → $src); sayfa taşıma '
-        'desteklenmiyor',
-      );
+    if (wanted.contains(src)) {
+      throw StateError('Sayfa $src modelde iki kez');
     }
-    previous = src;
-    kept.add(src);
+    wanted.add(src);
   }
   for (var s = sourceCount - 1; s >= 0; s--) {
-    if (!kept.contains(s)) p.FPDFPage_Delete(doc, s);
+    if (!wanted.contains(s)) p.FPDFPage_Delete(doc, s);
+  }
+  // Silmeden sonra kalanlar artan sırada; modelin sırasına tek tek taşınır.
+  final current = [...wanted]..sort();
+  final index = malloc<Int>();
+  try {
+    for (var i = 0; i < wanted.length; i++) {
+      final at = current.indexOf(wanted[i]);
+      if (at == i) continue;
+      index.value = at;
+      _check(p.FPDF_MovePages(doc, index, 1, i), 'sayfa taşıma');
+      current.insert(i, current.removeAt(at));
+    }
+  } finally {
+    malloc.free(index);
   }
   final out = <PageLayer>[];
   for (final (i, layer) in document.pages.indexed) {

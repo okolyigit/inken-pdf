@@ -418,6 +418,53 @@ class RemovePages extends EditCommand {
   }
 }
 
+/// [indexes] sayfalarını (çizimleriyle, kendi aralarındaki sırayla) taşır:
+/// taşınan ilk sayfa sonuçta [to] konumunda olur. Tek geri alma adımıdır.
+/// Dosyadan gelen sayfalar kayıtta dosyada da taşınır.
+///
+/// [to], taşınan sayfalar çıkarıldıktan sonra kalan listedeki ekleme
+/// yeridir (0…kalan sayfa sayısı).
+class MovePages extends EditCommand {
+  MovePages(int pageCount, Iterable<int> indexes, int to)
+    : order = movedOrder(pageCount, indexes, to);
+
+  /// Yeni sıradaki her konumda eski sıradaki hangi sayfa var.
+  final List<int> order;
+
+  /// [pageCount] sayfalık listede [indexes] sayfaları [to]'ya taşınınca
+  /// oluşan sıra (eski sıra numaraları).
+  static List<int> movedOrder(int pageCount, Iterable<int> indexes, int to) {
+    final moved = indexes.toSet().toList()..sort();
+    if (moved.any((i) => i < 0 || i >= pageCount)) {
+      throw RangeError('Sayfa yok: $moved ($pageCount sayfa)');
+    }
+    final rest = [
+      for (var i = 0; i < pageCount; i++)
+        if (!moved.contains(i)) i,
+    ];
+    if (to < 0 || to > rest.length) {
+      throw RangeError.range(to, 0, rest.length, 'to');
+    }
+    return [...rest.sublist(0, to), ...moved, ...rest.sublist(to)];
+  }
+
+  /// Sıra değişmiyor mu?
+  bool get isNoop => order.indexed.every((e) => e.$1 == e.$2);
+
+  @override
+  InkenDocument apply(InkenDocument doc) =>
+      doc.copyWith(pages: [for (final i in order) doc.pages[i]]);
+
+  @override
+  InkenDocument revert(InkenDocument doc) {
+    final pages = List<PageLayer?>.filled(order.length, null);
+    for (final (now, before) in order.indexed) {
+      pages[before] = doc.pages[now];
+    }
+    return doc.copyWith(pages: pages.cast<PageLayer>());
+  }
+}
+
 /// [indexes] sayfalarını [turns] çeyrek tur saat yönünde (negatif: ters)
 /// döndürür ([rotatePage]); tek geri alma adımıdır. Önceki ve sonraki
 /// sayfalar saklanır: geri alma, ters döndürmenin kayan nokta hatası

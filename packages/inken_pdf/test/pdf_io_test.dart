@@ -462,10 +462,10 @@ void main() {
         () => writeInkenPdf((src, encodeInkenDocument(outside))),
         throwsStateError,
       );
-      final swapped = base.copyWith(pages: base.pages.reversed.toList());
+      final twice = base.copyWith(pages: [base.pages[0], base.pages[0]]);
       expect(
-        () => writeInkenPdf((src, encodeInkenDocument(swapped))),
-        throwsUnsupportedError,
+        () => writeInkenPdf((src, encodeInkenDocument(twice))),
+        throwsStateError,
       );
     });
   });
@@ -773,6 +773,64 @@ void main() {
         expect(listAnnotations(r.pdf), isEmpty);
       },
     );
+
+    test('taşınan sayfalar dosyada da yer değiştirir; çizim sayfayla', () {
+      final n = base.pages.length;
+      final ink = _pen('a', const [InkPoint(50, 50), InkPoint(90, 90)]);
+      // Son sayfa başa (çizimiyle), araya çizgili sayfa, ikinci sayfa silinir.
+      final model = base.copyWith(
+        pages: [
+          base.pages[n - 1].copyWith(items: [ink]),
+          base.pages[0],
+          newPageLike(base, 0, PageTemplate.lined),
+          ...base.pages.sublist(2, n - 1),
+        ],
+      );
+      final r = writeInkenPdf((src, encodeInkenDocument(model)));
+      _dump('moved_pages.pdf', r.pdf);
+      final sizes = pageSizes(r.pdf);
+      expect(sizes.length, model.pages.length);
+      for (final (i, p) in model.pages.indexed) {
+        expect(sizes[i].width, closeTo(p.width, 0.01), reason: '$i');
+        expect(sizes[i].height, closeTo(p.height, 0.01), reason: '$i');
+      }
+      expect(listAnnotations(r.pdf).single.page, 0);
+      final saved = decodeInkenDocument(r.inkenJson);
+      expect(saved.pages.map((p) => p.sourceIndex), [
+        for (var i = 0; i < sizes.length; i++) i,
+      ]);
+      expect(saved.pages[0].items.single.id, 'a');
+      expect(saved.pages[2].template, PageTemplate.lined);
+      // Yeniden kayıt: düzen ve açıklama aynı kalır.
+      final again = writeInkenPdf((r.pdf, r.inkenJson));
+      expect(pageSizes(again.pdf).length, sizes.length);
+      expect(listAnnotations(again.pdf).single.page, 0);
+    });
+
+    test('yabancı açıklama taşınan sayfayla gider', () {
+      final foreign = addForeignInk(src); // ilk sayfada
+      final model = base.copyWith(
+        pages: [...base.pages.skip(1), base.pages[0]],
+      );
+      final r = writeInkenPdf((foreign, encodeInkenDocument(model)));
+      final last = base.pages.length - 1;
+      expect(listAnnotations(r.pdf).single.page, last);
+      expect(pageSizes(r.pdf)[last].width, closeTo(base.pages[0].width, 0.01));
+    });
+
+    test('görüntüleme kopyası taşınmış düzene de gelir', () {
+      final read = readInkenPdf(src);
+      final model = base.copyWith(pages: base.pages.reversed.toList());
+      final display = arrangeDisplayPdf((
+        read.displayPdf,
+        encodeInkenDocument(pageLayoutOnly(model)),
+      ));
+      final sizes = pageSizes(display);
+      for (final (i, p) in model.pages.indexed) {
+        expect(sizes[i].width, closeTo(p.width, 0.01), reason: '$i');
+        expect(sizes[i].height, closeTo(p.height, 0.01), reason: '$i');
+      }
+    });
 
     test('görüntüleme kopyası modelin düzenine gelir', () {
       final read = readInkenPdf(src);
