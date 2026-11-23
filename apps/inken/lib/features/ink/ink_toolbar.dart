@@ -106,6 +106,43 @@ class _ToolDockState extends ConsumerState<ToolDock> {
     return math.max(maxLeft, Space.s3) - left;
   }
 
+  /// Yan kenardaki kutunun tek sütun hâlinin içerik yüksekliği (son
+  /// çizimden ölçülür; iki sütundayken sütunların boyundan hesaplanır).
+  /// Bilinmiyorsa `null`: kutu ilk çizimde iki sütunla başlar.
+  double? _singleHeight;
+  final _contentKey = GlobalKey();
+  final _innerKey = GlobalKey();
+  final _outerKey = GlobalKey();
+
+  /// Çizimden sonra tek sütun yüksekliğini ölçer; değiştiyse yeniden çizer.
+  void _measureColumns(bool single) {
+    double? height(GlobalKey key) {
+      final box = key.currentContext?.findRenderObject();
+      return box is RenderBox && box.hasSize ? box.size.height : null;
+    }
+
+    final content = height(_contentKey);
+    if (content == null) return;
+    final double measured;
+    if (single) {
+      measured = content;
+    } else {
+      final inner = height(_innerKey);
+      final outer = height(_outerKey);
+      if (inner == null || outer == null) return;
+      measured = singleColumnHeight(
+        twoColumns: content,
+        inner: inner,
+        outer: outer,
+        gap: Space.s2,
+      );
+    }
+    if (_singleHeight != null && (_singleHeight! - measured).abs() < 0.5) {
+      return;
+    }
+    if (mounted) setState(() => _singleHeight = measured);
+  }
+
   /// Tutamaktan sürüklenen kutunun kayması ve sürükleniyor mu.
   Offset _drag = Offset.zero;
   bool _dragging = false;
@@ -252,22 +289,57 @@ class _ToolDockState extends ConsumerState<ToolDock> {
       ],
     );
 
-    // Yatayda tek sıra. Kenarda iki sütun: kalem grubu ve silgi sayfaya
-    // bakan iç sütunda, geri kalanı ekran kenarındaki dış sütunda.
-    final Widget content;
-    if (vertical) {
+    // Yatayda tek sıra. Kenarda sığıyorsa tek sütun (yataydaki sırayla);
+    // sığmıyorsa iki sütun: kalem grubu ve silgi sayfaya bakan iç sütunda,
+    // geri kalanı ekran kenarındaki dış sütunda.
+    final order = [
+      history,
+      selectFrame,
+      inkFrame,
+      eraserFrame,
+      shapeFrame,
+      textFrame,
+      coverFrame,
+      grip,
+    ];
+    Widget contentFor(bool single) {
+      if (!vertical) {
+        return Row(
+          key: _contentKey,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (i, w) in order.indexed) ...[if (i > 0) gap, w],
+          ],
+        );
+      }
+      if (single) {
+        return Column(
+          key: _contentKey,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (i, w) in order.indexed) ...[if (i > 0) gap, w],
+          ],
+        );
+      }
       const columnGap = SizedBox(width: Space.s1);
-      final outer = column([selectFrame, shapeFrame, textFrame, coverFrame]);
-      final inner = column([inkFrame, eraserFrame]);
+      final outer = KeyedSubtree(
+        key: _outerKey,
+        child: column([selectFrame, shapeFrame, textFrame, coverFrame]),
+      );
+      final inner = KeyedSubtree(
+        key: _innerKey,
+        child: column([inkFrame, eraserFrame]),
+      );
       // Üstte geri al / yinele, altında aynı hizadan başlayan iki sütun,
       // en altta tutamak.
-      content = Column(
-        key: const ValueKey('tool-dock-columns'),
+      return Column(
+        key: _contentKey,
         mainAxisSize: MainAxisSize.min,
         children: [
           history,
           gap,
           Row(
+            key: const ValueKey('tool-dock-columns'),
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             // Sütunlar arası dar: çerçevelerin kenar çizgisi zaten ayırır.
@@ -277,22 +349,6 @@ class _ToolDockState extends ConsumerState<ToolDock> {
           ),
           gap,
           grip,
-        ],
-      );
-    } else {
-      content = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final (i, w) in [
-            history,
-            selectFrame,
-            inkFrame,
-            eraserFrame,
-            shapeFrame,
-            textFrame,
-            coverFrame,
-            grip,
-          ].indexed) ...[if (i > 0) gap, w],
         ],
       );
     }
@@ -355,10 +411,28 @@ class _ToolDockState extends ConsumerState<ToolDock> {
       // Sürüklenirken kutu imleci izler; bırakınca en yakın kenara oturur.
       child: Transform.translate(
         offset: _drag,
-        child: _dockBox(c, axis, content),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final single =
+                vertical &&
+                dockFitsSingleColumn(
+                  singleHeight: _singleHeight,
+                  maxHeight: constraints.maxHeight,
+                  padding: _dockPadding,
+                );
+            if (vertical) {
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => _measureColumns(single),
+              );
+            }
+            return _dockBox(c, axis, contentFor(single));
+          },
+        ),
       ),
     );
   }
+
+  static const _dockPadding = Space.s1 + 2;
 
   Widget _dockBox(InkenColors c, Axis axis, Widget content) => AnimatedOpacity(
     key: const ValueKey('tool-dock'),
@@ -366,7 +440,7 @@ class _ToolDockState extends ConsumerState<ToolDock> {
     duration: Motion.fast,
     child: Container(
       key: _dockKey,
-      padding: const EdgeInsets.all(Space.s1 + 2),
+      padding: const EdgeInsets.all(_dockPadding),
       decoration: BoxDecoration(
         color: c.surfaceRaised,
         borderRadius: BorderRadius.circular(Radii.lg),
@@ -1067,3 +1141,21 @@ class _CoverButton extends ConsumerWidget {
     );
   }
 }
+
+/// İki sütunlu kutunun ölçülerinden tek sütun yüksekliği: sütunlar yan
+/// yana değil alt alta ([gap] arayla) dizilince içerik bu kadar uzar.
+double singleColumnHeight({
+  required double twoColumns,
+  required double inner,
+  required double outer,
+  required double gap,
+}) => twoColumns - math.max(inner, outer) + inner + gap + outer;
+
+/// Yan kenardaki kutu tek sütun sığar mı? [maxHeight] kutuya ayrılan
+/// yükseklik, [padding] kutunun iç boşluğu. Yükseklik henüz ölçülmediyse
+/// hayır (iki sütun her ekrana sığar).
+bool dockFitsSingleColumn({
+  required double? singleHeight,
+  required double maxHeight,
+  required double padding,
+}) => singleHeight != null && singleHeight + 2 * padding <= maxHeight;

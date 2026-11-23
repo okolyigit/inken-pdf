@@ -143,4 +143,74 @@ void main() {
     await t.pumpAndSettle();
     expect(settings.get<String>('toolDock'), 'right');
   });
+
+  testWidgets('yan kenarda sığarsa tek sütun, sığmazsa iki sütun', (t) async {
+    await initInkenPdf();
+    t.platformDispatcher.localesTestValue = const [Locale('tr')];
+    addTearDown(t.platformDispatcher.clearLocalesTestValue);
+    final dir = Directory.systemTemp.createTempSync('inken_dock_fit_it');
+    addTearDown(() => dir.deleteSync(recursive: true));
+    final pdf = File('${dir.path}/ders.pdf')
+      ..writeAsBytesSync(
+        File('../../test/fixtures/two_pages.pdf').readAsBytesSync(),
+      );
+    final container = ProviderContainer(
+      overrides: [
+        settingsStoreProvider.overrideWithValue(SettingsStore.memory()),
+        recentStoreProvider.overrideWithValue(
+          await RecentStore.load(directory: dir),
+        ),
+        backupStoreProvider.overrideWithValue(
+          BackupStore.at(Directory('${dir.path}/backups')),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    // Dikey tablet: uzun kenar.
+    await t.binding.setSurfaceSize(const Size(820, 1180));
+    addTearDown(() => t.binding.setSurfaceSize(null));
+    await t.pumpWidget(
+      RepaintBoundary(
+        key: _shotKey,
+        child: UncontrolledProviderScope(
+          container: container,
+          child: const InkenApp(),
+        ),
+      ),
+    );
+    container.read(toolDockProvider.notifier).set(DockEdge.right);
+    await container
+        .read(openDocumentProvider.notifier)
+        .openBytes(
+          name: 'ders.pdf',
+          bytes: pdf.readAsBytesSync(),
+          path: pdf.path,
+        );
+    await _until(t, () => find.byType(InkLayer).evaluate().isNotEmpty);
+    await t.pumpAndSettle();
+    final dock = find.byKey(const ValueKey('tool-dock'));
+    final columns = find.byKey(const ValueKey('tool-dock-columns'));
+
+    expect(columns, findsNothing, reason: 'dikey tablette tek sütun');
+    final pen = t.getRect(find.byKey(const ValueKey('tool-pen')));
+    final text = t.getRect(find.byKey(const ValueKey('tool-text')));
+    expect(text.left, closeTo(pen.left, 1), reason: 'aynı sütunda');
+    expect(text.top, greaterThan(pen.bottom));
+    expect(t.getRect(dock).bottom, lessThanOrEqualTo(1180));
+    await _shot(t, 'kutu-tek-sutun');
+
+    // Alçak pencere: tek sütun sığmaz → iki sütun.
+    await t.binding.setSurfaceSize(const Size(1280, 640));
+    await t.pumpAndSettle();
+    expect(columns, findsOneWidget, reason: 'alçak ekranda iki sütun');
+    final dockRect = t.getRect(dock);
+    expect(dockRect.top, greaterThanOrEqualTo(0));
+    expect(dockRect.bottom, lessThanOrEqualTo(640));
+    await _shot(t, 'kutu-iki-sutun');
+
+    // Yeniden uzayınca tek sütuna döner.
+    await t.binding.setSurfaceSize(const Size(820, 1180));
+    await t.pumpAndSettle();
+    expect(columns, findsNothing);
+  });
 }
