@@ -2965,6 +2965,42 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'PNG keskin; JPEG taranmış ve fotoğraflı sayfalarda çok daha küçük.'**
   String get exportFileTypeHint;
+
+  /// No description provided for @exportHide.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çizimleri gizle'**
+  String get exportHide;
+
+  /// No description provided for @exportHideHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dokunduğun renk dışa aktarılmaz: kırmızıyla yazdığın cevapları gizle, öğrenci kopyası çıksın. Belgen değişmez.'**
+  String get exportHideHint;
+
+  /// No description provided for @exportHideImages.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görseller'**
+  String get exportHideImages;
+
+  /// No description provided for @exportHideColor.
+  ///
+  /// In tr, this message translates to:
+  /// **'{color} rengini gizle'**
+  String exportHideColor(String color);
+
+  /// No description provided for @exportHiddenColors.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count, plural, =1{1 renk gizli} other{{count} renk gizli}}'**
+  String exportHiddenColors(int count);
+
+  /// No description provided for @exportHiddenImages.
+  ///
+  /// In tr, this message translates to:
+  /// **'görseller gizli'**
+  String get exportHiddenImages;
 }
 
 class _AppLocalizationsDelegate

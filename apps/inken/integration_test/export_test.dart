@@ -64,9 +64,15 @@ class _SaveIo extends PlatformDocumentIo {
     SaveFormat format = SaveFormat.pdf,
   }) async {
     asked.add((suggestedName, format));
-    final path = '${dir.path}/out/$suggestedName';
     Directory('${dir.path}/out').createSync(recursive: true);
-    return (location: path, name: suggestedName);
+    // Aynı ad yeniden istenirse (2), (3)…: üzerine yazma sorusu çıkmasın.
+    var name = suggestedName;
+    for (var n = 2; File('${dir.path}/out/$name').existsSync(); n++) {
+      final dot = suggestedName.lastIndexOf('.');
+      name =
+          '${suggestedName.substring(0, dot)} ($n)${suggestedName.substring(dot)}';
+    }
+    return (location: '${dir.path}/out/$name', name: name);
   }
 }
 
@@ -76,6 +82,22 @@ int _zipCount(Uint8List zip) {
   final end = zip.length - 22;
   expect(data.getUint32(end, Endian.little), 0x06054b50);
   return data.getUint16(end + 10, Endian.little);
+}
+
+/// PNG'deki kırmızı ve koyu piksel sayısı.
+Future<(int, int)> _count(Uint8List png) async {
+  final codec = await ui.instantiateImageCodec(png);
+  final image = (await codec.getNextFrame()).image;
+  final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+  final px = data!.buffer.asUint8List();
+  var red = 0, dark = 0;
+  for (var i = 0; i + 3 < px.length; i += 4) {
+    if (px[i] > 170 && px[i + 1] < 90 && px[i + 2] < 100) red++;
+    if (px[i] < 80 && px[i + 1] < 80 && px[i + 2] < 80) dark++;
+  }
+  image.dispose();
+  codec.dispose();
+  return (red, dark);
 }
 
 Future<void> _ctrlE(WidgetTester t) async {
@@ -160,6 +182,16 @@ void main() {
         x2: 260,
         y2: 80,
       ),
+      Shape(
+        id: 'siyah',
+        kind: ShapeKind.line,
+        color: 0xFF1A1A1A,
+        width: 6,
+        x1: 60,
+        y1: 300,
+        x2: 260,
+        y2: 300,
+      ),
     ]);
     session.clearSelection();
     session.insertPage(2, newPageLike(session.document, 1, PageTemplate.grid));
@@ -201,6 +233,17 @@ void main() {
     final flatRead = await loadInkenFile(flat.readAsBytesSync());
     expect(flatRead.pageCount, 1);
     expect(flatRead.inkenJson, isNull);
+    // Gizleme yokken kırmızı çizim çıktıda (aşağıdaki öğrenci kopyası
+    // denetimi bunu ayırt eder).
+    final flatImager = await PdfPageImager.open(flat.readAsBytesSync());
+    final flatShot = await flatImager.render(0, (
+      left: 0,
+      top: 0,
+      right: 400,
+      bottom: 400,
+    ), scale: 1);
+    await flatImager.dispose();
+    expect((await _count(flatShot.bytes)).$1, greaterThan(200));
 
     // 2) Yeniden aç: çizimli PDF ve "Çizimli" hatırlandı. Görsel, 96 dpi,
     // tüm sayfalar (boş atlanır) → 2 PNG tek ZIP.
@@ -255,6 +298,44 @@ void main() {
     final editRead = await loadInkenFile(editable.readAsBytesSync());
     expect(editRead.pageCount, 1);
     expect(editRead.inkenJson, isNotNull);
+
+    // Öğrenci kopyası: kırmızı gizli → çıktıda kırmızı yok, siyah var.
+    await _ctrlE(t);
+    await t.tap(find.byKey(const ValueKey('export-format-flattened')));
+    await t.pump();
+    await _segment(t, 'export-pages', 'Bu sayfa');
+    final red = find.byKey(const ValueKey('export-hide-d42a3f'));
+    await t.ensureVisible(red);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('export-hide-1a1a1a')), findsOneWidget);
+    await t.tap(red);
+    await t.pump();
+    expect(_summary(t), '1 sayfa · Çizimli PDF · 1 renk gizli');
+    await _until(
+      t,
+      () => find
+          .byKey(const ValueKey('export-preview-image'))
+          .evaluate()
+          .isNotEmpty,
+    );
+    await _shot(t, 'export_ogrenci');
+    await t.tap(find.byKey(const ValueKey('export-submit')));
+    await t.pumpAndSettle();
+    final student = File('${dir.path}/out/ders (çizimli) (2).pdf');
+    await _until(t, student.existsSync);
+    final imager = await PdfPageImager.open(student.readAsBytesSync());
+    final shot = await imager.render(0, (
+      left: 0,
+      top: 0,
+      right: 400,
+      bottom: 400,
+    ), scale: 1);
+    await imager.dispose();
+    final (redPx, darkPx) = await _count(shot.bytes);
+    expect(redPx, 0, reason: 'kırmızı gizli');
+    expect(darkPx, greaterThan(500), reason: 'siyah çizim ve metin duruyor');
+    // Belge değişmedi.
+    expect(session.document.pages[0].items, hasLength(2));
 
     // 4) Vazgeç: dosya yazılmaz.
     final before = io.asked.length;

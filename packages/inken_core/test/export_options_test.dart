@@ -67,4 +67,85 @@ void main() {
   test('dpi seçenekleri ve varsayılan', () {
     expect(exportDpis, contains(defaultExportDpi));
   });
+
+  group('öğrenci kopyası', () {
+    final answers = InkenDocument(
+      pages: [
+        const PageLayer(
+          sourceIndex: 0,
+          width: 595,
+          height: 842,
+          items: [
+            Stroke(
+              id: 'siyah',
+              tool: InkTool.pen,
+              color: 0xFF1A1A1A,
+              width: 2,
+              points: [InkPoint(1, 2), InkPoint(3, 4)],
+            ),
+            TextItem(
+              id: 'cevap',
+              text: 'x = 4',
+              color: 0x80D42A3F, // yarı saydam kırmızı
+              fontSize: 24,
+              x: 10,
+              y: 10,
+              width: 80,
+              height: 30,
+            ),
+            ImageItem(
+              id: 'resim',
+              imageId: 'g',
+              x: 0,
+              y: 0,
+              width: 10,
+              height: 10,
+            ),
+          ],
+        ),
+        const PageLayer(
+          sourceIndex: 1,
+          width: 595,
+          height: 842,
+          items: [
+            Shape(
+              id: 'daire',
+              kind: ShapeKind.ellipse,
+              color: 0xFFD42A3F,
+              width: 2,
+              x1: 0,
+              y1: 0,
+              x2: 50,
+              y2: 50,
+            ),
+          ],
+        ),
+      ],
+    );
+
+    test('kullanılan renkler: saydamlıksız, tekrarsız, sırayla', () {
+      expect(usedColors(answers, [0, 1]), [0x1A1A1A, 0xD42A3F]);
+      expect(usedColors(answers, [1]), [0xD42A3F]);
+      expect(hasImages(answers, [0]), isTrue);
+      expect(hasImages(answers, [1]), isFalse);
+    });
+
+    test('kırmızı gizlenir: yarı saydam metin ve şekil gider', () {
+      final student = hideItems(answers, colors: {0xD42A3F});
+      expect(student.pages[0].items.map((i) => i.id), ['siyah', 'resim']);
+      expect(student.pages[1].items, isEmpty);
+      expect(student.pages, hasLength(2), reason: 'sayfa silinmez');
+    });
+
+    test('görseller gizlenir; hiçbir şey gizlenmiyorsa aynı belge', () {
+      final noImages = hideItems(answers, images: true);
+      expect(noImages.pages[0].items.map((i) => i.id), ['siyah', 'cevap']);
+      expect(identical(hideItems(answers), answers), isTrue);
+    });
+
+    test('gizlenmiş kopya gidiş-dönüşte bozulmaz', () {
+      final student = hideItems(answers, colors: {0x1A1A1A}, images: true);
+      expect(decodeInkenDocument(encodeInkenDocument(student)), student);
+    });
+  });
 }

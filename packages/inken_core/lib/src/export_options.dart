@@ -75,3 +75,58 @@ List<int>? selectExportPages(
       if (!(doc.pages[i].isInserted && doc.pages[i].items.isEmpty)) i,
   ];
 }
+
+// ---- cevap anahtarı / öğrenci kopyası
+
+/// Öğenin rengi, saydamlığı atılmış (`0xRRGGBB`); renksiz öğede (görsel)
+/// `null`. Metnin ve fosforlunun saydamlığı renk sayılmaz: yarı saydam
+/// kırmızı da "kırmızı"dır.
+int? itemRgb(InkItem item) => switch (item) {
+  Stroke(:final color) ||
+  Shape(:final color) ||
+  TextItem(:final color) => color & 0xFFFFFF,
+  ImageItem() => null,
+};
+
+/// [pages] sayfalarındaki öğelerin renkleri (`0xRRGGBB`), ilk görülme
+/// sırasıyla, tekrarsız.
+List<int> usedColors(InkenDocument doc, Iterable<int> pages) {
+  final seen = <int>{};
+  return [
+    for (final p in pages)
+      for (final item in doc.pages[p].items)
+        if (itemRgb(item) case final rgb? when seen.add(rgb)) rgb,
+  ];
+}
+
+/// [pages] sayfalarında görsel var mı?
+bool hasImages(InkenDocument doc, Iterable<int> pages) =>
+    pages.any((p) => doc.pages[p].items.any((i) => i is ImageItem));
+
+/// [colors] renklerindeki (`0xRRGGBB`) öğeleri ve [images] ise görselleri
+/// çıkarılmış kopya: öğrenci kopyası (cevaplar kırmızıysa kırmızı gizlenir).
+/// Sayfalar ve sıraları değişmez; hiçbir şey gizlenmiyorsa aynı belge.
+InkenDocument hideItems(
+  InkenDocument doc, {
+  Set<int> colors = const {},
+  bool images = false,
+}) {
+  if (colors.isEmpty && !images) return doc;
+  bool hidden(InkItem item) => switch (itemRgb(item)) {
+    null => images,
+    final rgb => colors.contains(rgb),
+  };
+  return doc.copyWith(
+    pages: [
+      for (final page in doc.pages)
+        page.items.any(hidden)
+            ? page.copyWith(
+                items: [
+                  for (final i in page.items)
+                    if (!hidden(i)) i,
+                ],
+              )
+            : page,
+    ],
+  );
+}

@@ -477,5 +477,11 @@
   "dpiLabel": "{dpi} dpi",
   "exportPageOf": "Page {page} of the document",
   "exportFileType": "File type",
-  "exportFileTypeHint": "PNG is sharp; JPEG is much smaller for scanned and photo pages."
+  "exportFileTypeHint": "PNG is sharp; JPEG is much smaller for scanned and photo pages.",
+  "exportHide": "Hide drawings",
+  "exportHideHint": "Colors you tap are left out: hide answers written in red to get a student copy. Your document doesn't change.",
+  "exportHideImages": "Images",
+  "exportHideColor": "Hide {color}",
+  "exportHiddenColors": "{count, plural, =1{1 color hidden} other{{count} colors hidden}}",
+  "exportHiddenImages": "images hidden"
 }

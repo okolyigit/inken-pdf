@@ -1653,4 +1653,33 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get exportFileTypeHint =>
       'PNG is sharp; JPEG is much smaller for scanned and photo pages.';
+
+  @override
+  String get exportHide => 'Hide drawings';
+
+  @override
+  String get exportHideHint =>
+      'Colors you tap are left out: hide answers written in red to get a student copy. Your document doesn\'t change.';
+
+  @override
+  String get exportHideImages => 'Images';
+
+  @override
+  String exportHideColor(String color) {
+    return 'Hide $color';
+  }
+
+  @override
+  String exportHiddenColors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count colors hidden',
+      one: '1 color hidden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get exportHiddenImages => 'images hidden';
 }

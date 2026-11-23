@@ -752,8 +752,18 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       context,
       document: document,
       currentPage: _currentIndex(session),
-      renderPreview: (page, {required grayscale}) =>
-          _renderPreview(session, document, page, grayscale: grayscale),
+      renderPreview:
+          (
+            page, {
+            required grayscale,
+            required hiddenColors,
+            required hideImages,
+          }) => _renderPreview(
+            session,
+            hideItems(document, colors: hiddenColors, images: hideImages),
+            page,
+            grayscale: grayscale,
+          ),
       settings: ref.read(settingsStoreProvider),
     );
     if (choice == null || !mounted || !identical(session, _session)) return;
@@ -761,7 +771,13 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     final messenger = ScaffoldMessenger.of(context);
     final notifier = ref.read(openDocumentProvider.notifier);
     final base = withoutPdfExtension(widget.document.name);
-    final subset = pageSubset(document, choice.pages);
+    // Öğrenci kopyası: gizlenen renkler / görseller çıkarılır.
+    final shown = hideItems(
+      document,
+      colors: choice.hiddenColors,
+      images: choice.hideImages,
+    );
+    final subset = pageSubset(shown, choice.pages);
     final single = choice.pages.length == 1;
     final DocTarget? target = switch (choice.format) {
       ExportFormat.flattened || ExportFormat.editable => await _pickTarget(
@@ -816,7 +832,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
           final files = await _renderPages(
             session,
             choice.pages,
-            document: document,
+            document: shown,
             dpi: choice.dpi,
             grayscale: choice.grayscale,
             encoding: choice.encoding,

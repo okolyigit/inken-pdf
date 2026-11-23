@@ -1612,4 +1612,33 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get exportFileTypeHint =>
       'PNG keskin; JPEG taranmış ve fotoğraflı sayfalarda çok daha küçük.';
+
+  @override
+  String get exportHide => 'Çizimleri gizle';
+
+  @override
+  String get exportHideHint =>
+      'Dokunduğun renk dışa aktarılmaz: kırmızıyla yazdığın cevapları gizle, öğrenci kopyası çıksın. Belgen değişmez.';
+
+  @override
+  String get exportHideImages => 'Görseller';
+
+  @override
+  String exportHideColor(String color) {
+    return '$color rengini gizle';
+  }
+
+  @override
+  String exportHiddenColors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count renk gizli',
+      one: '1 renk gizli',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get exportHiddenImages => 'görseller gizli';
 }

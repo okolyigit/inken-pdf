@@ -6,7 +6,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
-import '../ink/tool_options.dart' show Segmented;
+import '../ink/tool_options.dart' show Segmented, colorNames;
+import '../ink/tool_state.dart';
 import '../settings/settings_store.dart';
 
 /// Dışa aktarma penceresinde seçilenler.
@@ -20,13 +21,19 @@ typedef ExportChoice = ({
   ImageEncoding encoding,
   int dpi,
   bool grayscale,
+
+  /// Dışa aktarılmayan renkler (`0xRRGGBB`) ve görseller (öğrenci kopyası).
+  Set<int> hiddenColors,
+  bool hideImages,
 });
 
 /// [page] sayfasının önizlemesi (PNG; çizimleri gömülü); [grayscale] gri
-/// tonlamalı.
+/// tonlamalı; [hiddenColors] / [hideImages] gizlenmiş.
 typedef RenderExportPreview = Future<Uint8List> Function(
   int page, {
   required bool grayscale,
+  required Set<int> hiddenColors,
+  required bool hideImages,
 });
 
 /// Inken'in dışa aktarma penceresi (yazdırma penceresinin düzeninde):
@@ -133,8 +140,13 @@ class ExportDialogState extends State<ExportDialog> {
   /// Önizlenen sayfanın seçilen sayfalardaki sırası.
   int previewAt = 0;
 
-  /// Önizlemeler: (sayfa, gri) → PNG.
-  final Map<(int, bool), Future<Uint8List>> _previews = {};
+  /// Gizlenen renkler (`0xRRGGBB`) ve görseller; hatırlanmaz (bir sonraki
+  /// dışa aktarmada çizimler fark edilmeden eksik çıkmasın).
+  Set<int> hiddenColors = {};
+  bool hideImages = false;
+
+  /// Önizlemeler: anahtar (sayfa, gri, gizlenenler) → PNG.
+  final Map<String, Future<Uint8List>> _previews = {};
 
   @override
   void dispose() {
@@ -166,9 +178,14 @@ class ExportDialogState extends State<ExportDialog> {
     final page = previewPage;
     if (page == null) return null;
     final gray = _grayPreview;
-    return _previews[(page, gray)] ??= widget.renderPreview(
+    final hidden = {...hiddenColors};
+    final key =
+        '$page|$gray|$hideImages|${(hidden.toList()..sort()).join(',')}';
+    return _previews[key] ??= widget.renderPreview(
       page,
       grayscale: gray,
+      hiddenColors: hidden,
+      hideImages: hideImages,
     );
   }
 
@@ -184,6 +201,20 @@ class ExportDialogState extends State<ExportDialog> {
   void setGrayscale(bool v) => setState(() => grayscale = v);
   void setDpi(int v) => setState(() => dpi = v);
   void setEncoding(ImageEncoding v) => setState(() => encoding = v);
+  void toggleColor(int rgb) => setState(() {
+    hiddenColors = {...hiddenColors};
+    if (!hiddenColors.remove(rgb)) hiddenColors.add(rgb);
+  });
+  void toggleImages() => setState(() => hideImages = !hideImages);
+
+  /// Seçilen sayfalarda kullanılan renkler (gizlenmişler dahil).
+  List<int> get colors => usedColors(widget.document, pages ?? const []);
+
+  /// Seçilen sayfalarda görsel var mı?
+  bool get images => hasImages(widget.document, pages ?? const []);
+
+  /// Seçilen sayfalarda gerçekten gizlenen renkler.
+  Set<int> get _effectiveHidden => colors.toSet().intersection(hiddenColors);
   void showPage(int at) => setState(() => previewAt = at);
 
   void _submit() {
@@ -203,6 +234,8 @@ class ExportDialogState extends State<ExportDialog> {
       encoding: encoding,
       dpi: dpi,
       grayscale: grayscale,
+      hiddenColors: _effectiveHidden,
+      hideImages: hideImages && images,
     ));
   }
 
@@ -217,7 +250,12 @@ class ExportDialogState extends State<ExportDialog> {
         if (count > 1) l10n.exportSummaryZip,
       ].join(' · '),
     };
-    return l10n.exportSummary(count, what);
+    final hidden = _effectiveHidden.length;
+    return [
+      l10n.exportSummary(count, what),
+      if (hidden > 0) l10n.exportHiddenColors(hidden),
+      if (hideImages && images) l10n.exportHiddenImages,
+    ].join(' · ');
   }
 
   @override
@@ -573,6 +611,36 @@ class _Settings extends StatelessWidget {
             onChanged: state.setGrayscale,
           ),
         ],
+        if (state.colors.isNotEmpty || state.images) ...[
+          gap,
+          label(l10n.exportHide),
+          Wrap(
+            key: const ValueKey('export-hide'),
+            spacing: Space.s1,
+            runSpacing: Space.s1,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (final rgb in state.colors)
+                _HideToggle(
+                  key: ValueKey('export-hide-${rgb.toRadixString(16)}'),
+                  label: l10n.exportHideColor(_colorName(l10n, rgb)),
+                  hidden: state.hiddenColors.contains(rgb),
+                  onTap: () => state.toggleColor(rgb),
+                  color: Color(0xFF000000 | rgb),
+                ),
+              if (state.images)
+                _HideToggle(
+                  key: const ValueKey('export-hide-images'),
+                  label: l10n.exportHideImages,
+                  hidden: state.hideImages,
+                  onTap: state.toggleImages,
+                  icon: LucideIcons.image,
+                  text: l10n.exportHideImages,
+                ),
+            ],
+          ),
+          hint(l10n.exportHideHint),
+        ],
         gap,
         label(l10n.exportPages),
         Segmented<ExportPageSet>(
@@ -706,3 +774,123 @@ String _encodingName(ImageEncoding e) => switch (e) {
   ImageEncoding.png => 'PNG',
   ImageEncoding.jpeg => 'JPEG',
 };
+
+/// Rengin adı: kalem, fosforlu ya da geçici kalem paletindeyse adı, değilse
+/// `#RRGGBB`.
+String _colorName(AppLocalizations l10n, int rgb) {
+  for (final (tool, palette) in [
+    (Tool.pen, penColors),
+    (Tool.highlighter, highlighterColors),
+    (Tool.laser, laserColors),
+  ]) {
+    final i = palette.indexWhere((c) => c & 0xFFFFFF == rgb);
+    if (i >= 0) return colorNames(l10n, tool)[i];
+  }
+  return '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
+}
+
+/// Gizle / göster düğmesi: renk yuvarlağı (ya da ikonlu etiket). Gizliyken
+/// soluk, göz ikonlu (etikette üstü çizili), çevresinde halka: durum
+/// yalnızca renkle gösterilmez. Dokunma alanı 48 px.
+class _HideToggle extends StatelessWidget {
+  const _HideToggle({
+    super.key,
+    required this.label,
+    required this.hidden,
+    required this.onTap,
+    this.color,
+    this.icon,
+    this.text,
+  });
+
+  final String label;
+  final bool hidden;
+  final VoidCallback onTap;
+  final Color? color;
+  final IconData? icon;
+  final String? text;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final swatch = color;
+    final Widget body;
+    if (swatch != null) {
+      body = SizedBox.square(
+        dimension: Sizes.swatch,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: hidden ? 0.3 : 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: swatch,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0x73808080)),
+                  ),
+                ),
+              ),
+            ),
+            if (hidden) Icon(LucideIcons.eyeOff, size: 16, color: c.ink),
+          ],
+        ),
+      );
+    } else {
+      body = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            hidden ? LucideIcons.eyeOff : icon,
+            size: 18,
+            color: hidden ? c.ink : c.inkMuted,
+          ),
+          const SizedBox(width: Space.s2),
+          Text(
+            text ?? label,
+            style: InkenText.menu.copyWith(
+              color: hidden ? c.inkMuted : c.ink,
+              decoration: hidden ? TextDecoration.lineThrough : null,
+            ),
+          ),
+        ],
+      );
+    }
+    final round = swatch != null;
+    return Semantics(
+      button: true,
+      toggled: hidden,
+      label: label,
+      excludeSemantics: true,
+      child: Tooltip(
+        message: label,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: round
+              ? const CircleBorder()
+              : RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(Radii.pill),
+                ),
+          child: Container(
+            width: round ? Sizes.target : null,
+            height: Sizes.target,
+            padding: round
+                ? null
+                : const EdgeInsets.symmetric(horizontal: Space.s3),
+            alignment: round ? Alignment.center : null,
+            decoration: BoxDecoration(
+              shape: round ? BoxShape.circle : BoxShape.rectangle,
+              borderRadius: round ? null : BorderRadius.circular(Radii.pill),
+              border: Border.all(
+                color: hidden ? c.ink : const Color(0x00000000),
+                width: 2,
+              ),
+            ),
+            child: body,
+          ),
+        ),
+      ),
+    );
+  }
+}

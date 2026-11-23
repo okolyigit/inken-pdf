@@ -881,5 +881,25 @@
     }
   },
   "exportFileType": "Dosya türü",
-  "exportFileTypeHint": "PNG keskin; JPEG taranmış ve fotoğraflı sayfalarda çok daha küçük."
+  "exportFileTypeHint": "PNG keskin; JPEG taranmış ve fotoğraflı sayfalarda çok daha küçük.",
+  "exportHide": "Çizimleri gizle",
+  "exportHideHint": "Dokunduğun renk dışa aktarılmaz: kırmızıyla yazdığın cevapları gizle, öğrenci kopyası çıksın. Belgen değişmez.",
+  "exportHideImages": "Görseller",
+  "exportHideColor": "{color} rengini gizle",
+  "@exportHideColor": {
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "exportHiddenColors": "{count, plural, =1{1 renk gizli} other{{count} renk gizli}}",
+  "@exportHiddenColors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exportHiddenImages": "görseller gizli"
 }
