@@ -444,5 +444,11 @@
   "captureFailed": "Couldn't capture the image: {error}",
   "captureFileName": "{base} - page {page}.png",
   "pngFileType": "PNG image",
-  "sharePageImage": "Share page as image…"
+  "sharePageImage": "Share page as image…",
+  "pagesAsImage": "As image",
+  "pagesZipName": "{base} - pages.zip",
+  "zipFileType": "ZIP archive",
+  "jpegFileType": "JPEG image",
+  "copyOnePageOnly": "Copy (single page)",
+  "preparingImages": "Preparing images…"
 }

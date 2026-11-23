@@ -35,12 +35,14 @@ class _FakeSharer implements ShareService {
   }
 
   @override
-  Future<ShareOutcome> shareFile(
-    String path, {
+  Future<ShareOutcome> shareFiles(
+    List<String> paths, {
     required String name,
     required String mime,
   }) async {
-    calls.add((path, name, File(path).readAsBytesSync()));
+    for (final path in paths) {
+      calls.add((path, name, File(path).readAsBytesSync()));
+    }
     return outcome();
   }
 

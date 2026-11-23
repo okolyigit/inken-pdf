@@ -810,5 +810,18 @@
     }
   },
   "pngFileType": "PNG görseli",
-  "sharePageImage": "Sayfayı görsel olarak paylaş…"
+  "sharePageImage": "Sayfayı görsel olarak paylaş…",
+  "pagesAsImage": "Görsel olarak",
+  "pagesZipName": "{base} - sayfalar.zip",
+  "@pagesZipName": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      }
+    }
+  },
+  "zipFileType": "ZIP arşivi",
+  "jpegFileType": "JPEG görseli",
+  "copyOnePageOnly": "Kopyala (tek sayfa)",
+  "preparingImages": "Görseller hazırlanıyor…"
 }

@@ -23,3 +23,4 @@ export 'src/serialization.dart';
 export 'src/stroke_builder.dart';
 export 'src/text_font.dart';
 export 'src/text_layout.dart';
+export 'src/zip.dart';

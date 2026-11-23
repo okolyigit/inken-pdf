@@ -17,11 +17,7 @@ class UnsupportedFormatVersion implements Exception {
 typedef _Migration = Map<String, dynamic> Function(Map<String, dynamic> json);
 
 /// Sürüm N → N+1 dönüştürücüleri. Format değişince buraya eklenir.
-const Map<int, _Migration> _migrations = {
-  1: _v1ToV2,
-  2: _v2ToV3,
-  3: _v3ToV4,
-};
+const Map<int, _Migration> _migrations = {1: _v1ToV2, 2: _v2ToV3, 3: _v3ToV4};
 
 /// 2: görsel öğesi (`image`) eklendi. Eski veride değişecek bir şey yok;
 /// sürüm, görselli dosyayı eski uygulamanın açıp görselleri sessizce

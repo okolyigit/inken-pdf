@@ -2767,6 +2767,42 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Sayfayı görsel olarak paylaş…'**
   String get sharePageImage;
+
+  /// No description provided for @pagesAsImage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görsel olarak'**
+  String get pagesAsImage;
+
+  /// No description provided for @pagesZipName.
+  ///
+  /// In tr, this message translates to:
+  /// **'{base} - sayfalar.zip'**
+  String pagesZipName(String base);
+
+  /// No description provided for @zipFileType.
+  ///
+  /// In tr, this message translates to:
+  /// **'ZIP arşivi'**
+  String get zipFileType;
+
+  /// No description provided for @jpegFileType.
+  ///
+  /// In tr, this message translates to:
+  /// **'JPEG görseli'**
+  String get jpegFileType;
+
+  /// No description provided for @copyOnePageOnly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kopyala (tek sayfa)'**
+  String get copyOnePageOnly;
+
+  /// No description provided for @preparingImages.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görseller hazırlanıyor…'**
+  String get preparingImages;
 }
 
 class _AppLocalizationsDelegate

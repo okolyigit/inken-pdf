@@ -696,9 +696,12 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
           .read(documentIoProvider)
           .pickSave(
             suggestedName: suggestedName,
-            typeLabel: format == SaveFormat.png
-                ? l10n.pngFileType
-                : l10n.pdfFileType,
+            typeLabel: switch (format) {
+              SaveFormat.png => l10n.pngFileType,
+              SaveFormat.jpeg => l10n.jpegFileType,
+              SaveFormat.zip => l10n.zipFileType,
+              SaveFormat.pdf => l10n.pdfFileType,
+            },
             near: path,
             format: format,
           );
@@ -1204,16 +1207,18 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       done = switch (action) {
         CaptureAction.newPage => await _captureToNewPage(session, sel),
         CaptureAction.copy => await _copyImage(
-          await _renderCapture(session, sel),
+          (await _renderCapture(session, sel)).png,
         ),
         CaptureAction.save => await _saveImage(
-          await _renderCapture(session, sel),
+          (await _renderCapture(session, sel)).png,
           _captureName(sel.page),
         ),
-        CaptureAction.share => await _shareImage(
-          await _renderCapture(session, sel),
-          _captureName(sel.page),
-        ),
+        CaptureAction.share => await _shareImages([
+          (
+            name: _captureName(sel.page),
+            bytes: (await _renderCapture(session, sel)).png,
+          ),
+        ], _captureName(sel.page)),
       };
     } on ShareUnsupported {
       messenger.showSnackBar(SnackBar(content: Text(l10n.shareUnsupported)));
@@ -1232,10 +1237,10 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
   }
 
   /// Görseli sistem panosuna koyar.
-  Future<bool> _copyImage(PageImage image) async {
+  Future<bool> _copyImage(Uint8List png) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final ok = await ref.read(clipboardServiceProvider).writeImage(image.png);
+    final ok = await ref.read(clipboardServiceProvider).writeImage(png);
     messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -1248,7 +1253,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
 
   /// Görseli kullanıcının seçtiği yere PNG olarak kaydeder; vazgeçilirse
   /// `false`.
-  Future<bool> _saveImage(PageImage image, String name) async {
+  Future<bool> _saveImage(Uint8List png, String name) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final target = await _pickTarget(
@@ -1258,26 +1263,133 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       format: SaveFormat.png,
     );
     if (target == null) return false;
-    await ref.read(documentIoProvider).write(target.location, image.png);
+    await ref.read(documentIoProvider).write(target.location, png);
     messenger.showSnackBar(SnackBar(content: Text(l10n.savedTo(target.name))));
     return true;
   }
 
-  /// Görseli (PNG) sistemin paylaşma yoluna verir.
-  Future<bool> _shareImage(PageImage image, String name) async {
+  /// Görselleri (PNG) sistemin paylaşma yoluna verir; [title] başlık /
+  /// konu olur.
+  Future<bool> _shareImages(List<ZipEntry> files, String title) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final sharer = ref.read(shareServiceProvider);
     if (!sharer.supported) throw const ShareUnsupported();
-    final file = File('${_shareFolder().path}/$name');
-    await file.writeAsBytes(image.png, flush: true);
-    final outcome = await sharer.shareFile(
-      file.path,
-      name: name,
+    final folder = _shareFolder();
+    final paths = <String>[];
+    for (final f in files) {
+      final file = File('${folder.path}/${f.name}');
+      await file.writeAsBytes(f.bytes, flush: true);
+      paths.add(file.path);
+    }
+    final outcome = await sharer.shareFiles(
+      paths,
+      name: title,
       mime: 'image/png',
     );
     _reportShare(messenger, l10n, outcome);
     return true;
+  }
+
+  /// Görselleri tek ZIP arşivine kaydeder (yeri kullanıcı seçer);
+  /// vazgeçilirse `false`.
+  Future<bool> _saveImagesZip(List<ZipEntry> files) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final target = await _pickTarget(
+      suggestedName: safeFileName(
+        l10n.pagesZipName(withoutPdfExtension(widget.document.name)),
+        extension: 'zip',
+      ),
+      allowed: (t) => !samePath(t, widget.document.path),
+      rejected: l10n.exportOntoOpenFile,
+      format: SaveFormat.zip,
+    );
+    if (target == null) return false;
+    await ref.read(documentIoProvider).write(target.location, storeZip(files));
+    messenger.showSnackBar(SnackBar(content: Text(l10n.savedTo(target.name))));
+    return true;
+  }
+
+  /// [pages] sayfalarının tamamı, çizimleri gömülü PNG olarak (sırayla):
+  /// tek düzleştirme, her sayfa 200 dpi (uzun kenar en çok 4096 px).
+  Future<List<ZipEntry>> _renderPages(
+    InkSession session,
+    List<int> pages,
+  ) async {
+    final document = session.document;
+    final subset = pageSubset(document, pages);
+    final imager = await ref
+        .read(openDocumentProvider.notifier)
+        .openPageImages(
+          document,
+          pages,
+          images: await _imagesFor(session, subset),
+        );
+    try {
+      return [
+        for (final (i, page) in pages.indexed)
+          (
+            name: _captureName(page),
+            bytes: (await imager.render(
+              i,
+              wholePage(subset.pages[i]),
+              scale: captureSize(wholePage(subset.pages[i])).scale,
+            )).png,
+          ),
+      ];
+    } finally {
+      await imager.dispose();
+    }
+  }
+
+  /// [pages] sayfalarını görsel olarak kopyalar (tek sayfa), kaydeder
+  /// (tek sayfa PNG, çok sayfa ZIP) ya da paylaşır.
+  Future<void> _pagesAsImages(Set<int> pages, CaptureAction action) async {
+    final session = _session;
+    if (session == null || _captureBusy || pages.isEmpty) return;
+    final sorted = pages.toList()..sort();
+    if (sorted.last >= session.document.pages.length) return;
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _captureBusy = true);
+    if (sorted.length > 1) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.preparingImages)));
+    }
+    try {
+      final files = await _renderPages(session, sorted);
+      if (!mounted) return;
+      messenger.hideCurrentSnackBar();
+      switch (action) {
+        case CaptureAction.copy:
+          await _copyImage(files.first.bytes);
+        case CaptureAction.save:
+          if (files.length == 1) {
+            await _saveImage(files.single.bytes, files.single.name);
+          } else {
+            await _saveImagesZip(files);
+          }
+        case CaptureAction.share:
+          await _shareImages(
+            files,
+            files.length == 1
+                ? files.single.name
+                : withoutPdfExtension(widget.document.name),
+          );
+        case CaptureAction.newPage:
+          break;
+      }
+    } on ShareUnsupported {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.shareUnsupported)));
+    } on Object catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.captureFailed(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _captureBusy = false);
+    }
   }
 
   /// Yakalanan alanı, yakalandığı sayfanın arkasına eklenen boş sayfanın
@@ -1334,28 +1446,10 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
   }
 
   /// Geçerli sayfanın tamamını görsel (PNG) olarak paylaşır.
-  Future<void> _sharePageImage() async {
+  void _sharePageImage() {
     final session = _session;
-    if (session == null || _captureBusy) return;
-    final page = _currentIndex(session);
-    final layer = session.document.pages[page];
-    final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    setState(() => _captureBusy = true);
-    try {
-      await _shareImage(
-        await _renderCapture(session, (page: page, region: wholePage(layer))),
-        _captureName(page),
-      );
-    } on ShareUnsupported {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.shareUnsupported)));
-    } on Object catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.captureFailed(e.toString()))),
-      );
-    } finally {
-      if (mounted) setState(() => _captureBusy = false);
-    }
+    if (session == null) return;
+    _pagesAsImages({_currentIndex(session)}, CaptureAction.share);
   }
 
   static void _cleanOldPrints(Directory root) {
@@ -2513,6 +2607,10 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                           setOrientation: _setNewOrientation,
                           color: _newColor,
                           setColor: _setNewColor,
+                          images: _captureBusy
+                              ? null
+                              : (pages, action) =>
+                                    _pagesAsImages(pages, action),
                         ),
                 ),
                 Expanded(child: doc),

@@ -24,8 +24,8 @@ class _FakeSharer implements ShareService {
       throw UnimplementedError();
 
   @override
-  Future<ShareOutcome> shareFile(
-    String path, {
+  Future<ShareOutcome> shareFiles(
+    List<String> paths, {
     required String name,
     required String mime,
   }) => throw UnimplementedError();

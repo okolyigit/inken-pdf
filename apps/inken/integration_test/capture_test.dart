@@ -21,6 +21,7 @@ import 'package:inken/features/files/recent_documents.dart';
 import 'package:inken/features/ink/ink_layer.dart';
 import 'package:inken/features/settings/settings_store.dart';
 import 'package:inken/platform/clipboard_service.dart';
+import 'package:inken/platform/share_service.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart';
 import 'package:integration_test/integration_test.dart';
@@ -58,6 +59,33 @@ class _FakeClipboard implements ClipboardService {
     image = png;
     return true;
   }
+}
+
+class _FakeSharer implements ShareService {
+  final shared = <(String name, String mime, List<String> files)>[];
+
+  @override
+  bool get supported => true;
+
+  @override
+  Future<ShareOutcome> sharePdf(String path, {required String name}) async =>
+      ShareOutcome.shared;
+
+  @override
+  Future<ShareOutcome> shareFiles(
+    List<String> paths, {
+    required String name,
+    required String mime,
+  }) async {
+    shared.add((name, mime, [for (final p in paths) p.split('/').last]));
+    for (final p in paths) {
+      expect(File(p).lengthSync(), greaterThan(1000));
+    }
+    return ShareOutcome.shared;
+  }
+
+  @override
+  Future<bool> shareText(String text, {required String subject}) async => false;
 }
 
 Future<void> _captureKey(WidgetTester t) async {
@@ -272,5 +300,93 @@ void main() {
       expect(gray[i], gray[i + 1]);
       expect(gray[i + 1], gray[i + 2]);
     }
+  });
+
+  testWidgets('sayfa paneli: görsel olarak kopyala; iki sayfayı paylaş', (
+    t,
+  ) async {
+    await initInkenPdf();
+    t.platformDispatcher.localesTestValue = const [Locale('tr')];
+    addTearDown(t.platformDispatcher.clearLocalesTestValue);
+    final dir = Directory.systemTemp.createTempSync('inken_capture_panel');
+    addTearDown(() => dir.deleteSync(recursive: true));
+    final pdf = File('${dir.path}/ders.pdf')
+      ..writeAsBytesSync(
+        File('../../test/fixtures/two_pages.pdf').readAsBytesSync(),
+      );
+    final clipboard = _FakeClipboard();
+    final sharer = _FakeSharer();
+    final container = ProviderContainer(
+      overrides: [
+        settingsStoreProvider.overrideWithValue(
+          SettingsStore.memory({'pagePanel': true}),
+        ),
+        recentStoreProvider.overrideWithValue(
+          await RecentStore.load(directory: dir),
+        ),
+        backupStoreProvider.overrideWithValue(
+          BackupStore.at(Directory('${dir.path}/backups')),
+        ),
+        clipboardServiceProvider.overrideWithValue(clipboard),
+        shareServiceProvider.overrideWithValue(sharer),
+      ],
+    );
+    addTearDown(container.dispose);
+    await t.pumpWidget(
+      UncontrolledProviderScope(container: container, child: const InkenApp()),
+    );
+    await container
+        .read(openDocumentProvider.notifier)
+        .openBytes(
+          name: 'ders.pdf',
+          bytes: pdf.readAsBytesSync(),
+          path: pdf.path,
+        );
+    await _until(
+      t,
+      () => find.byKey(const ValueKey('page-thumb-1')).evaluate().isNotEmpty,
+    );
+    await t.pump(const Duration(milliseconds: 300));
+    final page = t
+        .widget<InkLayer>(find.byType(InkLayer))
+        .session
+        .document
+        .pages[0];
+
+    Future<void> openAsImage(int thumb) async {
+      await t.tap(
+        find.byKey(ValueKey('page-thumb-$thumb')),
+        buttons: kSecondaryButton,
+      );
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('panel-as-image')));
+      await t.pumpAndSettle();
+    }
+
+    // 1) Tek sayfa: Kopyala → panoda sayfanın tamamı, 200 dpi.
+    await openAsImage(0);
+    await t.tap(find.byKey(const ValueKey('panel-image-copy')));
+    await _until(t, () => clipboard.image != null);
+    final copied = await _inspect(clipboard.image!);
+    expect(copied.width, closeTo(page.width * 200 / 72, 2));
+    expect(copied.height, closeTo(page.height * 200 / 72, 2));
+
+    // 2) İki sayfa seçili: Kopyala pasif, Paylaş iki PNG verir.
+    await t.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await t.tap(find.byKey(const ValueKey('page-thumb-0')));
+    await t.tap(find.byKey(const ValueKey('page-thumb-1')));
+    await t.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await t.pump();
+    await openAsImage(1);
+    final copy = t.widget<MenuItemButton>(
+      find.byKey(const ValueKey('panel-image-copy')),
+    );
+    expect(copy.onPressed, isNull);
+    await t.tap(find.byKey(const ValueKey('panel-image-share')));
+    await _until(t, () => sharer.shared.isNotEmpty);
+    final (name, mime, files) = sharer.shared.single;
+    expect(mime, 'image/png');
+    expect(name, 'ders');
+    expect(files, ['ders - sayfa 1.png', 'ders - sayfa 2.png']);
   });
 }

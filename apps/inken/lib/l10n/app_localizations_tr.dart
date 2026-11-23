@@ -1491,4 +1491,24 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get sharePageImage => 'Sayfayı görsel olarak paylaş…';
+
+  @override
+  String get pagesAsImage => 'Görsel olarak';
+
+  @override
+  String pagesZipName(String base) {
+    return '$base - sayfalar.zip';
+  }
+
+  @override
+  String get zipFileType => 'ZIP arşivi';
+
+  @override
+  String get jpegFileType => 'JPEG görseli';
+
+  @override
+  String get copyOnePageOnly => 'Kopyala (tek sayfa)';
+
+  @override
+  String get preparingImages => 'Görseller hazırlanıyor…';
 }

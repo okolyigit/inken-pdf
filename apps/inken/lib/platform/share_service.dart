@@ -41,9 +41,10 @@ abstract class ShareService {
   /// Dosya, paylaşan uygulama okuyana kadar yerinde kalmalıdır.
   Future<ShareOutcome> sharePdf(String path, {required String name});
 
-  /// [path]'teki dosyayı ([mime] türünde: görsel, zip) paylaşır.
-  Future<ShareOutcome> shareFile(
-    String path, {
+  /// [paths]'teki dosyaları ([mime] türünde: görsel, zip) paylaşır.
+  /// [name] başlık / konu olarak kullanılır.
+  Future<ShareOutcome> shareFiles(
+    List<String> paths, {
     required String name,
     required String mime,
   });
@@ -63,22 +64,32 @@ class PlatformShareService implements ShareService {
 
   @override
   Future<ShareOutcome> sharePdf(String path, {required String name}) =>
-      shareFile(path, name: name, mime: 'application/pdf');
+      shareFiles([path], name: name, mime: 'application/pdf');
 
   @override
-  Future<ShareOutcome> shareFile(
-    String path, {
+  Future<ShareOutcome> shareFiles(
+    List<String> paths, {
     required String name,
     required String mime,
   }) async {
+    if (paths.isEmpty) throw ArgumentError.value(paths, 'paths', 'boş');
     if (defaultTargetPlatform == TargetPlatform.linux) {
-      return _linux(path, name);
+      return _linux(paths, name);
     }
     final ShareResult result;
     try {
       result = await SharePlus.instance.share(
         ShareParams(
-          files: [XFile(path, mimeType: mime, name: name)],
+          files: [
+            for (final path in paths)
+              XFile(
+                path,
+                mimeType: mime,
+                name: paths.length == 1
+                    ? name
+                    : File(path).uri.pathSegments.last,
+              ),
+          ],
           title: name,
           subject: name,
         ),
@@ -102,12 +113,17 @@ class PlatformShareService implements ShareService {
     return true;
   }
 
-  static Future<ShareOutcome> _linux(String path, String name) async {
-    if (await _run('xdg-email', ['--subject', name, '--attach', path])) {
+  static Future<ShareOutcome> _linux(List<String> paths, String name) async {
+    if (await _run('xdg-email', [
+      '--subject',
+      name,
+      for (final p in paths) ...['--attach', p],
+    ])) {
       return ShareOutcome.mailed;
     }
     // Dosya yöneticisinde seçili göster (freedesktop FileManager1);
     // desteklemeyen yöneticide klasörü aç.
+    final path = paths.first;
     final uri = Uri.file(path).toString();
     if (await _run('gdbus', [
       'call',

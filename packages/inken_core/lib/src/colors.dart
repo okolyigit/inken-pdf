@@ -65,10 +65,8 @@ int hsvToArgb(double hue, double saturation, double value) {
 
 /// Son kullanılan özel renkler listesine [color]'ı en başa ekler: varsa
 /// yerinden alınır, liste [max] öğeyi geçmez (en eskisi düşer).
-List<int> pushRecentColor(List<int> recent, int color, {int max = 5}) => [
-  color,
-  ...recent.where((c) => c != color),
-].take(max).toList();
+List<int> pushRecentColor(List<int> recent, int color, {int max = 5}) =>
+    [color, ...recent.where((c) => c != color)].take(max).toList();
 
 /// Gece modunda çizim rengi: koyu sayfada okunsun diye açık tona çevrilir.
 /// Gri tonlar (siyah kalem, beyaz) ters çevrilir; renkliler tonunu ve

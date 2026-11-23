@@ -11,6 +11,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
+import '../capture/capture_layer.dart' show CaptureAction;
 import '../ink/ink_images.dart';
 import '../ink/ink_painter.dart';
 import '../ink/ink_session.dart';
@@ -47,6 +48,7 @@ class PagePanelActions {
     required this.setOrientation,
     required this.color,
     required this.setColor,
+    this.images,
   });
 
   /// [pages] sayfalarını [turns] çeyrek tur döndürür (1 sağa, -1 sola).
@@ -69,6 +71,10 @@ class PagePanelActions {
   /// Eklenecek sayfanın kâğıt rengi ve değiştirilmesi.
   final PageColor color;
   final ValueChanged<PageColor> setColor;
+
+  /// Sayfaları görsel olarak kopyalar (tek sayfa), kaydeder ya da paylaşır;
+  /// görüntü hazırlanırken `null`.
+  final void Function(Set<int> pages, CaptureAction action)? images;
 }
 
 /// Panel menüsünün neyi gösterdiği.
@@ -477,6 +483,40 @@ class _PagePanelState extends State<PagePanel> {
             leadingIcon: const Icon(LucideIcons.filePlus2),
             menuChildren: insertAt(last + 1, 'panel-after'),
             child: Text(l10n.insertPageAfter),
+          ),
+          menuSeparator,
+          SubmenuButton(
+            key: const ValueKey('panel-as-image'),
+            leadingIcon: const Icon(LucideIcons.fileImage),
+            menuChildren: [
+              MenuItemButton(
+                key: const ValueKey('panel-image-copy'),
+                leadingIcon: const Icon(LucideIcons.copy),
+                onPressed: a.images != null && pages.length == 1
+                    ? () => a.images!(pages, CaptureAction.copy)
+                    : null,
+                child: Text(
+                  pages.length == 1 ? l10n.copy : l10n.copyOnePageOnly,
+                ),
+              ),
+              MenuItemButton(
+                key: const ValueKey('panel-image-save'),
+                leadingIcon: const Icon(LucideIcons.download),
+                onPressed: a.images == null
+                    ? null
+                    : () => a.images!(pages, CaptureAction.save),
+                child: Text(l10n.captureSave),
+              ),
+              MenuItemButton(
+                key: const ValueKey('panel-image-share'),
+                leadingIcon: const Icon(LucideIcons.share2),
+                onPressed: a.images == null
+                    ? null
+                    : () => a.images!(pages, CaptureAction.share),
+                child: Text(l10n.captureShare),
+              ),
+            ],
+            child: Text(l10n.pagesAsImage),
           ),
           menuSeparator,
           MenuItemButton(

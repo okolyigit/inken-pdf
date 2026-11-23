@@ -1532,4 +1532,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sharePageImage => 'Share page as image…';
+
+  @override
+  String get pagesAsImage => 'As image';
+
+  @override
+  String pagesZipName(String base) {
+    return '$base - pages.zip';
+  }
+
+  @override
+  String get zipFileType => 'ZIP archive';
+
+  @override
+  String get jpegFileType => 'JPEG image';
+
+  @override
+  String get copyOnePageOnly => 'Copy (single page)';
+
+  @override
+  String get preparingImages => 'Preparing images…';
 }
