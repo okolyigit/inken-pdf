@@ -89,7 +89,9 @@ ThemeData inkenTheme(Brightness brightness) {
     focusColor: c.brandTint,
     splashFactory: NoSplash.splashFactory,
     visualDensity: VisualDensity.standard,
-    materialTapTargetSize: MaterialTapTargetSize.padded,
+    // Düğmeler kendi boyunda (Sizes.target); Material'in görünmez 48 px
+    // dokunma payı sıkı ölçeği geri büyütmesin.
+    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     extensions: [c],
     iconTheme: IconThemeData(color: c.ink, size: Sizes.icon),
     dividerTheme: DividerThemeData(color: c.line, thickness: 1, space: 1),

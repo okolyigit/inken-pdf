@@ -225,21 +225,25 @@ abstract final class Radii {
   static const double pill = 999;
 }
 
-/// Dokunmatik öncelikli ölçüler: hiçbir dokunma hedefi [target]'ın altına
-/// inmez (bilinçli tek istisna: masaüstü menü çubuğu).
+/// Ölçüler: hiçbir dokunma hedefi [target]'ın altına inmez (bilinçli
+/// istisnalar: masaüstü menü çubuğu, pencerelerdeki sıkı form satırları).
+/// Sıkı ölçek (kullanıcı kararı, 23 Kasım 2026): dokunma hedefi 48 → 40,
+/// araç düğmesi 52 → 44, menü satırı 40 → 36, renk yuvarlağı 32 → 28;
+/// büyük ekranda arayüz daha az yer kaplasın. Telefonun üst çubuğu ve alt
+/// rafı değişmedi.
 abstract final class Sizes {
   static const double menubar = 44;
 
-  /// Menü çubuğunun altındaki hızlı erişim çubuğu: akıllı tahtada parmakla
-  /// kullanıldığı için düğmeler tam dokunma hedefi ([target]).
-  static const double quickbar = 48;
+  /// Menü çubuğunun altındaki hızlı erişim çubuğu; düğmeler tam dokunma
+  /// hedefi ([target]).
+  static const double quickbar = 40;
   static const double menubarItem = 34;
-  static const double menuRow = 40;
+  static const double menuRow = 36;
   static const double bar = 64;
   static const double drop = 288;
-  static const double tool = 52;
-  static const double target = 48;
-  static const double swatch = 32;
+  static const double tool = 44;
+  static const double target = 40;
+  static const double swatch = 28;
   static const double icon = 24;
 
   /// Bölünmüş araç düğmesinin ok parçası.

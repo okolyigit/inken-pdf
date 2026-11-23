@@ -342,7 +342,7 @@ void main() {
         expect(quick(t, id).onPressed, isNull, reason: id);
       }
       // Düğmeler tam dokunma hedefi.
-      expect(t.getSize(find.byKey(const ValueKey('quick-save'))).height, 48);
+      expect(t.getSize(find.byKey(const ValueKey('quick-save'))).height, 40);
     });
 
     testWidgets('ayarlar sayfası: sekmeler, kalıcı ayarlar, kısayollar', (
@@ -468,9 +468,9 @@ void main() {
       // Büyük: 1920 geniş ekran, %125 → 1536 mantıksal (masaüstü).
       final settings = SettingsStore.memory({'uiScale': 'large'});
       final c = await pump(t, settings: settings, size: const Size(1920, 1080));
-      // Ekranda 1,25 kat: 48'lik düğme 60.
+      // Ekranda 1,25 kat: 40'lık düğme 50.
       final save = t.getRect(find.byKey(const ValueKey('quick-save')));
-      expect(save.height, closeTo(60, 0.01));
+      expect(save.height, closeTo(50, 0.01));
       // Uyarlanabilir yerleşim küçülen mantıksal genişliğe göre: 1920 / 1,25.
       final ctx = t.element(find.byKey(const ValueKey('quick-save')));
       expect(MediaQuery.sizeOf(ctx).width, closeTo(1920 / 1.25, 0.01));
@@ -488,7 +488,7 @@ void main() {
       await t.pumpAndSettle();
       expect(
         t.getRect(find.byKey(const ValueKey('quick-save'))).height,
-        closeTo(48, 0.01),
+        closeTo(40, 0.01),
       );
     });
 

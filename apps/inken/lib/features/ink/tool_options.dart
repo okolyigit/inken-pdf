@@ -863,7 +863,7 @@ class Segmented<T> extends StatelessWidget {
                     hoverColor: c.surfaceHover,
                     onTap: () => onChanged(v),
                     child: SizedBox(
-                      height: dense ? 32 : 44,
+                      height: dense ? 32 : 36,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
