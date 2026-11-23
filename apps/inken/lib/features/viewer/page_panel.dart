@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -446,26 +446,26 @@ class _PagePanelState extends State<PagePanel> {
         return [
           MenuItemButton(
             key: const ValueKey('panel-rotate-right'),
-            leadingIcon: const Icon(LucideIcons.rotateCw),
+            leadingIcon: const Icon(LucideIcons200.rotateCw),
             onPressed: enabled ? () => _rotate(pages, 1) : null,
             child: Text(l10n.rotateRight),
           ),
           MenuItemButton(
             key: const ValueKey('panel-rotate-left'),
-            leadingIcon: const Icon(LucideIcons.rotateCcw),
+            leadingIcon: const Icon(LucideIcons200.rotateCcw),
             onPressed: enabled ? () => _rotate(pages, -1) : null,
             child: Text(l10n.rotateLeft),
           ),
           menuSeparator,
           MenuItemButton(
             key: const ValueKey('panel-move-up'),
-            leadingIcon: const Icon(LucideIcons.arrowUp),
+            leadingIcon: const Icon(LucideIcons200.arrowUp),
             onPressed: enabled && first > 0 ? () => _moveBy(pages, -1) : null,
             child: Text(l10n.movePageUp),
           ),
           MenuItemButton(
             key: const ValueKey('panel-move-down'),
-            leadingIcon: const Icon(LucideIcons.arrowDown),
+            leadingIcon: const Icon(LucideIcons200.arrowDown),
             onPressed: enabled && last < count - 1
                 ? () => _moveBy(pages, 1)
                 : null,
@@ -474,24 +474,24 @@ class _PagePanelState extends State<PagePanel> {
           menuSeparator,
           SubmenuButton(
             key: const ValueKey('panel-insert-before'),
-            leadingIcon: const Icon(LucideIcons.filePlus2),
+            leadingIcon: const Icon(LucideIcons200.filePlus2),
             menuChildren: insertAt(first, 'panel-before'),
             child: Text(l10n.insertPageBefore),
           ),
           SubmenuButton(
             key: const ValueKey('panel-insert-after'),
-            leadingIcon: const Icon(LucideIcons.filePlus2),
+            leadingIcon: const Icon(LucideIcons200.filePlus2),
             menuChildren: insertAt(last + 1, 'panel-after'),
             child: Text(l10n.insertPageAfter),
           ),
           menuSeparator,
           SubmenuButton(
             key: const ValueKey('panel-as-image'),
-            leadingIcon: const Icon(LucideIcons.fileImage),
+            leadingIcon: const Icon(LucideIcons200.fileImage),
             menuChildren: [
               MenuItemButton(
                 key: const ValueKey('panel-image-copy'),
-                leadingIcon: const Icon(LucideIcons.copy),
+                leadingIcon: const Icon(LucideIcons200.copy),
                 onPressed: a.images != null && pages.length == 1
                     ? () => a.images!(pages, CaptureAction.copy)
                     : null,
@@ -501,7 +501,7 @@ class _PagePanelState extends State<PagePanel> {
               ),
               MenuItemButton(
                 key: const ValueKey('panel-image-save'),
-                leadingIcon: const Icon(LucideIcons.download),
+                leadingIcon: const Icon(LucideIcons200.download),
                 onPressed: a.images == null
                     ? null
                     : () => a.images!(pages, CaptureAction.save),
@@ -509,7 +509,7 @@ class _PagePanelState extends State<PagePanel> {
               ),
               MenuItemButton(
                 key: const ValueKey('panel-image-share'),
-                leadingIcon: const Icon(LucideIcons.share2),
+                leadingIcon: const Icon(LucideIcons200.share2),
                 onPressed: a.images == null
                     ? null
                     : () => a.images!(pages, CaptureAction.share),
@@ -521,7 +521,7 @@ class _PagePanelState extends State<PagePanel> {
           menuSeparator,
           MenuItemButton(
             key: const ValueKey('panel-delete'),
-            leadingIcon: const Icon(LucideIcons.trash2),
+            leadingIcon: const Icon(LucideIcons200.trash2),
             onPressed: enabled && pages.length < count
                 ? () => _delete(pages)
                 : null,
@@ -880,8 +880,8 @@ class _PanelTabs extends StatelessWidget {
     );
     return Row(
       children: [
-        tab('pages', false, LucideIcons.layoutGrid, l10n.pagePanelPages),
-        tab('outline', true, LucideIcons.listTree, l10n.outline),
+        tab('pages', false, LucideIcons200.layoutGrid, l10n.pagePanelPages),
+        tab('outline', true, LucideIcons200.listTree, l10n.outline),
       ],
     );
   }
@@ -1038,8 +1038,8 @@ class _OutlineRow extends StatelessWidget {
                       ),
                       icon: Icon(
                         expanded
-                            ? LucideIcons.chevronDown
-                            : LucideIcons.chevronRight,
+                            ? LucideIcons200.chevronDown
+                            : LucideIcons200.chevronRight,
                         size: 16,
                       ),
                       onPressed: onToggle,
@@ -1151,38 +1151,43 @@ class _SelectionStrip extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              button('clear', LucideIcons.x, l10n.clearPageSelection, onClear),
+              button(
+                'clear',
+                LucideIcons200.x,
+                l10n.clearPageSelection,
+                onClear,
+              ),
             ],
           ),
           Row(
             children: [
               button(
                 'move-up',
-                LucideIcons.arrowUp,
+                LucideIcons200.arrowUp,
                 l10n.movePageUp,
                 enabled && canMoveUp ? () => onMove(-1) : null,
               ),
               button(
                 'move-down',
-                LucideIcons.arrowDown,
+                LucideIcons200.arrowDown,
                 l10n.movePageDown,
                 enabled && canMoveDown ? () => onMove(1) : null,
               ),
               button(
                 'rotate-left',
-                LucideIcons.rotateCcw,
+                LucideIcons200.rotateCcw,
                 l10n.rotateLeft,
                 enabled ? () => onRotate(-1) : null,
               ),
               button(
                 'rotate-right',
-                LucideIcons.rotateCw,
+                LucideIcons200.rotateCw,
                 l10n.rotateRight,
                 enabled ? () => onRotate(1) : null,
               ),
               button(
                 'delete',
-                LucideIcons.trash2,
+                LucideIcons200.trash2,
                 l10n.deletePages(count),
                 enabled && canDelete ? onDelete : null,
               ),
@@ -1427,7 +1432,7 @@ class _PageTile extends StatelessWidget {
                       child: controls && onMenu != null
                           ? control(
                               'menu',
-                              LucideIcons.ellipsis,
+                              LucideIcons200.ellipsis,
                               l10n.pageActions,
                               onMenu,
                             )
@@ -1453,7 +1458,7 @@ class _PageTile extends StatelessWidget {
                       child: controls && onAdd != null
                           ? control(
                               'add',
-                              LucideIcons.plus,
+                              LucideIcons200.plus,
                               l10n.insertPageAfter,
                               onAdd,
                             )

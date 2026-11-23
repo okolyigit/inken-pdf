@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inken_core/inken_core.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
+import 'package:lucide_icons_flutter/lucide_icons_300.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -75,10 +76,10 @@ final toolDockProvider = NotifierProvider<ToolDockNotifier, DockEdge>(
 
 /// Kenarların adı ve ikonu (Görünüm menüsü, Ayarlar, tutamak menüsü).
 List<(DockEdge, IconData, String)> dockEdgeChoices(AppLocalizations l10n) => [
-  (DockEdge.top, LucideIcons.panelTop, l10n.dockTop),
-  (DockEdge.bottom, LucideIcons.panelBottom, l10n.dockBottom),
-  (DockEdge.left, LucideIcons.panelLeft, l10n.dockLeft),
-  (DockEdge.right, LucideIcons.panelRight, l10n.dockRight),
+  (DockEdge.top, LucideIcons200.panelTop, l10n.dockTop),
+  (DockEdge.bottom, LucideIcons200.panelBottom, l10n.dockBottom),
+  (DockEdge.left, LucideIcons200.panelLeft, l10n.dockLeft),
+  (DockEdge.right, LucideIcons200.panelRight, l10n.dockRight),
 ];
 
 /// Ayarı (seçenek paneli) olan araçlar.
@@ -134,23 +135,46 @@ void tapSelect(WidgetRef ref) {
 /// Aracın ikonu; şekil aracında seçili şeklin ikonu ([shape]).
 IconData toolIcon(Tool tool, [ShapeKind shape = ShapeKind.rectangle]) =>
     switch (tool) {
-      Tool.hand => LucideIcons.hand,
-      Tool.select => LucideIcons.mousePointer2,
-      Tool.pen => LucideIcons.penLine,
+      Tool.hand => LucideIcons200.hand,
+      Tool.select => LucideIcons200.mousePointer2,
+      Tool.pen => LucideIcons200.penLine,
       Tool.shape => shapeIcon(shape),
-      Tool.text => LucideIcons.type,
-      Tool.highlighter => LucideIcons.highlighter,
-      Tool.eraser => LucideIcons.eraser,
-      Tool.laser => LucideIcons.sparkles,
-      Tool.textSelect => LucideIcons.textSelect,
+      Tool.text => LucideIcons200.type,
+      Tool.highlighter => LucideIcons200.highlighter,
+      Tool.eraser => LucideIcons200.eraser,
+      Tool.laser => LucideIcons200.sparkles,
+      Tool.textSelect => LucideIcons200.textSelect,
     };
 
+/// Seçili araç düğmesinde (lacivert zemin) ikon bir kademe kalın çizilir:
+/// 1px çizgi dolu zeminde fazla incelir. Listede olmayan ikon aynen kalır.
+IconData selectedIcon(IconData icon) => _selectedIcons[icon] ?? icon;
+
+final Map<IconData, IconData> _selectedIcons = {
+  LucideIcons200.hand: LucideIcons300.hand,
+  LucideIcons200.mousePointer2: LucideIcons300.mousePointer2,
+  LucideIcons200.penLine: LucideIcons300.penLine,
+  LucideIcons200.type: LucideIcons300.type,
+  LucideIcons200.highlighter: LucideIcons300.highlighter,
+  LucideIcons200.eraser: LucideIcons300.eraser,
+  LucideIcons200.sparkles: LucideIcons300.sparkles,
+  LucideIcons200.textSelect: LucideIcons300.textSelect,
+  LucideIcons200.slash: LucideIcons300.slash,
+  LucideIcons200.moveUpRight: LucideIcons300.moveUpRight,
+  LucideIcons200.square: LucideIcons300.square,
+  LucideIcons200.circle: LucideIcons300.circle,
+  LucideIcons200.chartScatter: LucideIcons300.chartScatter,
+  LucideIcons200.flashlight: LucideIcons300.flashlight,
+  LucideIcons200.blinds: LucideIcons300.blinds,
+  LucideIcons200.eye: LucideIcons300.eye,
+};
+
 IconData shapeIcon(ShapeKind kind) => switch (kind) {
-  ShapeKind.line => LucideIcons.slash,
-  ShapeKind.arrow => LucideIcons.moveUpRight,
-  ShapeKind.rectangle => LucideIcons.square,
-  ShapeKind.ellipse => LucideIcons.circle,
-  ShapeKind.coordinate => LucideIcons.chartScatter,
+  ShapeKind.line => LucideIcons200.slash,
+  ShapeKind.arrow => LucideIcons200.moveUpRight,
+  ShapeKind.rectangle => LucideIcons200.square,
+  ShapeKind.ellipse => LucideIcons200.circle,
+  ShapeKind.coordinate => LucideIcons200.chartScatter,
 };
 
 String shapeLabel(AppLocalizations l10n, ShapeKind kind) => switch (kind) {
@@ -745,7 +769,7 @@ class ColorPalette extends ConsumerWidget {
                         border: Border.all(color: c.lineStrong),
                       ),
                       child: Icon(
-                        LucideIcons.plus,
+                        LucideIcons200.plus,
                         size: 18,
                         color: c.inkMuted,
                       ),
@@ -780,8 +804,8 @@ class _EraserOptions extends ConsumerWidget {
             value: s.eraserMode,
             onChanged: n.setEraserMode,
             options: [
-              (EraserMode.stroke, LucideIcons.spline, l10n.eraserStroke),
-              (EraserMode.pixel, LucideIcons.eraser, l10n.eraserPixel),
+              (EraserMode.stroke, LucideIcons200.spline, l10n.eraserStroke),
+              (EraserMode.pixel, LucideIcons200.eraser, l10n.eraserPixel),
             ],
           ),
         ),
@@ -1118,7 +1142,7 @@ Future<void> showToolOptionsSheet(BuildContext context, Tool tool) {
                 ),
                 IconButton(
                   tooltip: l10n.close,
-                  icon: const Icon(LucideIcons.x),
+                  icon: const Icon(LucideIcons200.x),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],

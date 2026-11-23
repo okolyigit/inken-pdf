@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -133,9 +133,9 @@ final stageCoverProvider =
 
 /// Örtünün ikonu ve adı (araç kutusu, menü, tanıtım).
 IconData stageCoverIcon(StageCover mode) => switch (mode) {
-  StageCover.spotlight => LucideIcons.flashlight,
-  StageCover.curtain => LucideIcons.blinds,
-  StageCover.none => LucideIcons.eye,
+  StageCover.spotlight => LucideIcons200.flashlight,
+  StageCover.curtain => LucideIcons200.blinds,
+  StageCover.none => LucideIcons200.eye,
 };
 
 String stageCoverLabel(AppLocalizations l10n, StageCover mode) =>
@@ -290,7 +290,7 @@ class _SpotlightState extends State<_Spotlight> {
                 child: _RoundHandle(
                   size: _handle,
                   child: Icon(
-                    LucideIcons.moveDiagonal2,
+                    LucideIcons200.moveDiagonal2,
                     size: 18,
                     color: c.ink,
                   ),
@@ -310,7 +310,7 @@ class _SpotlightState extends State<_Spotlight> {
               onTap: widget.onClose,
               child: _RoundHandle(
                 size: _handle,
-                child: Icon(LucideIcons.x, size: 18, color: c.ink),
+                child: Icon(LucideIcons200.x, size: 18, color: c.ink),
               ),
             ),
           ),
@@ -471,7 +471,7 @@ class _Curtain extends StatelessWidget {
                           IconButton(
                             key: const ValueKey('curtain-close'),
                             tooltip: l10n.curtainClose,
-                            icon: const Icon(LucideIcons.x),
+                            icon: const Icon(LucideIcons200.x),
                             onPressed: onClose,
                           ),
                           Expanded(

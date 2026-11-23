@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart';
 import 'package:intl/intl.dart' show NumberFormat;
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -51,10 +51,10 @@ final instrumentsProvider =
     );
 
 IconData instrumentIcon(InstrumentKind kind) => switch (kind) {
-  InstrumentKind.ruler => LucideIcons.ruler,
-  InstrumentKind.setSquare => LucideIcons.triangleRight,
-  InstrumentKind.protractor => LucideIcons.gauge,
-  InstrumentKind.compass => LucideIcons.draftingCompass,
+  InstrumentKind.ruler => LucideIcons200.ruler,
+  InstrumentKind.setSquare => LucideIcons200.triangleRight,
+  InstrumentKind.protractor => LucideIcons200.gauge,
+  InstrumentKind.compass => LucideIcons200.draftingCompass,
 };
 
 String instrumentLabel(AppLocalizations l10n, InstrumentKind kind) =>
@@ -625,11 +625,11 @@ class _InstrumentPainter extends CustomPainter {
     for (final MapEntry(:key, :value) in handles.entries) {
       switch (key) {
         case _Part.rotate:
-          _handle(canvas, value, LucideIcons.rotateCw);
+          _handle(canvas, value, LucideIcons200.rotateCw);
         case _Part.close:
-          _handle(canvas, value, LucideIcons.x, small: true);
+          _handle(canvas, value, LucideIcons200.x, small: true);
         case _Part.knob:
-          _handle(canvas, value, LucideIcons.rotateCw);
+          _handle(canvas, value, LucideIcons200.rotateCw);
         case _Part.pencil:
           canvas.drawCircle(value, 7, Paint()..color = _halo);
           canvas.drawCircle(value, 5, Paint()..color = penColor);

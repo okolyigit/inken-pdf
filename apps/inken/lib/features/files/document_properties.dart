@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -48,7 +48,7 @@ class DocumentPropertiesDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return AlertDialog(
       key: const ValueKey('properties-dialog'),
-      icon: Icon(LucideIcons.fileText, color: context.colors.inkMuted),
+      icon: Icon(LucideIcons200.fileText, color: context.colors.inkMuted),
       title: Text(l10n.propertiesTitle),
       content: SizedBox(
         width: 460,

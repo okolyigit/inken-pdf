@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../backup/backup_store.dart';
@@ -1812,7 +1812,10 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                   SizedBox(
                     width: 32,
                     child: m == current
-                        ? Icon(LucideIcons.check, color: context.colors.brand)
+                        ? Icon(
+                            LucideIcons200.check,
+                            color: context.colors.brand,
+                          )
                         : null,
                   ),
                   Expanded(child: Text(label)),
@@ -1873,7 +1876,10 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                   SizedBox(
                     width: 32,
                     child: m == current
-                        ? Icon(LucideIcons.check, color: context.colors.brand)
+                        ? Icon(
+                            LucideIcons200.check,
+                            color: context.colors.brand,
+                          )
                         : null,
                   ),
                   Expanded(child: Text(label)),
@@ -2027,7 +2033,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
           IconButton(
             key: const ValueKey('app-menu'),
             tooltip: l10n.menu,
-            icon: const Icon(LucideIcons.menu),
+            icon: const Icon(LucideIcons200.menu),
             onPressed: () => _scaffoldKey.currentState?.openDrawer(),
           ),
           const SizedBox(width: Space.s1),
@@ -2054,7 +2060,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
             key: const ValueKey('phone-tools'),
             tooltip: _phoneDock ? l10n.phoneToolsHide : l10n.phoneToolsShow,
             isSelected: _phoneDock,
-            icon: const Icon(LucideIcons.penLine),
+            icon: const Icon(LucideIcons200.penLine),
             style: IconButton.styleFrom(
               foregroundColor: c.ink,
               backgroundColor: _phoneDock ? c.brandTint : null,
@@ -2064,13 +2070,13 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
           IconButton(
             key: const ValueKey('share'),
             tooltip: l10n.shareDocument,
-            icon: const Icon(LucideIcons.share2),
+            icon: const Icon(LucideIcons200.share2),
             onPressed: _actions(session).share,
           ),
           IconButton(
             key: const ValueKey('undo'),
             tooltip: l10n.undo,
-            icon: const Icon(LucideIcons.undo2),
+            icon: const Icon(LucideIcons200.undo2),
             onPressed: session?.canUndo ?? false ? session!.undo : null,
           ),
           // Sabit genişlik ve sağ kenara hizalı: MenuAnchor sağa sığmayan
@@ -2087,22 +2093,22 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
             ),
             menuChildren: [
               MenuItemButton(
-                leadingIcon: const Icon(LucideIcons.redo2),
+                leadingIcon: const Icon(LucideIcons200.redo2),
                 onPressed: session?.canRedo ?? false ? session!.redo : null,
                 child: Text(l10n.redo),
               ),
               MenuItemButton(
-                leadingIcon: const Icon(LucideIcons.save),
+                leadingIcon: const Icon(LucideIcons200.save),
                 onPressed: _canSave(session) ? _save : null,
                 child: Text(l10n.save),
               ),
               MenuItemButton(
-                leadingIcon: const Icon(LucideIcons.clipboardPaste),
+                leadingIcon: const Icon(LucideIcons200.clipboardPaste),
                 onPressed: session == null ? null : _paste,
                 child: Text(l10n.paste),
               ),
               MenuItemButton(
-                leadingIcon: const Icon(LucideIcons.imagePlus),
+                leadingIcon: const Icon(LucideIcons200.imagePlus),
                 onPressed: session == null ? null : _insertImageFile,
                 child: Text(l10n.insertImage),
               ),
@@ -2110,7 +2116,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
             builder: (context, menu, _) => IconButton(
               key: const ValueKey('more'),
               tooltip: l10n.more,
-              icon: const Icon(LucideIcons.ellipsisVertical),
+              icon: const Icon(LucideIcons200.ellipsisVertical),
               onPressed: () => menu.isOpen ? menu.close() : menu.open(),
             ),
           ),
@@ -2185,7 +2191,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                       turns: open ? 0.5 : 0,
                       duration: Motion.fast,
                       child: Icon(
-                        LucideIcons.chevronDown,
+                        LucideIcons200.chevronDown,
                         size: 20,
                         color: c.inkMuted,
                       ),
@@ -2247,75 +2253,75 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                     children: [
                       section('file', l10n.menuFile, [
                         item(
-                          LucideIcons.filePlus,
+                          LucideIcons200.filePlus,
                           l10n.newDocument,
                           _newDocument,
                         ),
                         item(
-                          LucideIcons.folderOpen,
+                          LucideIcons200.folderOpen,
                           l10n.openPdfMenu,
                           _openAnother,
                         ),
                         item(
-                          LucideIcons.save,
+                          LucideIcons200.save,
                           l10n.save,
                           _canSave(session) ? _save : null,
                         ),
                         item(
-                          LucideIcons.saveAll,
+                          LucideIcons200.saveAll,
                           l10n.saveAs,
                           session == null || _saving ? null : _saveAs,
                         ),
                         item(
-                          LucideIcons.fileDown,
+                          LucideIcons200.fileDown,
                           l10n.exportMenu,
                           session == null || _exporting ? null : _export,
                         ),
                         item(
-                          LucideIcons.printer,
+                          LucideIcons200.printer,
                           l10n.printDocument,
                           _actions(session).print,
                         ),
                         item(
-                          LucideIcons.share2,
+                          LucideIcons200.share2,
                           l10n.shareDocument,
                           _actions(session).share,
                         ),
                         item(
-                          LucideIcons.fileImage,
+                          LucideIcons200.fileImage,
                           l10n.sharePageImage,
                           _actions(session).sharePageImage,
                         ),
                         item(
-                          LucideIcons.fileText,
+                          LucideIcons200.fileText,
                           l10n.documentProperties,
                           session == null ? null : _showProperties,
                         ),
-                        item(LucideIcons.x, l10n.closeDocument, _close),
+                        item(LucideIcons200.x, l10n.closeDocument, _close),
                       ]),
                       section('edit', l10n.menuEdit, [
                         item(
-                          LucideIcons.clipboardPaste,
+                          LucideIcons200.clipboardPaste,
                           l10n.paste,
                           session == null ? null : _paste,
                         ),
                         item(
-                          LucideIcons.imagePlus,
+                          LucideIcons200.imagePlus,
                           l10n.insertImage,
                           session == null ? null : _insertImageFile,
                         ),
                         item(
-                          LucideIcons.camera,
+                          LucideIcons200.camera,
                           l10n.captureRegion,
                           session == null ? null : _startCapture,
                         ),
                         item(
-                          LucideIcons.squareDashedMousePointer,
+                          LucideIcons200.squareDashedMousePointer,
                           l10n.selectAll,
                           session == null ? null : _selectAll,
                         ),
                         item(
-                          LucideIcons.textSelect,
+                          LucideIcons200.textSelect,
                           l10n.toolTextSelect,
                           session == null
                               ? null
@@ -2324,25 +2330,25 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                       ]),
                       section('page', l10n.menuPage, [
                         item(
-                          LucideIcons.chevronLeft,
+                          LucideIcons200.chevronLeft,
                           l10n.previousPage,
                           () => _goPage(-1),
                         ),
                         item(
-                          LucideIcons.chevronRight,
+                          LucideIcons200.chevronRight,
                           l10n.nextPage,
                           () => _goPage(1),
                         ),
-                        item(LucideIcons.hash, l10n.goToPage, _askGoToPage),
+                        item(LucideIcons200.hash, l10n.goToPage, _askGoToPage),
                         item(
-                          LucideIcons.search,
+                          LucideIcons200.search,
                           l10n.find,
                           session == null ? null : _openSearch,
                         ),
                       ]),
                       section('view', l10n.menuView, [
                         item(
-                          LucideIcons.palette,
+                          LucideIcons200.palette,
                           l10n.theme,
                           _chooseTheme,
                           subtitle: {
@@ -2351,25 +2357,25 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                           }[ref.watch(themeModeProvider)],
                         ),
                         item(
-                          LucideIcons.moon,
+                          LucideIcons200.moon,
                           l10n.nightMode,
                           ref.read(nightModeProvider.notifier).toggle,
                           trailing: ref.watch(nightModeProvider)
-                              ? Icon(LucideIcons.check, color: c.brand)
+                              ? Icon(LucideIcons200.check, color: c.brand)
                               : null,
                         ),
                         item(
-                          LucideIcons.maximize,
+                          LucideIcons200.maximize,
                           l10n.fullscreen,
                           () => _setFullscreen(true),
                         ),
                         item(
-                          LucideIcons.scan,
+                          LucideIcons200.scan,
                           l10n.fitPage,
                           _controller.fitPage,
                         ),
                         item(
-                          LucideIcons.moveHorizontal,
+                          LucideIcons200.moveHorizontal,
                           l10n.fitWidth,
                           _controller.fitWidth,
                         ),
@@ -2382,11 +2388,11 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                             stageCoverLabel(l10n, mode),
                             () => _toggleCover(mode),
                             trailing: ref.watch(stageCoverProvider).mode == mode
-                                ? Icon(LucideIcons.check, color: c.brand)
+                                ? Icon(LucideIcons200.check, color: c.brand)
                                 : null,
                           ),
                         item(
-                          LucideIcons.hand,
+                          LucideIcons200.hand,
                           l10n.inputMode,
                           _chooseInputMode,
                           subtitle: switch (mode) {
@@ -2397,7 +2403,11 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                         ),
                       ]),
                       section('help', l10n.menuHelp, [
-                        item(LucideIcons.bookOpen, l10n.guideMenu, _openGuide),
+                        item(
+                          LucideIcons200.bookOpen,
+                          l10n.guideMenu,
+                          _openGuide,
+                        ),
                         for (final (target, icon, label) in helpEntries(l10n))
                           item(
                             icon,
@@ -2405,7 +2415,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                             () => openSettingsPage(context, initial: target),
                           ),
                         item(
-                          LucideIcons.share2,
+                          LucideIcons200.share2,
                           l10n.shareApp,
                           () => shareApp(context),
                         ),
@@ -2417,7 +2427,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                 Padding(
                   padding: const EdgeInsets.all(Space.s2),
                   child: item(
-                    LucideIcons.settings,
+                    LucideIcons200.settings,
                     l10n.settingsMenu,
                     _openSettings,
                   ),
@@ -2643,7 +2653,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
           child: IconButton(
             key: const ValueKey('exit-fullscreen'),
             tooltip: AppLocalizations.of(context).exitFullscreen,
-            icon: const Icon(LucideIcons.minimize),
+            icon: const Icon(LucideIcons200.minimize),
             onPressed: () => _setFullscreen(false),
           ),
         ),

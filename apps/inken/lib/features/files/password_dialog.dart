@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -44,7 +44,7 @@ class _PasswordDialogState extends State<_PasswordDialog> {
     final c = context.colors;
     return AlertDialog(
       key: const ValueKey('password-dialog'),
-      icon: Icon(LucideIcons.lock, color: c.inkMuted),
+      icon: Icon(LucideIcons200.lock, color: c.inkMuted),
       title: Text(l10n.passwordTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -66,7 +66,9 @@ class _PasswordDialogState extends State<_PasswordDialog> {
               suffixIcon: IconButton(
                 key: const ValueKey('password-visibility'),
                 tooltip: _visible ? l10n.passwordHide : l10n.passwordShow,
-                icon: Icon(_visible ? LucideIcons.eyeOff : LucideIcons.eye),
+                icon: Icon(
+                  _visible ? LucideIcons200.eyeOff : LucideIcons200.eye,
+                ),
                 onPressed: () => setState(() => _visible = !_visible),
               ),
             ),

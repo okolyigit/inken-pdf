@@ -979,7 +979,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byKey(const ValueKey('tool-shape')),
-          matching: find.byIcon(shapeIcon(ShapeKind.ellipse)),
+          matching: find.byIcon(selectedIcon(shapeIcon(ShapeKind.ellipse))),
         ),
         findsOneWidget,
       );
@@ -1011,7 +1011,7 @@ void main() {
     expect(
       find.descendant(
         of: button,
-        matching: find.byIcon(toolIcon(Tool.textSelect)),
+        matching: find.byIcon(selectedIcon(toolIcon(Tool.textSelect))),
       ),
       findsOneWidget,
     );

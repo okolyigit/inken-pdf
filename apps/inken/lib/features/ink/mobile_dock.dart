@@ -141,7 +141,10 @@ class _DockTool extends StatelessWidget {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        Icon(icon, color: selected ? c.onBrand : c.ink),
+                        Icon(
+                          selected ? selectedIcon(icon) : icon,
+                          color: selected ? c.onBrand : c.ink,
+                        ),
                         // Kalem / fosforlu: köşede o anki rengin noktası.
                         if (ink != null)
                           Positioned(

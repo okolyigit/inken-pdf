@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:inken_pdf/inken_pdf.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -125,7 +125,7 @@ class _Bar extends StatelessWidget {
                   IconButton(
                     key: const ValueKey('selection-edit-image'),
                     tooltip: l10n.editImage,
-                    icon: const Icon(LucideIcons.crop),
+                    icon: const Icon(LucideIcons200.crop),
                     onPressed: edit,
                   ),
                 if (session.selectionOpacityPercent case final percent?)
@@ -133,13 +133,13 @@ class _Bar extends StatelessWidget {
                 IconButton(
                   key: const ValueKey('selection-copy'),
                   tooltip: '${l10n.copy} (Ctrl+C)',
-                  icon: const Icon(LucideIcons.copy),
+                  icon: const Icon(LucideIcons200.copy),
                   onPressed: onCopy,
                 ),
                 IconButton(
                   key: const ValueKey('selection-delete'),
                   tooltip: '${l10n.deleteSelection} (Delete)',
-                  icon: const Icon(LucideIcons.trash2),
+                  icon: const Icon(LucideIcons200.trash2),
                   onPressed: session.deleteSelection,
                 ),
               ],
@@ -204,7 +204,7 @@ class _OpacityButtonState extends State<_OpacityButton> {
       builder: (context, menu, _) => IconButton(
         key: const ValueKey('selection-opacity'),
         tooltip: '${l10n.opacity} (${l10n.percent(widget.percent)})',
-        icon: const Icon(LucideIcons.blend),
+        icon: const Icon(LucideIcons200.blend),
         onPressed: () => menu.isOpen ? menu.close() : menu.open(),
       ),
     );

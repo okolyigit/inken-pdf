@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -112,17 +112,17 @@ class QuickBar extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                button('open', LucideIcons.folderOpen, l10n.openPdf, onOpen),
-                button('save', LucideIcons.save, l10n.save, a.save),
+                button('open', LucideIcons200.folderOpen, l10n.openPdf, onOpen),
+                button('save', LucideIcons200.save, l10n.save, a.save),
                 button(
                   'export',
-                  LucideIcons.fileDown,
+                  LucideIcons200.fileDown,
                   l10n.exportShort,
                   a.export,
                 ),
                 button(
                   'print',
-                  LucideIcons.printer,
+                  LucideIcons200.printer,
                   l10n.printDocument,
                   a.print,
                 ),
@@ -154,7 +154,7 @@ class QuickBar extends StatelessWidget {
                         ),
                         builder: (context, menu, _) => groupButton(
                           'insert-page',
-                          LucideIcons.filePlus2,
+                          LucideIcons200.filePlus2,
                           l10n.insertPage,
                           a.insertPage == null
                               ? null
@@ -165,7 +165,7 @@ class QuickBar extends StatelessWidget {
                       VerticalDivider(width: 1, thickness: 1, color: c.line),
                       groupButton(
                         'append-page',
-                        LucideIcons.plus,
+                        LucideIcons200.plus,
                         l10n.appendPage(
                           pageTemplateLabel(l10n, a.newPageTemplate),
                         ),
@@ -177,33 +177,38 @@ class QuickBar extends StatelessWidget {
                 ),
                 button(
                   'delete-page',
-                  LucideIcons.fileMinus2,
+                  LucideIcons200.fileMinus2,
                   l10n.deletePage,
                   a.deletePage,
                 ),
                 button(
                   'rotate-page',
-                  LucideIcons.rotateCw,
+                  LucideIcons200.rotateCw,
                   l10n.rotateRight,
                   a.rotatePage == null ? null : () => a.rotatePage!(1),
                 ),
-                button('search', LucideIcons.search, l10n.searchHint, a.find),
+                button(
+                  'search',
+                  LucideIcons200.search,
+                  l10n.searchHint,
+                  a.find,
+                ),
                 button(
                   'go-to-page',
-                  LucideIcons.hash,
+                  LucideIcons200.hash,
                   l10n.goToPageTitle,
                   a.goToPage,
                 ),
                 button(
                   'page-panel',
-                  LucideIcons.panelLeft,
+                  LucideIcons200.panelLeft,
                   l10n.pagePanel,
                   a.pagePanel,
                 ),
                 divider(),
                 button(
                   'fullscreen',
-                  LucideIcons.maximize,
+                  LucideIcons200.maximize,
                   l10n.fullscreen,
                   a.fullscreen,
                 ),
@@ -211,9 +216,9 @@ class QuickBar extends StatelessWidget {
             ),
           ),
         ),
-        button('capture', LucideIcons.camera, l10n.captureRegion, a.capture),
-        button('share', LucideIcons.share2, l10n.shareDocument, a.share),
-        button('settings', LucideIcons.settings, l10n.settings, onSettings),
+        button('capture', LucideIcons200.camera, l10n.captureRegion, a.capture),
+        button('share', LucideIcons200.share2, l10n.shareDocument, a.share),
+        button('settings', LucideIcons200.settings, l10n.settings, onSettings),
       ],
     );
     if (!framed) return SizedBox(height: Sizes.quickbar, child: row);

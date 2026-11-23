@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -381,7 +381,7 @@ class ImageEditorState extends State<ImageEditor> {
           leading: IconButton(
             key: const ValueKey('image-edit-cancel'),
             tooltip: l10n.cancel,
-            icon: const Icon(LucideIcons.x),
+            icon: const Icon(LucideIcons200.x),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(l10n.editImage),
@@ -431,7 +431,7 @@ class ImageEditorState extends State<ImageEditor> {
         children: [
           Row(
             children: [
-              Icon(LucideIcons.crop, color: c.inkMuted),
+              Icon(LucideIcons200.crop, color: c.inkMuted),
               const SizedBox(width: Space.s3),
               Expanded(
                 child: Text(
@@ -442,7 +442,7 @@ class ImageEditorState extends State<ImageEditor> {
               IconButton(
                 key: const ValueKey('image-edit-close'),
                 tooltip: l10n.cancel,
-                icon: const Icon(LucideIcons.x),
+                icon: const Icon(LucideIcons200.x),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -489,7 +489,7 @@ class ImageEditorState extends State<ImageEditor> {
             children: [
               TextButton.icon(
                 key: const ValueKey('image-edit-reset'),
-                icon: const Icon(LucideIcons.rotateCcw, size: 18),
+                icon: const Icon(LucideIcons200.rotateCcw, size: 18),
                 label: Text(l10n.resetEdits),
                 onPressed: reset,
               ),
@@ -712,7 +712,7 @@ class _Settings extends StatelessWidget {
             if (phone)
               TextButton.icon(
                 key: const ValueKey('image-edit-reset'),
-                icon: const Icon(LucideIcons.rotateCcw, size: 16),
+                icon: const Icon(LucideIcons200.rotateCcw, size: 16),
                 label: Text(l10n.resetEdits),
                 onPressed: state.reset,
               ),
@@ -747,8 +747,8 @@ class _Settings extends StatelessWidget {
               key: const ValueKey('image-edit-lock'),
               tooltip: state.locked ? l10n.aspectLocked : l10n.aspectUnlocked,
               isSelected: state.locked,
-              icon: const Icon(LucideIcons.lockOpen),
-              selectedIcon: const Icon(LucideIcons.lock),
+              icon: const Icon(LucideIcons200.lockOpen),
+              selectedIcon: const Icon(LucideIcons200.lock),
               style: IconButton.styleFrom(
                 minimumSize: const Size.square(Sizes.target),
                 foregroundColor: c.inkMuted,
@@ -773,7 +773,7 @@ class _Settings extends StatelessWidget {
             Expanded(child: label(l10n.rotate)),
             OutlinedButton.icon(
               key: const ValueKey('image-edit-rotate-left'),
-              icon: const Icon(LucideIcons.rotateCcwSquare, size: 18),
+              icon: const Icon(LucideIcons200.rotateCcwSquare, size: 18),
               label: Tooltip(
                 message: l10n.rotateLeft,
                 child: Text(l10n.rotateLeftShort),
@@ -783,7 +783,7 @@ class _Settings extends StatelessWidget {
             const SizedBox(width: Space.s2),
             OutlinedButton.icon(
               key: const ValueKey('image-edit-rotate-right'),
-              icon: const Icon(LucideIcons.rotateCwSquare, size: 18),
+              icon: const Icon(LucideIcons200.rotateCwSquare, size: 18),
               label: Tooltip(
                 message: l10n.rotateRight,
                 child: Text(l10n.rotateRightShort),

@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -244,7 +244,7 @@ class _Hint extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(LucideIcons.camera, size: 20, color: c.accent),
+              Icon(LucideIcons200.camera, size: 20, color: c.accent),
               const SizedBox(width: Space.s2),
               Flexible(
                 child: Text(
@@ -257,7 +257,7 @@ class _Hint extends StatelessWidget {
               IconButton(
                 key: const ValueKey('capture-close'),
                 tooltip: '${l10n.close} (Esc)',
-                icon: const Icon(LucideIcons.x),
+                icon: const Icon(LucideIcons200.x),
                 onPressed: onClose,
               ),
             ],
@@ -284,12 +284,12 @@ class _Bar extends StatelessWidget {
     final c = context.colors;
     final l10n = AppLocalizations.of(context);
     final actions = [
-      (CaptureAction.copy, LucideIcons.copy, l10n.copy, null),
-      (CaptureAction.save, LucideIcons.download, l10n.captureSave, null),
-      (CaptureAction.share, LucideIcons.share2, l10n.captureShare, null),
+      (CaptureAction.copy, LucideIcons200.copy, l10n.copy, null),
+      (CaptureAction.save, LucideIcons200.download, l10n.captureSave, null),
+      (CaptureAction.share, LucideIcons200.share2, l10n.captureShare, null),
       (
         CaptureAction.newPage,
-        LucideIcons.filePlus2,
+        LucideIcons200.filePlus2,
         l10n.captureToNewPage,
         l10n.captureToNewPageHint,
       ),

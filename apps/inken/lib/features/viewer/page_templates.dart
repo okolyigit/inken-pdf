@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inken_core/inken_core.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -16,11 +16,11 @@ String pageTemplateLabel(AppLocalizations l10n, PageTemplate t) => switch (t) {
 };
 
 IconData pageTemplateIcon(PageTemplate t) => switch (t) {
-  PageTemplate.blank => LucideIcons.file,
-  PageTemplate.grid => LucideIcons.grid3x3,
-  PageTemplate.dotted => LucideIcons.gripHorizontal,
-  PageTemplate.lined => LucideIcons.alignJustify,
-  PageTemplate.coordinate => LucideIcons.chartScatter,
+  PageTemplate.blank => LucideIcons200.file,
+  PageTemplate.grid => LucideIcons200.grid3x3,
+  PageTemplate.dotted => LucideIcons200.gripHorizontal,
+  PageTemplate.lined => LucideIcons200.alignJustify,
+  PageTemplate.coordinate => LucideIcons200.chartScatter,
 };
 
 /// Kâğıt rengi adı.
@@ -55,8 +55,8 @@ List<Widget> pageInsertMenuChildren(
           ? null
           : (v) => onOrientation(v!),
       trailingIcon: Icon(switch (o) {
-        PageOrientation.portrait => LucideIcons.rectangleVertical,
-        PageOrientation.landscape => LucideIcons.rectangleHorizontal,
+        PageOrientation.portrait => LucideIcons200.rectangleVertical,
+        PageOrientation.landscape => LucideIcons200.rectangleHorizontal,
       }, size: 18),
       child: Text(switch (o) {
         PageOrientation.portrait => l10n.orientationPortrait,

@@ -1,6 +1,6 @@
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -92,7 +92,7 @@ class _PdfDropTargetState extends State<PdfDropTarget> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(LucideIcons.fileDown, size: 48, color: c.brand),
+                        Icon(LucideIcons200.fileDown, size: 48, color: c.brand),
                         const SizedBox(height: Space.s3),
                         Text(
                           widget.onImage == null

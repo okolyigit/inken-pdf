@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -67,13 +67,17 @@ class _SettingsPageState extends State<SettingsPage> {
     final sections = [
       (
         SettingsSection.appearance,
-        LucideIcons.palette,
+        LucideIcons200.palette,
         l10n.settingsAppearance,
       ),
-      (SettingsSection.input, LucideIcons.penLine, l10n.settingsInput),
-      (SettingsSection.shortcuts, LucideIcons.keyboard, l10n.settingsShortcuts),
-      (SettingsSection.about, LucideIcons.info, l10n.settingsAbout),
-      (SettingsSection.info, LucideIcons.clipboardList, l10n.settingsInfo),
+      (SettingsSection.input, LucideIcons200.penLine, l10n.settingsInput),
+      (
+        SettingsSection.shortcuts,
+        LucideIcons200.keyboard,
+        l10n.settingsShortcuts,
+      ),
+      (SettingsSection.about, LucideIcons200.info, l10n.settingsAbout),
+      (SettingsSection.info, LucideIcons200.clipboardList, l10n.settingsInfo),
     ];
 
     Widget tab((SettingsSection, IconData, String) s, {required bool row}) {
@@ -211,7 +215,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         key: const ValueKey('settings-close'),
                         tooltip: MaterialLocalizations.of(context)
                             .backButtonTooltip,
-                        icon: const Icon(LucideIcons.arrowLeft),
+                        icon: const Icon(LucideIcons200.arrowLeft),
                         onPressed: () => Navigator.maybePop(context),
                       ),
                       const SizedBox(width: Space.s2),
@@ -322,9 +326,9 @@ class _AppearanceSection extends ConsumerWidget {
                 (
                   m,
                   switch (m) {
-                    ThemeMode.light => LucideIcons.sun,
-                    ThemeMode.dark => LucideIcons.moon,
-                    ThemeMode.system => LucideIcons.monitor,
+                    ThemeMode.light => LucideIcons200.sun,
+                    ThemeMode.dark => LucideIcons200.moon,
+                    ThemeMode.system => LucideIcons200.monitor,
                   },
                   label,
                 ),
@@ -342,8 +346,8 @@ class _AppearanceSection extends ConsumerWidget {
                 (
                   s,
                   switch (s) {
-                    UiScale.normal => LucideIcons.monitor,
-                    UiScale.large => LucideIcons.zoomIn,
+                    UiScale.normal => LucideIcons200.monitor,
+                    UiScale.large => LucideIcons200.zoomIn,
                   },
                   label,
                 ),
@@ -361,8 +365,8 @@ class _AppearanceSection extends ConsumerWidget {
                 (
                   language,
                   language == AppLanguage.system
-                      ? LucideIcons.monitor
-                      : LucideIcons.languages,
+                      ? LucideIcons200.monitor
+                      : LucideIcons200.languages,
                   label,
                 ),
             ],
@@ -606,7 +610,7 @@ class _AboutSection extends ConsumerWidget {
               padding: const EdgeInsets.all(Space.s3),
               child: Row(
                 children: [
-                  Icon(LucideIcons.gitBranch, color: c.ink),
+                  Icon(LucideIcons200.gitBranch, color: c.ink),
                   const SizedBox(width: Space.s3),
                   Expanded(
                     child: Column(
@@ -627,7 +631,11 @@ class _AboutSection extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  Icon(LucideIcons.externalLink, size: 18, color: c.inkMuted),
+                  Icon(
+                    LucideIcons200.externalLink,
+                    size: 18,
+                    color: c.inkMuted,
+                  ),
                 ],
               ),
             ),
@@ -657,20 +665,20 @@ class _AboutSection extends ConsumerWidget {
           children: [
             OutlinedButton.icon(
               key: const ValueKey('about-bug-report'),
-              icon: const Icon(LucideIcons.bug, size: 18),
+              icon: const Icon(LucideIcons200.bug, size: 18),
               label: Text(l10n.bugReport),
               onPressed: () =>
                   reportBug(context, appInfoText(l10n.appTitle, infoRows)),
             ),
             OutlinedButton.icon(
               key: const ValueKey('about-share-app'),
-              icon: const Icon(LucideIcons.share2, size: 18),
+              icon: const Icon(LucideIcons200.share2, size: 18),
               label: Text(l10n.shareApp),
               onPressed: () => shareApp(context),
             ),
             OutlinedButton.icon(
               key: const ValueKey('about-licenses'),
-              icon: const Icon(LucideIcons.scrollText, size: 18),
+              icon: const Icon(LucideIcons200.scrollText, size: 18),
               label: Text(l10n.aboutLicenses),
               onPressed: () => showLicensePage(
                 context: context,
@@ -685,7 +693,7 @@ class _AboutSection extends ConsumerWidget {
             ),
             OutlinedButton.icon(
               key: const ValueKey('about-info'),
-              icon: const Icon(LucideIcons.clipboardList, size: 18),
+              icon: const Icon(LucideIcons200.clipboardList, size: 18),
               label: Text(l10n.settingsInfo),
               onPressed: () => context
                   .findAncestorStateOfType<_SettingsPageState>()
@@ -783,7 +791,7 @@ class _InfoSection extends ConsumerWidget {
           children: [
             FilledButton.icon(
               key: const ValueKey('info-copy'),
-              icon: const Icon(LucideIcons.copy, size: 18),
+              icon: const Icon(LucideIcons200.copy, size: 18),
               label: Text(l10n.infoCopy),
               onPressed: () async {
                 final messenger = ScaffoldMessenger.of(context);
@@ -797,7 +805,7 @@ class _InfoSection extends ConsumerWidget {
             ),
             OutlinedButton.icon(
               key: const ValueKey('info-bug-report'),
-              icon: const Icon(LucideIcons.bug, size: 18),
+              icon: const Icon(LucideIcons200.bug, size: 18),
               label: Text(l10n.bugReport),
               onPressed: () =>
                   reportBug(context, appInfoText(l10n.appTitle, rows)),

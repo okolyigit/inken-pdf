@@ -46,7 +46,8 @@ void main() {
     expect(
       find.descendant(
         of: select,
-        matching: find.byIcon(toolIcon(Tool.textSelect)),
+        // Seçili düğmede ikon bir kademe kalın.
+        matching: find.byIcon(selectedIcon(toolIcon(Tool.textSelect))),
       ),
       findsOneWidget,
     );

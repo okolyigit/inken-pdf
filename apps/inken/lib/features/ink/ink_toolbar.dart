@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inken_pdf/inken_pdf.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -186,13 +186,13 @@ class _ToolDockState extends ConsumerState<ToolDock> {
           IconButton(
             key: const ValueKey('undo'),
             tooltip: '${l10n.undo} (Ctrl+Z)',
-            icon: const Icon(LucideIcons.undo2),
+            icon: const Icon(LucideIcons200.undo2),
             onPressed: session?.canUndo ?? false ? session!.undo : null,
           ),
           IconButton(
             key: const ValueKey('redo'),
             tooltip: '${l10n.redo} (Ctrl+Y)',
-            icon: const Icon(LucideIcons.redo2),
+            icon: const Icon(LucideIcons200.redo2),
             onPressed: session?.canRedo ?? false ? session!.redo : null,
           ),
         ],
@@ -504,7 +504,10 @@ class ToolButton extends StatelessWidget {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(bottom: ink == null ? 0 : 6),
-                    child: Icon(icon, color: fg),
+                    child: Icon(
+                      selected ? selectedIcon(icon) : icon,
+                      color: fg,
+                    ),
                   ),
                   if (ink != null)
                     Positioned(
@@ -771,7 +774,7 @@ class _PageNavState extends State<PageNav> {
                   key: const ValueKey('page-prev'),
                   tooltip: l10n.previousPage,
                   style: ButtonStyle(shape: pill),
-                  icon: const Icon(LucideIcons.chevronLeft),
+                  icon: const Icon(LucideIcons200.chevronLeft),
                   onPressed: page != null && page > 0
                       ? () => viewer.goToPage(page - 1)
                       : null,
@@ -797,7 +800,7 @@ class _PageNavState extends State<PageNav> {
                   key: const ValueKey('page-next'),
                   tooltip: l10n.nextPage,
                   style: ButtonStyle(shape: pill),
-                  icon: const Icon(LucideIcons.chevronRight),
+                  icon: const Icon(LucideIcons200.chevronRight),
                   onPressed: page != null && page < count - 1
                       ? () => viewer.goToPage(page + 1)
                       : null,
@@ -865,7 +868,7 @@ class ZoomControl extends StatelessWidget {
                 key: const ValueKey('zoom-out'),
                 tooltip: '${l10n.zoomOut} (Ctrl+−)',
                 style: pill,
-                icon: const Icon(LucideIcons.minus),
+                icon: const Icon(LucideIcons200.minus),
                 onPressed: usable && zoom > min ? viewer.zoomOut : null,
               ),
               if (slider)
@@ -883,7 +886,7 @@ class ZoomControl extends StatelessWidget {
                 key: const ValueKey('zoom-in'),
                 tooltip: '${l10n.zoomIn} (Ctrl+=)',
                 style: pill,
-                icon: const Icon(LucideIcons.plus),
+                icon: const Icon(LucideIcons200.plus),
                 onPressed: usable && zoom < max ? viewer.zoomIn : null,
               ),
               // Yüzdeye dokunmak sığdırma seçeneklerini açar.
@@ -891,19 +894,19 @@ class ZoomControl extends StatelessWidget {
                 menuChildren: [
                   MenuItemButton(
                     key: const ValueKey('zoom-fit-page'),
-                    leadingIcon: const Icon(LucideIcons.scan),
+                    leadingIcon: const Icon(LucideIcons200.scan),
                     onPressed: viewer.fitPage,
                     child: Text('${l10n.fitPage} (Ctrl+0)'),
                   ),
                   MenuItemButton(
                     key: const ValueKey('zoom-fit-width'),
-                    leadingIcon: const Icon(LucideIcons.moveHorizontal),
+                    leadingIcon: const Icon(LucideIcons200.moveHorizontal),
                     onPressed: viewer.fitWidth,
                     child: Text('${l10n.fitWidth} (Ctrl+2)'),
                   ),
                   MenuItemButton(
                     key: const ValueKey('zoom-actual-size'),
-                    leadingIcon: const Icon(LucideIcons.ratio),
+                    leadingIcon: const Icon(LucideIcons200.ratio),
                     onPressed: () => viewer.setZoom(1),
                     child: Text('${l10n.actualSize} (Ctrl+1)'),
                   ),
@@ -995,8 +998,8 @@ class _DockGrip extends StatelessWidget {
                 dimension: Sizes.target,
                 child: Icon(
                   vertical
-                      ? LucideIcons.gripHorizontal
-                      : LucideIcons.gripVertical,
+                      ? LucideIcons200.gripHorizontal
+                      : LucideIcons200.gripVertical,
                   size: 20,
                   color: c.inkMuted,
                 ),

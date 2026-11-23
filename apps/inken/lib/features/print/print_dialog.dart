@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../platform/print_service.dart';
@@ -373,8 +373,8 @@ class PrintDialogState extends State<PrintDialog> {
       key: const ValueKey('print-submit'),
       icon: Icon(
         widget.service.choosesPrinter
-            ? LucideIcons.printer
-            : LucideIcons.chevronRight,
+            ? LucideIcons200.printer
+            : LucideIcons200.chevronRight,
         size: 18,
       ),
       label: Text(printLabel),
@@ -389,7 +389,7 @@ class PrintDialogState extends State<PrintDialog> {
           leading: IconButton(
             key: const ValueKey('print-cancel'),
             tooltip: l10n.cancel,
-            icon: const Icon(LucideIcons.x),
+            icon: const Icon(LucideIcons200.x),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(l10n.printTitle),
@@ -450,7 +450,7 @@ class PrintDialogState extends State<PrintDialog> {
         children: [
           Row(
             children: [
-              Icon(LucideIcons.printer, color: c.inkMuted),
+              Icon(LucideIcons200.printer, color: c.inkMuted),
               const SizedBox(width: Space.s3),
               Expanded(
                 child: Text(
@@ -461,7 +461,7 @@ class PrintDialogState extends State<PrintDialog> {
               IconButton(
                 key: const ValueKey('print-close'),
                 tooltip: l10n.cancel,
-                icon: const Icon(LucideIcons.x),
+                icon: const Icon(LucideIcons200.x),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -610,7 +610,7 @@ class _Preview extends StatelessWidget {
               IconButton.outlined(
                 key: const ValueKey('print-prev'),
                 tooltip: l10n.printPrevPage,
-                icon: const Icon(LucideIcons.chevronLeft, size: 18),
+                icon: const Icon(LucideIcons200.chevronLeft, size: 18),
                 onPressed: at > 0 ? () => state.showPage(at - 1) : null,
               ),
               const SizedBox(width: Space.s2),
@@ -623,7 +623,7 @@ class _Preview extends StatelessWidget {
               IconButton.outlined(
                 key: const ValueKey('print-next'),
                 tooltip: l10n.printNextPage,
-                icon: const Icon(LucideIcons.chevronRight, size: 18),
+                icon: const Icon(LucideIcons200.chevronRight, size: 18),
                 onPressed: at < list.length - 1
                     ? () => state.showPage(at + 1)
                     : null,
@@ -730,7 +730,7 @@ class _Settings extends StatelessWidget {
                   key: const ValueKey('print-copies-down'),
                   tooltip: l10n.printDecrease,
                   visualDensity: VisualDensity.compact,
-                  icon: const Icon(LucideIcons.minus, size: 18),
+                  icon: const Icon(LucideIcons200.minus, size: 18),
                   onPressed: state.copies > 1
                       ? () => state.setCopies(state.copies - 1)
                       : null,
@@ -748,7 +748,7 @@ class _Settings extends StatelessWidget {
                   key: const ValueKey('print-copies-up'),
                   tooltip: l10n.printIncrease,
                   visualDensity: VisualDensity.compact,
-                  icon: const Icon(LucideIcons.plus, size: 18),
+                  icon: const Icon(LucideIcons200.plus, size: 18),
                   onPressed: state.copies < 99
                       ? () => state.setCopies(state.copies + 1)
                       : null,
@@ -865,7 +865,7 @@ class _MoreOptions extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  LucideIcons.slidersHorizontal,
+                  LucideIcons200.slidersHorizontal,
                   size: 18,
                   color: c.inkMuted,
                 ),
@@ -888,7 +888,9 @@ class _MoreOptions extends StatelessWidget {
                   ),
                 ),
                 Icon(
-                  state.more ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                  state.more
+                      ? LucideIcons200.chevronUp
+                      : LucideIcons200.chevronDown,
                   size: 18,
                   color: c.inkMuted,
                 ),
@@ -1001,7 +1003,7 @@ class _MoreOptions extends StatelessWidget {
                 message: l10n.printPropertiesHint,
                 child: TextButton.icon(
                   key: const ValueKey('print-properties'),
-                  icon: const Icon(LucideIcons.printer, size: 18),
+                  icon: const Icon(LucideIcons200.printer, size: 18),
                   label: Text(l10n.printProperties),
                   onPressed: () =>
                       state.widget.service.printerProperties(state.printer!),

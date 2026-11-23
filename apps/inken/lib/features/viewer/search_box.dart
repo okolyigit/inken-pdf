@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inken_pdf/inken_pdf.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -118,7 +118,7 @@ class SearchBoxState extends State<SearchBox> {
               : l10n.searchCount(index == null ? 0 : index + 1, count);
           return Row(
             children: [
-              Icon(LucideIcons.search, size: 18, color: c.inkMuted),
+              Icon(LucideIcons200.search, size: 18, color: c.inkMuted),
               const SizedBox(width: Space.s2),
               Expanded(
                 child: Focus(
@@ -155,21 +155,21 @@ class SearchBoxState extends State<SearchBox> {
                 key: const ValueKey('search-previous'),
                 tooltip: '${l10n.searchPrevious} (Shift+Enter)',
                 style: pill,
-                icon: const Icon(LucideIcons.chevronUp),
+                icon: const Icon(LucideIcons200.chevronUp),
                 onPressed: count > 0 ? () => _step(s.previous) : null,
               ),
               IconButton(
                 key: const ValueKey('search-next'),
                 tooltip: '${l10n.searchNext} (Enter)',
                 style: pill,
-                icon: const Icon(LucideIcons.chevronDown),
+                icon: const Icon(LucideIcons200.chevronDown),
                 onPressed: count > 0 ? () => _step(s.next) : null,
               ),
               IconButton(
                 key: const ValueKey('search-close'),
                 tooltip: '${l10n.searchClose} (Esc)',
                 style: pill,
-                icon: const Icon(LucideIcons.x),
+                icon: const Icon(LucideIcons200.x),
                 onPressed: widget.onClose,
               ),
             ],

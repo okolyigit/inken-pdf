@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart' show ImageEncoding;
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/dialog_form.dart';
@@ -267,7 +267,7 @@ class ExportDialogState extends State<ExportDialog> {
     final settings = _Settings(state: this);
     final submit = FilledButton.icon(
       key: const ValueKey('export-submit'),
-      icon: const Icon(LucideIcons.fileDown, size: 18),
+      icon: const Icon(LucideIcons200.fileDown, size: 18),
       label: Text(l10n.exportTitle),
       onPressed: canExport ? _submit : null,
     );
@@ -285,7 +285,7 @@ class ExportDialogState extends State<ExportDialog> {
           leading: IconButton(
             key: const ValueKey('export-cancel'),
             tooltip: l10n.cancel,
-            icon: const Icon(LucideIcons.x),
+            icon: const Icon(LucideIcons200.x),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(l10n.exportTitle),
@@ -346,7 +346,7 @@ class ExportDialogState extends State<ExportDialog> {
         children: [
           Row(
             children: [
-              Icon(LucideIcons.fileDown, color: c.inkMuted),
+              Icon(LucideIcons200.fileDown, color: c.inkMuted),
               const SizedBox(width: Space.s3),
               Expanded(
                 child: Text(
@@ -357,7 +357,7 @@ class ExportDialogState extends State<ExportDialog> {
               IconButton(
                 key: const ValueKey('export-close'),
                 tooltip: l10n.cancel,
-                icon: const Icon(LucideIcons.x),
+                icon: const Icon(LucideIcons200.x),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -493,7 +493,7 @@ class _Preview extends StatelessWidget {
               IconButton.outlined(
                 key: const ValueKey('export-prev'),
                 tooltip: l10n.printPrevPage,
-                icon: const Icon(LucideIcons.chevronLeft, size: 18),
+                icon: const Icon(LucideIcons200.chevronLeft, size: 18),
                 onPressed: at > 0 ? () => state.showPage(at - 1) : null,
               ),
               const SizedBox(width: Space.s2),
@@ -506,7 +506,7 @@ class _Preview extends StatelessWidget {
               IconButton.outlined(
                 key: const ValueKey('export-next'),
                 tooltip: l10n.printNextPage,
-                icon: const Icon(LucideIcons.chevronRight, size: 18),
+                icon: const Icon(LucideIcons200.chevronRight, size: 18),
                 onPressed: at < list.length - 1
                     ? () => state.showPage(at + 1)
                     : null,
@@ -556,17 +556,17 @@ class _Settings extends StatelessWidget {
             options: [
               (
                 ExportFormat.flattened,
-                phone ? null : LucideIcons.fileCheck,
+                phone ? null : LucideIcons200.fileCheck,
                 l10n.exportFormatFlattenedShort,
               ),
               (
                 ExportFormat.editable,
-                phone ? null : LucideIcons.filePen,
+                phone ? null : LucideIcons200.filePen,
                 l10n.exportFormatEditableShort,
               ),
               (
                 ExportFormat.images,
-                phone ? null : LucideIcons.fileImage,
+                phone ? null : LucideIcons200.fileImage,
                 l10n.exportFormatImages,
               ),
             ],
@@ -633,7 +633,7 @@ class _Settings extends StatelessWidget {
                     label: l10n.exportHideImages,
                     hidden: state.hideImages,
                     onTap: state.toggleImages,
-                    icon: LucideIcons.image,
+                    icon: LucideIcons200.image,
                     text: l10n.exportHideImages,
                   ),
               ],
@@ -760,7 +760,7 @@ class _HideToggle extends StatelessWidget {
                 ),
               ),
             ),
-            if (hidden) Icon(LucideIcons.eyeOff, size: 16, color: c.ink),
+            if (hidden) Icon(LucideIcons200.eyeOff, size: 16, color: c.ink),
           ],
         ),
       );
@@ -769,7 +769,7 @@ class _HideToggle extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            hidden ? LucideIcons.eyeOff : icon,
+            hidden ? LucideIcons200.eyeOff : icon,
             size: 18,
             color: hidden ? c.ink : c.inkMuted,
           ),

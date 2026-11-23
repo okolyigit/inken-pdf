@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inken_core/inken_core.dart';
 import 'package:inken_pdf/inken_pdf.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../platform/window_title.dart';
@@ -355,7 +355,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       fileExtras: [
         if (recents.isNotEmpty)
           SubmenuButton(
-            leadingIcon: const Icon(LucideIcons.history),
+            leadingIcon: const Icon(LucideIcons200.history),
             menuChildren: [
               for (final r in recents.take(8))
                 MenuItemButton(
@@ -430,7 +430,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final openButton = FilledButton.icon(
       key: const ValueKey('home-open'),
       onPressed: _open,
-      icon: const Icon(LucideIcons.folderOpen),
+      icon: const Icon(LucideIcons200.folderOpen),
       label: Text(l10n.openPdf),
       style: FilledButton.styleFrom(minimumSize: const Size(160, 48)),
     );
@@ -691,7 +691,7 @@ class _RecentCardState extends ConsumerState<_RecentCard> {
                 menuChildren: [
                   MenuItemButton(
                     key: const ValueKey('recent-remove'),
-                    leadingIcon: const Icon(LucideIcons.x),
+                    leadingIcon: const Icon(LucideIcons200.x),
                     onPressed: widget.onRemove,
                     child: Text(l10n.recentRemove),
                   ),
@@ -702,7 +702,7 @@ class _RecentCardState extends ConsumerState<_RecentCard> {
                     backgroundColor: c.surfaceRaised.withValues(alpha: 0.9),
                   ),
                   icon: Icon(
-                    LucideIcons.ellipsisVertical,
+                    LucideIcons200.ellipsisVertical,
                     size: 18,
                     color: c.inkMuted,
                   ),
@@ -759,7 +759,7 @@ class _RecentCardState extends ConsumerState<_RecentCard> {
   Widget _placeholder(InkenColors c) => ColoredBox(
     color: c.surfaceRaised,
     child: Center(
-      child: Icon(LucideIcons.fileText, size: 40, color: c.inkFaint),
+      child: Icon(LucideIcons200.fileText, size: 40, color: c.inkFaint),
     ),
   );
 }

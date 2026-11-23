@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../platform/link_opener.dart';
@@ -102,7 +102,7 @@ class _BugReportDialog extends StatelessWidget {
           children: [
             _ChannelTile(
               key: const ValueKey('bug-report-email'),
-              icon: LucideIcons.mail,
+              icon: LucideIcons200.mail,
               title: l10n.bugReportEmail,
               hint: l10n.bugReportEmailHint(feedbackEmail),
               channel: BugReportChannel.email,
@@ -110,7 +110,7 @@ class _BugReportDialog extends StatelessWidget {
             const SizedBox(height: Space.s2),
             _ChannelTile(
               key: const ValueKey('bug-report-github'),
-              icon: LucideIcons.gitBranch,
+              icon: LucideIcons200.gitBranch,
               title: l10n.bugReportGitHub,
               hint: l10n.bugReportGitHubHint,
               channel: BugReportChannel.github,

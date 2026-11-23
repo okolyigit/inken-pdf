@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inken_core/inken_core.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/logo.dart';
@@ -45,7 +45,7 @@ List<Widget> viewSettingsMenuItems(WidgetRef ref, AppLocalizations l10n) => [
   // üstte: alt menü aşağıya sığsın (sığmazsa Flutter satırın üstüne açar).
   SubmenuButton(
     key: const ValueKey('menu-bars'),
-    leadingIcon: const Icon(LucideIcons.panelsTopLeft),
+    leadingIcon: const Icon(LucideIcons200.panelsTopLeft),
     menuChildren: [
       SubmenuButton(
         menuChildren: [
@@ -90,7 +90,7 @@ List<Widget> viewSettingsMenuItems(WidgetRef ref, AppLocalizations l10n) => [
     child: Text(l10n.menuBars),
   ),
   SubmenuButton(
-    leadingIcon: const Icon(LucideIcons.palette),
+    leadingIcon: const Icon(LucideIcons200.palette),
     menuChildren: [
       for (final (mode, label) in themeChoices(l10n))
         RadioMenuButton<ThemeMode>(
@@ -106,12 +106,12 @@ List<Widget> viewSettingsMenuItems(WidgetRef ref, AppLocalizations l10n) => [
     key: const ValueKey('menu-night-mode'),
     value: ref.watch(nightModeProvider),
     onChanged: (v) => ref.read(nightModeProvider.notifier).set(v!),
-    trailingIcon: const Icon(LucideIcons.moon, size: 18),
+    trailingIcon: const Icon(LucideIcons200.moon, size: 18),
     child: Text(l10n.nightMode),
   ),
   SubmenuButton(
     key: const ValueKey('menu-ui-scale'),
-    leadingIcon: const Icon(LucideIcons.scaling),
+    leadingIcon: const Icon(LucideIcons200.scaling),
     menuChildren: [
       for (final (s, label) in uiScaleChoices(l10n))
         RadioMenuButton<UiScale>(
@@ -126,7 +126,7 @@ List<Widget> viewSettingsMenuItems(WidgetRef ref, AppLocalizations l10n) => [
   ),
   SubmenuButton(
     key: const ValueKey('menu-language'),
-    leadingIcon: const Icon(LucideIcons.languages),
+    leadingIcon: const Icon(LucideIcons200.languages),
     menuChildren: [
       for (final (language, label) in languageChoices(l10n))
         RadioMenuButton<AppLanguage>(
@@ -405,13 +405,13 @@ List<Widget> appMenus(
       style: barStyle,
       menuChildren: [
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.filePlus),
+          leadingIcon: const Icon(LucideIcons200.filePlus),
           shortcut: key(LogicalKeyboardKey.keyN, control: true),
           onPressed: onNew,
           child: Text(l10n.newDocument),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.folderOpen),
+          leadingIcon: const Icon(LucideIcons200.folderOpen),
           shortcut: key(LogicalKeyboardKey.keyO, control: true),
           onPressed: onOpen,
           child: Text(l10n.openPdfMenu),
@@ -419,51 +419,51 @@ List<Widget> appMenus(
         ...fileExtras,
         sep,
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.save),
+          leadingIcon: const Icon(LucideIcons200.save),
           shortcut: key(LogicalKeyboardKey.keyS, control: true),
           onPressed: a.save,
           child: Text(l10n.save),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.saveAll),
+          leadingIcon: const Icon(LucideIcons200.saveAll),
           shortcut: key(LogicalKeyboardKey.keyS, control: true, shift: true),
           onPressed: a.saveAs,
           child: Text(l10n.saveAs),
         ),
         MenuItemButton(
           key: const ValueKey('menu-export'),
-          leadingIcon: const Icon(LucideIcons.fileDown),
+          leadingIcon: const Icon(LucideIcons200.fileDown),
           shortcut: key(LogicalKeyboardKey.keyE, control: true),
           onPressed: a.export,
           child: Text(l10n.exportMenu),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.printer),
+          leadingIcon: const Icon(LucideIcons200.printer),
           shortcut: key(LogicalKeyboardKey.keyP, control: true),
           onPressed: a.print,
           child: Text(l10n.printDocument),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.share2),
+          leadingIcon: const Icon(LucideIcons200.share2),
           onPressed: a.share,
           child: Text(l10n.shareDocument),
         ),
         MenuItemButton(
           key: const ValueKey('menu-share-page-image'),
-          leadingIcon: const Icon(LucideIcons.fileImage),
+          leadingIcon: const Icon(LucideIcons200.fileImage),
           onPressed: a.sharePageImage,
           child: Text(l10n.sharePageImage),
         ),
         MenuItemButton(
           key: const ValueKey('menu-properties'),
-          leadingIcon: const Icon(LucideIcons.fileText),
+          leadingIcon: const Icon(LucideIcons200.fileText),
           shortcut: key(LogicalKeyboardKey.keyD, control: true),
           onPressed: a.properties,
           child: Text(l10n.documentProperties),
         ),
         sep,
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.x),
+          leadingIcon: const Icon(LucideIcons200.x),
           shortcut: key(LogicalKeyboardKey.keyW, control: true),
           onPressed: a.close,
           child: Text(l10n.closeDocument),
@@ -475,70 +475,70 @@ List<Widget> appMenus(
       style: barStyle,
       menuChildren: [
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.undo2),
+          leadingIcon: const Icon(LucideIcons200.undo2),
           shortcut: key(LogicalKeyboardKey.keyZ, control: true),
           onPressed: a.undo,
           child: Text(l10n.undo),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.redo2),
+          leadingIcon: const Icon(LucideIcons200.redo2),
           shortcut: key(LogicalKeyboardKey.keyY, control: true),
           onPressed: a.redo,
           child: Text(l10n.redo),
         ),
         sep,
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.scissors),
+          leadingIcon: const Icon(LucideIcons200.scissors),
           shortcut: key(LogicalKeyboardKey.keyX, control: true),
           onPressed: a.cut,
           child: Text(l10n.cut),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.copy),
+          leadingIcon: const Icon(LucideIcons200.copy),
           shortcut: key(LogicalKeyboardKey.keyC, control: true),
           onPressed: a.copy,
           child: Text(l10n.copy),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.clipboardPaste),
+          leadingIcon: const Icon(LucideIcons200.clipboardPaste),
           shortcut: key(LogicalKeyboardKey.keyV, control: true),
           onPressed: a.paste,
           child: Text(l10n.paste),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.squareDashedMousePointer),
+          leadingIcon: const Icon(LucideIcons200.squareDashedMousePointer),
           shortcut: key(LogicalKeyboardKey.keyA, control: true),
           onPressed: a.selectAll,
           child: Text(l10n.selectAll),
         ),
         MenuItemButton(
           key: const ValueKey('menu-find'),
-          leadingIcon: const Icon(LucideIcons.search),
+          leadingIcon: const Icon(LucideIcons200.search),
           shortcut: key(LogicalKeyboardKey.keyF, control: true),
           onPressed: a.find,
           child: Text(l10n.find),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.imagePlus),
+          leadingIcon: const Icon(LucideIcons200.imagePlus),
           onPressed: a.insertImage,
           child: Text(l10n.insertImage),
         ),
         MenuItemButton(
           key: const ValueKey('menu-capture'),
-          leadingIcon: const Icon(LucideIcons.camera),
+          leadingIcon: const Icon(LucideIcons200.camera),
           shortcut: key(LogicalKeyboardKey.keyC, control: true, shift: true),
           onPressed: a.capture,
           child: Text(l10n.captureRegion),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.trash2),
+          leadingIcon: const Icon(LucideIcons200.trash2),
           shortcut: key(LogicalKeyboardKey.delete),
           onPressed: a.deleteSelection,
           child: Text(l10n.deleteSelection),
         ),
         sep,
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.settings),
+          leadingIcon: const Icon(LucideIcons200.settings),
           shortcut: key(LogicalKeyboardKey.comma, control: true),
           onPressed: onSettings,
           child: Text(l10n.settingsMenu),
@@ -550,34 +550,34 @@ List<Widget> appMenus(
       style: barStyle,
       menuChildren: [
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.zoomIn),
+          leadingIcon: const Icon(LucideIcons200.zoomIn),
           shortcut: key(LogicalKeyboardKey.equal, control: true),
           onPressed: a.zoomIn,
           child: Text(l10n.zoomIn),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.zoomOut),
+          leadingIcon: const Icon(LucideIcons200.zoomOut),
           shortcut: key(LogicalKeyboardKey.minus, control: true),
           onPressed: a.zoomOut,
           child: Text(l10n.zoomOut),
         ),
         MenuItemButton(
           key: const ValueKey('menu-fit-page'),
-          leadingIcon: const Icon(LucideIcons.scan),
+          leadingIcon: const Icon(LucideIcons200.scan),
           shortcut: key(LogicalKeyboardKey.digit0, control: true),
           onPressed: a.fitPage,
           child: Text(l10n.fitPage),
         ),
         MenuItemButton(
           key: const ValueKey('menu-fit-width'),
-          leadingIcon: const Icon(LucideIcons.moveHorizontal),
+          leadingIcon: const Icon(LucideIcons200.moveHorizontal),
           shortcut: key(LogicalKeyboardKey.digit2, control: true),
           onPressed: a.fitWidth,
           child: Text(l10n.fitWidth),
         ),
         MenuItemButton(
           key: const ValueKey('menu-actual-size'),
-          leadingIcon: const Icon(LucideIcons.ratio),
+          leadingIcon: const Icon(LucideIcons200.ratio),
           shortcut: key(LogicalKeyboardKey.digit1, control: true),
           onPressed: a.actualSize,
           child: Text(l10n.actualSize),
@@ -586,7 +586,7 @@ List<Widget> appMenus(
         ...viewSettingsMenuItems(ref, l10n),
         sep,
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.maximize),
+          leadingIcon: const Icon(LucideIcons200.maximize),
           shortcut: key(LogicalKeyboardKey.f11),
           onPressed: a.fullscreen,
           child: Text(l10n.fullscreen),
@@ -598,26 +598,26 @@ List<Widget> appMenus(
       style: barStyle,
       menuChildren: [
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.chevronLeft),
+          leadingIcon: const Icon(LucideIcons200.chevronLeft),
           shortcut: key(LogicalKeyboardKey.pageUp),
           onPressed: a.previousPage,
           child: Text(l10n.previousPage),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.chevronRight),
+          leadingIcon: const Icon(LucideIcons200.chevronRight),
           shortcut: key(LogicalKeyboardKey.pageDown),
           onPressed: a.nextPage,
           child: Text(l10n.nextPage),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.hash),
+          leadingIcon: const Icon(LucideIcons200.hash),
           shortcut: key(LogicalKeyboardKey.keyG, control: true),
           onPressed: a.goToPage,
           child: Text(l10n.goToPage),
         ),
         sep,
         SubmenuButton(
-          leadingIcon: const Icon(LucideIcons.filePlus2),
+          leadingIcon: const Icon(LucideIcons200.filePlus2),
           menuChildren: pageInsertMenuChildren(
             l10n,
             orientation: a.newPageOrientation,
@@ -629,18 +629,18 @@ List<Widget> appMenus(
           child: Text(l10n.insertPage),
         ),
         SubmenuButton(
-          leadingIcon: const Icon(LucideIcons.rotateCw),
+          leadingIcon: const Icon(LucideIcons200.rotateCw),
           menuChildren: [
             MenuItemButton(
               key: const ValueKey('menu-rotate-right'),
-              leadingIcon: const Icon(LucideIcons.rotateCw),
+              leadingIcon: const Icon(LucideIcons200.rotateCw),
               shortcut: key(LogicalKeyboardKey.keyR, control: true),
               onPressed: a.rotatePage == null ? null : () => a.rotatePage!(1),
               child: Text(l10n.rotateRight),
             ),
             MenuItemButton(
               key: const ValueKey('menu-rotate-left'),
-              leadingIcon: const Icon(LucideIcons.rotateCcw),
+              leadingIcon: const Icon(LucideIcons200.rotateCcw),
               shortcut: key(
                 LogicalKeyboardKey.keyR,
                 control: true,
@@ -653,7 +653,7 @@ List<Widget> appMenus(
           child: Text(l10n.rotatePage),
         ),
         MenuItemButton(
-          leadingIcon: const Icon(LucideIcons.fileMinus2),
+          leadingIcon: const Icon(LucideIcons200.fileMinus2),
           onPressed: a.deletePage,
           child: Text(l10n.deletePage),
         ),
@@ -702,12 +702,13 @@ List<Widget> appMenus(
 
 /// Yardım: kısayollar, uygulama bilgileri, hakkında (Ayarlar sayfasının
 /// ilgili sekmesini açar). Menülerde önlerinde "Başlarken" kılavuzu durur.
-List<(SettingsSection, IconData, String)> helpEntries(AppLocalizations l10n) =>
-    [
-      (SettingsSection.shortcuts, LucideIcons.keyboard, l10n.keyboardShortcuts),
-      (SettingsSection.info, LucideIcons.clipboardList, l10n.settingsInfo),
-      (SettingsSection.about, LucideIcons.info, l10n.aboutApp),
-    ];
+List<(SettingsSection, IconData, String)> helpEntries(
+  AppLocalizations l10n,
+) => [
+  (SettingsSection.shortcuts, LucideIcons200.keyboard, l10n.keyboardShortcuts),
+  (SettingsSection.info, LucideIcons200.clipboardList, l10n.settingsInfo),
+  (SettingsSection.about, LucideIcons200.info, l10n.aboutApp),
+];
 
 List<Widget> helpMenuItems(
   BuildContext context, {
@@ -715,7 +716,7 @@ List<Widget> helpMenuItems(
 }) => [
   MenuItemButton(
     key: const ValueKey('help-guide'),
-    leadingIcon: const Icon(LucideIcons.bookOpen),
+    leadingIcon: const Icon(LucideIcons200.bookOpen),
     onPressed: onGuide,
     child: Text(AppLocalizations.of(context).guideMenu),
   ),
@@ -730,7 +731,7 @@ List<Widget> helpMenuItems(
     ),
   MenuItemButton(
     key: const ValueKey('help-share-app'),
-    leadingIcon: const Icon(LucideIcons.share2),
+    leadingIcon: const Icon(LucideIcons200.share2),
     onPressed: () => shareApp(context),
     child: Text(AppLocalizations.of(context).shareApp),
   ),

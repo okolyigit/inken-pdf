@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inken_core/inken_core.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons_200.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../theme/tokens.dart';
@@ -109,7 +109,7 @@ class HomeIntro extends ConsumerWidget {
         key: const ValueKey('intro-text'),
       ),
       (
-        icon: LucideIcons.imagePlus,
+        icon: LucideIcons200.imagePlus,
         title: l10n.introImageTitle,
         keys: 'Ctrl+V',
         body: l10n.introImage,
@@ -130,7 +130,7 @@ class HomeIntro extends ConsumerWidget {
         key: const ValueKey('intro-hand'),
       ),
       (
-        icon: LucideIcons.undo2,
+        icon: LucideIcons200.undo2,
         title: '${l10n.undo} / ${l10n.redo}',
         keys: 'Ctrl+Z · Ctrl+Y',
         body: l10n.introUndo,
@@ -139,28 +139,28 @@ class HomeIntro extends ConsumerWidget {
     ];
     final lesson = <_Feature>[
       (
-        icon: LucideIcons.save,
+        icon: LucideIcons200.save,
         title: l10n.save,
         keys: 'Ctrl+S',
         body: l10n.introSave,
         key: const ValueKey('intro-save'),
       ),
       (
-        icon: LucideIcons.fileDown,
+        icon: LucideIcons200.fileDown,
         title: l10n.exportMenu,
         keys: null,
         body: l10n.introExport,
         key: const ValueKey('intro-export'),
       ),
       (
-        icon: LucideIcons.lifeBuoy,
+        icon: LucideIcons200.lifeBuoy,
         title: l10n.introBackupTitle,
         keys: null,
         body: l10n.introBackup,
         key: const ValueKey('intro-backup'),
       ),
       (
-        icon: LucideIcons.maximize,
+        icon: LucideIcons200.maximize,
         title: l10n.fullscreen,
         keys: 'F11',
         body: l10n.introFullscreen,
@@ -181,7 +181,7 @@ class HomeIntro extends ConsumerWidget {
         key: const ValueKey('intro-curtain'),
       ),
       (
-        icon: LucideIcons.bookOpen,
+        icon: LucideIcons200.bookOpen,
         title: l10n.introPagesTitle,
         keys: 'PgUp · PgDn · ${l10n.keySpace}',
         body: l10n.introPages,
