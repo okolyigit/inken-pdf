@@ -43,3 +43,14 @@ cd apps/inken && flutter build apk --release --split-per-abi
 `inken-release.jks` dosyasını ve parolaları güvenli bir yerde saklayın, depoya koymayın. Kaybolursa yayımlanmış uygulama bir daha aynı kimlikle güncellenemez.
 
 Google Play'e çıkarken Play App Signing kullanılır; yukarıdaki anahtar "yükleme anahtarı" olur. Uygulama kimliği (`com.inkenpdf.app`) yayından sonra değiştirilemez.
+
+## Google Play paketi (AAB)
+
+Play APK kabul etmez; CI aynı işte `flutter build appbundle --release` ile `InkenPDF-<sürüm>.aab` üretir, yükleme anahtarıyla imzalar ve ayrı `play` artifact'ine koyar (sürüm sayfasına eklenmez). Yerelde:
+
+```sh
+. ~/.local/share/inken-pdf-imza/imza.env
+cd apps/inken && flutter build appbundle --release
+```
+
+İmzayı doğrulamak: `keytool -printcert -jarfile build/app/outputs/bundle/release/app-release.aab` → SHA-256 yukarıdakiyle aynı olmalı. `versionCode` pubspec'teki `+` sonrası sayıdır; Play her yüklemede bir öncekinden büyük ister.

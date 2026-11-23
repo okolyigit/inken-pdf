@@ -164,6 +164,23 @@ jobs:
           INKEN_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           INKEN_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: flutter build apk --release --split-per-abi
+      # Google Play: tek .aab, yükleme anahtarıyla imzalı (Play App Signing).
+      # Sürüm sayfasına eklenmez; ayrı "play" artifact'i.
+      - name: AAB (Google Play)
+        working-directory: apps/inken
+        env:
+          INKEN_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          INKEN_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          INKEN_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          flutter build appbundle --release
+          version="$(sed -n 's/^version: *\([0-9.]*\)+\([0-9]*\).*/\1+\2/p' pubspec.yaml)"
+          mkdir -p ../../play
+          cp build/app/outputs/bundle/release/app-release.aab "../../play/InkenPDF-$version.aab"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: play
+          path: play/*.aab
       - name: Adlandır
         run: |
           version="$(sed -n 's/^version: *\([0-9.]*\)+\([0-9]*\).*/\1+\2/p' apps/inken/pubspec.yaml)"
