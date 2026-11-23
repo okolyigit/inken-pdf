@@ -54,6 +54,12 @@ class _FakeClipboard implements ClipboardService {
 
   @override
   Future<Uint8List?> readImage() async => image;
+
+  @override
+  Future<bool> writeImage(Uint8List png) async {
+    image = png;
+    return true;
+  }
 }
 
 /// 600x300 "ekran görüntüsü": sol yarı kırmızı, sağ yarı mavi.

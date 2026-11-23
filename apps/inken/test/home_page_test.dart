@@ -33,6 +33,7 @@ class _FakeIo extends DocumentIo {
     required String suggestedName,
     required String typeLabel,
     String? near,
+    SaveFormat format = SaveFormat.pdf,
   }) async => null;
 
   @override
@@ -415,7 +416,10 @@ void main() {
       await t.pumpAndSettle();
       expect(copied, startsWith('Inken PDF\nSürüm: '));
       expect(copied, contains('PDF motoru: pdfrx '));
-      expect(copied, contains('Kayıt formatı (inken.json): $currentFormatVersion'));
+      expect(
+        copied,
+        contains('Kayıt formatı (inken.json): $currentFormatVersion'),
+      );
       expect(find.text('Uygulama bilgileri panoya kopyalandı'), findsOneWidget);
 
       // Esc kapatır; çubuk kapalı kaldı.

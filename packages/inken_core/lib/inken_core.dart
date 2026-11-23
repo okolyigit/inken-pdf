@@ -11,6 +11,7 @@ export 'src/colors.dart';
 export 'src/coordinate_plane.dart';
 export 'src/instruments.dart';
 export 'src/backup.dart';
+export 'src/capture.dart';
 export 'src/geometry.dart';
 export 'src/history.dart';
 export 'src/image_edit.dart';

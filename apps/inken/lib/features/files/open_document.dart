@@ -228,16 +228,20 @@ String backupDisplayName(InkenBackup backup) {
   return decoded.split('/').last;
 }
 
-/// Dosya adından `.pdf` uzantısını atar.
-/// [name]'den güvenli bir PDF dosya adı: yol ve dosya sistemine yasak
-/// karakterler `_` olur, sonu `.pdf`.
-String safeFileName(String name) {
-  final base = withoutPdfExtension(name)
-      .replaceAll(RegExp(r'[\\/:*?"<>|\x00-\x1F]'), '_')
-      .trim();
-  return '${base.isEmpty ? 'Inken' : base}.pdf';
+/// [name]'den güvenli bir dosya adı: yol ve dosya sistemine yasak
+/// karakterler `_` olur, sonu `.<extension>` (varsayılan `.pdf`; adın
+/// sonundaki `.pdf` ya da aynı uzantı bir kez sayılır).
+String safeFileName(String name, {String extension = 'pdf'}) {
+  var base = withoutPdfExtension(name);
+  final ext = '.$extension';
+  if (base.toLowerCase().endsWith(ext)) {
+    base = base.substring(0, base.length - ext.length);
+  }
+  base = base.replaceAll(RegExp(r'[\\/:*?"<>|\x00-\x1F]'), '_').trim();
+  return '${base.isEmpty ? 'Inken' : base}$ext';
 }
 
+/// Dosya adından `.pdf` uzantısını atar.
 String withoutPdfExtension(String name) => name.toLowerCase().endsWith('.pdf')
     ? name.substring(0, name.length - 4)
     : name;
@@ -547,6 +551,28 @@ class OpenDocumentNotifier extends Notifier<OpenDocument?> {
     );
     await _io.write(target, result.pdf);
     return result.skippedItems;
+  }
+
+  /// [model]'in [pages] sayfalarını (verilen sırayla) çizimleri gömülü
+  /// olarak görüntüye çevirmek üzere açar: yalnızca bu sayfalar düzleştirilir
+  /// ([pageSubset]); görüntü, dışa aktarılanla ve yazdırılanla aynıdır.
+  /// Kapatmak ([PdfPageImager.dispose]) çağıranın işidir. Açık belge
+  /// değişmez.
+  Future<PdfPageImager> openPageImages(
+    InkenDocument model,
+    List<int> pages, {
+    Map<String, InkenImage> images = const {},
+  }) async {
+    final doc = state;
+    if (doc == null) throw StateError('Açık belge yok');
+    final result = await exportFlattenedFile(
+      doc.bytes,
+      pageSubset(model, pages),
+      font: ref.read(textFontProvider)?.bytes,
+      images: images,
+      password: doc.password,
+    );
+    return PdfPageImager.open(result.pdf, password: doc.password);
   }
 
   void close() => state = null;

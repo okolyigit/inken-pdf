@@ -1486,4 +1486,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get printNextPage => 'Next page';
+
+  @override
+  String get captureRegion => 'Capture area';
+
+  @override
+  String get captureHint =>
+      'Drag a frame around the area to capture, or tap a page to capture all of it.';
+
+  @override
+  String get captureBar => 'Capture';
+
+  @override
+  String get captureSave => 'Save…';
+
+  @override
+  String get captureShare => 'Share…';
+
+  @override
+  String get captureToNewPage => 'Put on a new page';
+
+  @override
+  String get captureToNewPageHint =>
+      'Places the captured area at the top of a new blank page added after it, with room to work below.';
+
+  @override
+  String get captureCopied => 'Image copied to the clipboard';
+
+  @override
+  String get captureCopyUnsupported =>
+      'Images can\'t be copied to the clipboard on this system; save or share it instead.';
+
+  @override
+  String captureFailed(String error) {
+    return 'Couldn\'t capture the image: $error';
+  }
+
+  @override
+  String captureFileName(String base, int page) {
+    return '$base - page $page.png';
+  }
+
+  @override
+  String get pngFileType => 'PNG image';
+
+  @override
+  String get sharePageImage => 'Share page as image…';
 }

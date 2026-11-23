@@ -254,6 +254,12 @@ void main() {
     expect(safeFileName('Limit: 1/2.pdf'), 'Limit_ 1_2.pdf');
     expect(safeFileName('ders.PDF'), 'ders.pdf');
     expect(safeFileName('  '), 'Inken.pdf');
+    expect(
+      safeFileName('ders - sayfa 1.png', extension: 'png'),
+      'ders - sayfa 1.png',
+    );
+    expect(safeFileName('ders.pdf', extension: 'png'), 'ders.png');
+    expect(safeFileName('a/b', extension: 'png'), 'a_b.png');
     expect(safeFileName('Türev ölçme'), 'Türev ölçme.pdf');
   });
 

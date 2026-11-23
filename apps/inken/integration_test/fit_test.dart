@@ -54,10 +54,7 @@ void main() {
     );
     addTearDown(container.dispose);
     await t.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const InkenApp(),
-      ),
+      UncontrolledProviderScope(container: container, child: const InkenApp()),
     );
     await container
         .read(openDocumentProvider.notifier)

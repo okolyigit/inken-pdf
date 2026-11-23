@@ -32,6 +32,12 @@ class _FakeImageClipboard implements ClipboardService {
   Uint8List? image;
   @override
   Future<Uint8List?> readImage() async => image;
+
+  @override
+  Future<bool> writeImage(Uint8List png) async {
+    image = png;
+    return true;
+  }
 }
 
 Future<void> _ctrl(WidgetTester t, LogicalKeyboardKey key) async {

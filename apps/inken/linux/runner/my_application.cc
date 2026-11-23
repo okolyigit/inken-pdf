@@ -15,7 +15,8 @@ struct _MyApplication {
   FlMethodChannel* window_channel;
   // Yazdırma: "inken/print" kanalı, "print" {path, title}.
   FlMethodChannel* print_channel;
-  // Pano: "inken/clipboard" kanalı, "readImage" → PNG baytları ya da null.
+  // Pano: "inken/clipboard" kanalı, "readImage" → PNG baytları ya da null;
+  // "writeImage" {png} → görseli panoya koyar.
   FlMethodChannel* clipboard_channel;
 };
 
@@ -48,8 +49,45 @@ static void clipboard_image_cb(GtkClipboard* clipboard, GdkPixbuf* pixbuf,
   fl_method_call_respond_success(call, result, nullptr);
 }
 
+// "writeImage" {png}: görseli panoya koyar (bölge yakalama). GTK, isteyen
+// uygulamaya istediği biçimde (image/png, image/bmp…) verir; uygulama
+// kapanınca pano yöneticisi saklasın diye gtk_clipboard_store.
+static void clipboard_write_image(FlMethodCall* call) {
+  FlValue* args = fl_method_call_get_args(call);
+  FlValue* png = fl_value_get_type(args) == FL_VALUE_TYPE_MAP
+                     ? fl_value_lookup_string(args, "png")
+                     : nullptr;
+  if (png == nullptr || fl_value_get_type(png) != FL_VALUE_TYPE_UINT8_LIST) {
+    fl_method_call_respond_error(call, "bad_args", "png gerekli", nullptr,
+                                 nullptr);
+    return;
+  }
+  g_autoptr(GdkPixbufLoader) loader = gdk_pixbuf_loader_new_with_type("png", nullptr);
+  g_autoptr(GError) error = nullptr;
+  if (loader == nullptr ||
+      !gdk_pixbuf_loader_write(loader, fl_value_get_uint8_list(png),
+                               fl_value_get_length(png), &error) ||
+      !gdk_pixbuf_loader_close(loader, &error)) {
+    fl_method_call_respond_error(
+        call, "clipboard_failed",
+        error != nullptr ? error->message : "PNG okunamadı", nullptr, nullptr);
+    return;
+  }
+  GdkPixbuf* pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  gtk_clipboard_set_image(clipboard, pixbuf);
+  gtk_clipboard_set_can_store(clipboard, nullptr, 0);
+  gtk_clipboard_store(clipboard);
+  g_autoptr(FlValue) ok = fl_value_new_bool(TRUE);
+  fl_method_call_respond_success(call, ok, nullptr);
+}
+
 static void clipboard_method_cb(FlMethodChannel* channel, FlMethodCall* call,
                                 gpointer user_data) {
+  if (g_strcmp0(fl_method_call_get_name(call), "writeImage") == 0) {
+    clipboard_write_image(call);
+    return;
+  }
   if (g_strcmp0(fl_method_call_get_name(call), "readImage") != 0) {
     g_autoptr(FlMethodResponse) response =
         FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());

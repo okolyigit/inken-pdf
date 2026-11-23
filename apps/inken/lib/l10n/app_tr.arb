@@ -780,5 +780,35 @@
   "printDecrease": "Azalt",
   "printIncrease": "Artır",
   "printPrevPage": "Önceki sayfa",
-  "printNextPage": "Sonraki sayfa"
+  "printNextPage": "Sonraki sayfa",
+  "captureRegion": "Bölge yakala",
+  "captureHint": "Yakalamak istediğin alanı çerçeve içine al; sayfanın tamamı için sayfaya dokun.",
+  "captureBar": "Yakalama",
+  "captureSave": "Kaydet…",
+  "captureShare": "Paylaş…",
+  "captureToNewPage": "Yeni sayfaya al",
+  "captureToNewPageHint": "Yakalanan alanı arkasına eklenen boş sayfanın üstüne koyar; altında çözebilirsin.",
+  "captureCopied": "Görsel panoya kopyalandı",
+  "captureCopyUnsupported": "Bu sistemde panoya görsel kopyalanamıyor; kaydedip paylaşabilirsin.",
+  "captureFailed": "Görüntü alınamadı: {error}",
+  "@captureFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "captureFileName": "{base} - sayfa {page}.png",
+  "@captureFileName": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      },
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "pngFileType": "PNG görseli",
+  "sharePageImage": "Sayfayı görsel olarak paylaş…"
 }

@@ -1,5 +1,7 @@
 #include "flutter_window.h"
 
+#include <cstring>
+#include <variant>
 #include <vector>
 
 #include <flutter/standard_method_codec.h>
@@ -62,6 +64,61 @@ std::vector<uint8_t> ReadClipboardImage(HWND owner) {
   }
   CloseClipboard();
   return out;
+}
+
+// [bytes]'ı taşınabilir bir bellek bloğuna kopyalar (pano için).
+HGLOBAL CopyToGlobal(const uint8_t* bytes, size_t size) {
+  HGLOBAL h = GlobalAlloc(GMEM_MOVEABLE, size);
+  if (h == nullptr) return nullptr;
+  if (void* dst = GlobalLock(h)) {
+    memcpy(dst, bytes, size);
+    GlobalUnlock(h);
+    return h;
+  }
+  GlobalFree(h);
+  return nullptr;
+}
+
+// Görseli panoya koyar: "PNG" biçimi (tarayıcılar, Office, Paint.NET) ve
+// CF_DIB (her uygulama). [bgra] üstten aşağı satırlardır; DIB alttan üste
+// yazılır. Başarılıysa true.
+bool WriteClipboardImage(HWND owner, const std::vector<uint8_t>& png,
+                         const std::vector<uint8_t>& bgra, int32_t width,
+                         int32_t height) {
+  const size_t row = static_cast<size_t>(width) * 4;
+  if (width <= 0 || height <= 0 || bgra.size() != row * height) return false;
+  BITMAPINFOHEADER info{};
+  info.biSize = sizeof(info);
+  info.biWidth = width;
+  info.biHeight = height;  // alttan üste
+  info.biPlanes = 1;
+  info.biBitCount = 32;
+  info.biCompression = BI_RGB;
+  info.biSizeImage = static_cast<DWORD>(row * height);
+  std::vector<uint8_t> dib(sizeof(info) + row * height);
+  memcpy(dib.data(), &info, sizeof(info));
+  for (int32_t y = 0; y < height; y++) {
+    memcpy(dib.data() + sizeof(info) + row * (height - 1 - y),
+           bgra.data() + row * y, row);
+  }
+  if (!OpenClipboard(owner)) return false;
+  EmptyClipboard();
+  bool ok = false;
+  static const UINT png_format = RegisterClipboardFormatW(L"PNG");
+  if (!png.empty()) {
+    if (HGLOBAL h = CopyToGlobal(png.data(), png.size())) {
+      if (SetClipboardData(png_format, h) == nullptr) GlobalFree(h);
+    }
+  }
+  if (HGLOBAL h = CopyToGlobal(dib.data(), dib.size())) {
+    if (SetClipboardData(CF_DIB, h) == nullptr) {
+      GlobalFree(h);
+    } else {
+      ok = true;
+    }
+  }
+  CloseClipboard();
+  return ok;
 }
 
 }  // namespace
@@ -257,6 +314,38 @@ bool FlutterWindow::OnCreate() {
       [this](const flutter::MethodCall<flutter::EncodableValue>& call,
              std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>
                  result) {
+        if (call.method_name() == "writeImage") {
+          const auto* args =
+              std::get_if<flutter::EncodableMap>(call.arguments());
+          auto get = [&](const char* key) -> const flutter::EncodableValue* {
+            if (args == nullptr) return nullptr;
+            auto it = args->find(flutter::EncodableValue(key));
+            return it == args->end() ? nullptr : &it->second;
+          };
+          const auto* png = get("png");
+          const auto* bgra = get("bgra");
+          const auto* width = get("width");
+          const auto* height = get("height");
+          if (png == nullptr || bgra == nullptr || width == nullptr ||
+              height == nullptr ||
+              !std::holds_alternative<std::vector<uint8_t>>(*png) ||
+              !std::holds_alternative<std::vector<uint8_t>>(*bgra) ||
+              !std::holds_alternative<int32_t>(*width) ||
+              !std::holds_alternative<int32_t>(*height)) {
+            result->Error("bad_args", "png, bgra, width, height gerekli");
+            return;
+          }
+          const bool ok = WriteClipboardImage(
+              GetHandle(), std::get<std::vector<uint8_t>>(*png),
+              std::get<std::vector<uint8_t>>(*bgra), std::get<int32_t>(*width),
+              std::get<int32_t>(*height));
+          if (ok) {
+            result->Success(flutter::EncodableValue(true));
+          } else {
+            result->Error("clipboard_failed", "Pano yazılamadı");
+          }
+          return;
+        }
         if (call.method_name() != "readImage") {
           result->NotImplemented();
           return;

@@ -35,8 +35,17 @@ class _FakeSharer implements ShareService {
   }
 
   @override
-  Future<bool> shareText(String text, {required String subject}) async =>
-      false;
+  Future<ShareOutcome> shareFile(
+    String path, {
+    required String name,
+    required String mime,
+  }) async {
+    calls.add((path, name, File(path).readAsBytesSync()));
+    return outcome();
+  }
+
+  @override
+  Future<bool> shareText(String text, {required String subject}) async => false;
 }
 
 Future<void> _until(WidgetTester t, bool Function() done) async {

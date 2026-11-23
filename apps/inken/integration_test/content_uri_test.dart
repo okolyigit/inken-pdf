@@ -34,6 +34,7 @@ class _FakeSaf extends DocumentIo {
     required String suggestedName,
     required String typeLabel,
     String? near,
+    SaveFormat format = SaveFormat.pdf,
   }) async {
     suggested.add(suggestedName);
     return nextSave.isEmpty ? null : nextSave.removeAt(0);

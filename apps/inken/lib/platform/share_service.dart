@@ -41,6 +41,13 @@ abstract class ShareService {
   /// Dosya, paylaşan uygulama okuyana kadar yerinde kalmalıdır.
   Future<ShareOutcome> sharePdf(String path, {required String name});
 
+  /// [path]'teki dosyayı ([mime] türünde: görsel, zip) paylaşır.
+  Future<ShareOutcome> shareFile(
+    String path, {
+    required String name,
+    required String mime,
+  });
+
   /// [text]'i sistemin paylaşma sayfasıyla paylaşır. Yalnızca Android'de
   /// vardır; başka yerde `false` döner (çağıran metni panoya kopyalar).
   Future<bool> shareText(String text, {required String subject});
@@ -55,7 +62,15 @@ class PlatformShareService implements ShareService {
           defaultTargetPlatform == TargetPlatform.android);
 
   @override
-  Future<ShareOutcome> sharePdf(String path, {required String name}) async {
+  Future<ShareOutcome> sharePdf(String path, {required String name}) =>
+      shareFile(path, name: name, mime: 'application/pdf');
+
+  @override
+  Future<ShareOutcome> shareFile(
+    String path, {
+    required String name,
+    required String mime,
+  }) async {
     if (defaultTargetPlatform == TargetPlatform.linux) {
       return _linux(path, name);
     }
@@ -63,7 +78,7 @@ class PlatformShareService implements ShareService {
     try {
       result = await SharePlus.instance.share(
         ShareParams(
-          files: [XFile(path, mimeType: 'application/pdf', name: name)],
+          files: [XFile(path, mimeType: mime, name: name)],
           title: name,
           subject: name,
         ),

@@ -1,6 +1,7 @@
 package com.inkenpdf.app
 
 import android.app.Activity
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Intent
@@ -159,8 +160,9 @@ class MainActivity : FlutterActivity() {
      * gibi (PNG, JPEG…) döner. Görsel yoksa `null`.
      */
     private fun onClipboard(call: MethodCall, result: MethodChannel.Result) {
-        if (call.method != "readImage") return result.notImplemented()
         val manager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        if (call.method == "writeImage") return writeClipboardImage(manager, call, result)
+        if (call.method != "readImage") return result.notImplemented()
         val clip = manager.primaryClip
         val uri = clip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.uri
         if (uri == null) return result.success(null)
@@ -169,6 +171,30 @@ class MainActivity : FlutterActivity() {
         if (type != null && !type.startsWith("image/")) return result.success(null)
         background(result) {
             contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        }
+    }
+
+    /**
+     * Görseli (PNG) panoya koyar: önbelleğe yazılır, `ClipboardImageProvider`
+     * URI'siyle panoya verilir. Eski kopyalar silinir (pano tek görsel tutar).
+     */
+    private fun writeClipboardImage(
+        manager: ClipboardManager,
+        call: MethodCall,
+        result: MethodChannel.Result,
+    ) {
+        val png = call.argument<ByteArray>("png")
+            ?: return result.error("bad_args", "png gerekli", null)
+        background(result) {
+            val dir = ClipboardImageProvider.folder(this)
+            dir.mkdirs()
+            dir.listFiles()?.forEach { it.delete() }
+            val file = File(dir, "inken-${System.currentTimeMillis()}.png")
+            file.writeBytes(png)
+            val uri = ClipboardImageProvider.uriFor(this, file)
+            val clip = ClipData.newUri(contentResolver, "Inken PDF", uri)
+            runOnUiThread { manager.setPrimaryClip(clip) }
+            true
         }
     }
 
@@ -237,7 +263,7 @@ class MainActivity : FlutterActivity() {
             "create" -> startPicker(REQUEST_CREATE, result) {
                 Intent(Intent.ACTION_CREATE_DOCUMENT)
                     .addCategory(Intent.CATEGORY_OPENABLE)
-                    .setType("application/pdf")
+                    .setType(call.argument<String>("mime") ?: "application/pdf")
                     .putExtra(Intent.EXTRA_TITLE, call.argument<String>("name"))
             }
             "read" -> background(result) {

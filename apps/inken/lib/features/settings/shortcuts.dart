@@ -21,6 +21,7 @@ enum AppShortcut {
   paste,
   selectAll,
   find,
+  capture,
   deleteSelection,
   settings,
   toolPen,
@@ -75,6 +76,9 @@ const Map<AppShortcut, List<SingleActivator>> shortcutKeys = {
     SingleActivator(LogicalKeyboardKey.keyA, control: true),
   ],
   AppShortcut.find: [SingleActivator(LogicalKeyboardKey.keyF, control: true)],
+  AppShortcut.capture: [
+    SingleActivator(LogicalKeyboardKey.keyC, control: true, shift: true),
+  ],
   AppShortcut.deleteSelection: [
     SingleActivator(LogicalKeyboardKey.delete),
     SingleActivator(LogicalKeyboardKey.backspace),
@@ -169,6 +173,7 @@ List<(String, List<ShortcutRow>)> shortcutGroups(AppLocalizations l10n) {
         row(AppShortcut.paste, l10n.paste),
         row(AppShortcut.selectAll, l10n.selectAll),
         row(AppShortcut.find, l10n.find),
+        row(AppShortcut.capture, l10n.captureRegion),
         row(AppShortcut.deleteSelection, l10n.deleteSelection),
         row(AppShortcut.settings, l10n.settings),
       ],

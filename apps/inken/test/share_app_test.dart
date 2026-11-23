@@ -24,6 +24,13 @@ class _FakeSharer implements ShareService {
       throw UnimplementedError();
 
   @override
+  Future<ShareOutcome> shareFile(
+    String path, {
+    required String name,
+    required String mime,
+  }) => throw UnimplementedError();
+
+  @override
   Future<bool> shareText(String text, {required String subject}) async {
     texts.add((text, subject));
     return sheet;
@@ -93,9 +100,7 @@ void main() {
       expect(find.byType(SnackBar), findsNothing);
     });
 
-    testWidgets('masaüstünde metin panoya kopyalanır ve bildirilir', (
-      t,
-    ) async {
+    testWidgets('masaüstünde metin panoya kopyalanır ve bildirilir', (t) async {
       final sharer = _FakeSharer(sheet: false);
       await pumpAndTap(t, sharer);
       expect(clipboard, shareAppMessage(AppLocalizationsTr()));

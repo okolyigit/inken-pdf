@@ -1445,4 +1445,50 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get printNextPage => 'Sonraki sayfa';
+
+  @override
+  String get captureRegion => 'Bölge yakala';
+
+  @override
+  String get captureHint =>
+      'Yakalamak istediğin alanı çerçeve içine al; sayfanın tamamı için sayfaya dokun.';
+
+  @override
+  String get captureBar => 'Yakalama';
+
+  @override
+  String get captureSave => 'Kaydet…';
+
+  @override
+  String get captureShare => 'Paylaş…';
+
+  @override
+  String get captureToNewPage => 'Yeni sayfaya al';
+
+  @override
+  String get captureToNewPageHint =>
+      'Yakalanan alanı arkasına eklenen boş sayfanın üstüne koyar; altında çözebilirsin.';
+
+  @override
+  String get captureCopied => 'Görsel panoya kopyalandı';
+
+  @override
+  String get captureCopyUnsupported =>
+      'Bu sistemde panoya görsel kopyalanamıyor; kaydedip paylaşabilirsin.';
+
+  @override
+  String captureFailed(String error) {
+    return 'Görüntü alınamadı: $error';
+  }
+
+  @override
+  String captureFileName(String base, int page) {
+    return '$base - sayfa $page.png';
+  }
+
+  @override
+  String get pngFileType => 'PNG görseli';
+
+  @override
+  String get sharePageImage => 'Sayfayı görsel olarak paylaş…';
 }

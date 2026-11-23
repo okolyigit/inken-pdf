@@ -248,6 +248,8 @@ class DocumentMenuActions {
     this.goToPage,
     this.print,
     this.share,
+    this.sharePageImage,
+    this.capture,
     this.insertPage,
     this.appendPage,
     this.newPageTemplate = PageTemplate.blank,
@@ -291,6 +293,12 @@ class DocumentMenuActions {
 
   /// Belgeyi (düzenlenebilir PDF) sistemin paylaşma yoluna verir.
   final VoidCallback? share;
+
+  /// Geçerli sayfayı görsel (PNG) olarak paylaşır.
+  final VoidCallback? sharePageImage;
+
+  /// Bölge yakalamayı başlatır.
+  final VoidCallback? capture;
 
   /// Geçerli sayfanın arkasına seçilen zeminle sayfa ekler.
   final ValueChanged<PageTemplate>? insertPage;
@@ -439,6 +447,12 @@ List<Widget> appMenus(
           child: Text(l10n.shareDocument),
         ),
         MenuItemButton(
+          key: const ValueKey('menu-share-page-image'),
+          leadingIcon: const Icon(LucideIcons.fileImage),
+          onPressed: a.sharePageImage,
+          child: Text(l10n.sharePageImage),
+        ),
+        MenuItemButton(
           key: const ValueKey('menu-properties'),
           leadingIcon: const Icon(LucideIcons.fileText),
           shortcut: key(LogicalKeyboardKey.keyD, control: true),
@@ -506,6 +520,13 @@ List<Widget> appMenus(
           leadingIcon: const Icon(LucideIcons.imagePlus),
           onPressed: a.insertImage,
           child: Text(l10n.insertImage),
+        ),
+        MenuItemButton(
+          key: const ValueKey('menu-capture'),
+          leadingIcon: const Icon(LucideIcons.camera),
+          shortcut: key(LogicalKeyboardKey.keyC, control: true, shift: true),
+          onPressed: a.capture,
+          child: Text(l10n.captureRegion),
         ),
         MenuItemButton(
           leadingIcon: const Icon(LucideIcons.trash2),

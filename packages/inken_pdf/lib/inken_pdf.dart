@@ -7,6 +7,7 @@ library;
 export 'src/init.dart';
 export 'src/inken_file.dart';
 export 'src/page_geometry.dart';
+export 'src/page_image.dart';
 export 'src/page_transform.dart';
 export 'src/pdf_io.dart'
     show

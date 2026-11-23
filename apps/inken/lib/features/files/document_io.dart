@@ -23,6 +23,28 @@ typedef PickedDocument = ({
   bool writable,
 });
 
+/// Kaydedilecek dosyanın türü: uzantı ve MIME türü.
+enum SaveFormat {
+  pdf('pdf', 'application/pdf'),
+  png('png', 'image/png'),
+  jpeg('jpg', 'image/jpeg'),
+  zip('zip', 'application/zip');
+
+  const SaveFormat(this.extension, this.mime);
+
+  final String extension;
+  final String mime;
+
+  /// [path] bu türün uzantısıyla bitmiyorsa uzantıyı ekler.
+  String withExtension(String path) {
+    final lower = path.toLowerCase();
+    final ok =
+        lower.endsWith('.$extension') ||
+        (this == SaveFormat.jpeg && lower.endsWith('.jpeg'));
+    return ok ? path : '$path.$extension';
+  }
+}
+
 /// Boyut ve değiştirilme zamanı (bilinmiyorsa 1970).
 typedef DocStat = ({int size, DateTime modified});
 
@@ -33,11 +55,12 @@ abstract class DocumentIo {
 
   /// Kayıt yeri seçtirir; vazgeçilirse `null`. Masaüstünde [near]'ın
   /// klasöründe açılır. Android'de seçilen ad doluysa sistem yeni ad verir
-  /// (üzerine yazılmaz).
+  /// (üzerine yazılmaz). [format]: dosya türü (uzantı ve süzgeç).
   Future<DocTarget?> pickSave({
     required String suggestedName,
     required String typeLabel,
     String? near,
+    SaveFormat format = SaveFormat.pdf,
   });
 
   Future<Uint8List> read(String location);
@@ -125,10 +148,12 @@ class PlatformDocumentIo extends DocumentIo {
     required String suggestedName,
     required String typeLabel,
     String? near,
+    SaveFormat format = SaveFormat.pdf,
   }) async {
     if (_android) {
       final r = await _channel.invokeMapMethod<String, Object?>('create', {
         'name': suggestedName,
+        'mime': format.mime,
       });
       if (r == null) return null;
       return (location: r['uri']! as String, name: r['name']! as String);
@@ -138,11 +163,16 @@ class PlatformDocumentIo extends DocumentIo {
       initialDirectory: near == null || isContentUri(near)
           ? null
           : File(near).parent.path,
-      acceptedTypeGroups: [_pdf(typeLabel)],
+      acceptedTypeGroups: [
+        XTypeGroup(
+          label: typeLabel,
+          extensions: [format.extension, if (format == SaveFormat.jpeg) 'jpeg'],
+          mimeTypes: [format.mime],
+        ),
+      ],
     );
     if (location == null) return null;
-    var path = location.path;
-    if (!path.toLowerCase().endsWith('.pdf')) path = '$path.pdf';
+    final path = format.withExtension(location.path);
     return (location: path, name: File(path).uri.pathSegments.last);
   }
 

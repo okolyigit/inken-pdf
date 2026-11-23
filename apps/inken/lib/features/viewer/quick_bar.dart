@@ -211,6 +211,7 @@ class QuickBar extends StatelessWidget {
             ),
           ),
         ),
+        button('capture', LucideIcons.camera, l10n.captureRegion, a.capture),
         button('share', LucideIcons.share2, l10n.shareDocument, a.share),
         button('settings', LucideIcons.settings, l10n.settings, onSettings),
       ],

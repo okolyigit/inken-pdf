@@ -12,6 +12,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../backup/backup_store.dart';
+import '../capture/capture_layer.dart';
 import '../files/document_io.dart';
 import '../files/document_properties.dart';
 import '../files/guide.dart';
@@ -144,13 +145,15 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     AppFullscreen.set(on);
   }
 
-  /// Esc: önce açık seçenek panelini, sonra seçimi, sonra örtüyü (spot
+  /// Esc: önce bölge yakalamayı, sonra açık seçenek panelini, sonra seçimi, sonra örtüyü (spot
   /// ışığı / perde), sonra ölçme araçlarını, sonra tam ekranı kapatır.
   /// Kapatacak bir şey bulduysa `true`.
   bool _escape() {
     final options = ref.read(toolOptionsProvider.notifier);
     final session = _session;
-    if (ref.read(toolOptionsProvider) != null) {
+    if (_capturing) {
+      _closeCapture();
+    } else if (ref.read(toolOptionsProvider) != null) {
       options.close();
     } else if (_searchOpen) {
       _closeSearch();
@@ -682,6 +685,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     required String suggestedName,
     required bool Function(String location) allowed,
     required String rejected,
+    SaveFormat format = SaveFormat.pdf,
   }) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -692,8 +696,11 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
           .read(documentIoProvider)
           .pickSave(
             suggestedName: suggestedName,
-            typeLabel: l10n.pdfFileType,
+            typeLabel: format == SaveFormat.png
+                ? l10n.pngFileType
+                : l10n.pdfFileType,
             near: path,
+            format: format,
           );
     } on UnimplementedError {
       messenger.showSnackBar(SnackBar(content: Text(l10n.pickerUnavailable)));
@@ -1078,11 +1085,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     final notifier = ref.read(openDocumentProvider.notifier);
     setState(() => _sharing = true);
     try {
-      final root = Directory('${Directory.systemTemp.path}/inken-share');
-      _cleanOldPrints(root);
-      final folder = Directory(
-        '${root.path}/${DateTime.now().microsecondsSinceEpoch}',
-      )..createSync(recursive: true);
+      final folder = _shareFolder();
       final name = safeFileName(widget.document.name);
       final file = File('${folder.path}/$name');
       final document = session.document;
@@ -1092,16 +1095,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
         images: await _imagesFor(session, document),
       );
       final outcome = await sharer.sharePdf(file.path, name: name);
-      switch (outcome) {
-        case ShareOutcome.mailed:
-          messenger.showSnackBar(SnackBar(content: Text(l10n.shareMailed)));
-        case ShareOutcome.shown:
-          messenger.showSnackBar(SnackBar(content: Text(l10n.shareShown)));
-        case ShareOutcome.shared ||
-            ShareOutcome.started ||
-            ShareOutcome.dismissed:
-          break;
-      }
+      _reportShare(messenger, l10n, outcome);
     } on ShareUnsupported {
       messenger.showSnackBar(SnackBar(content: Text(l10n.shareUnsupported)));
     } on Object catch (e) {
@@ -1110,6 +1104,257 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
       );
     } finally {
       if (mounted) setState(() => _sharing = false);
+    }
+  }
+
+  /// Paylaşmanın sonucunu bildirir (Linux'ta e-posta / klasör).
+  static void _reportShare(
+    ScaffoldMessengerState messenger,
+    AppLocalizations l10n,
+    ShareOutcome outcome,
+  ) {
+    switch (outcome) {
+      case ShareOutcome.mailed:
+        messenger.showSnackBar(SnackBar(content: Text(l10n.shareMailed)));
+      case ShareOutcome.shown:
+        messenger.showSnackBar(SnackBar(content: Text(l10n.shareShown)));
+      case ShareOutcome.shared ||
+          ShareOutcome.started ||
+          ShareOutcome.dismissed:
+        break;
+    }
+  }
+
+  /// Paylaşılacak dosyalar için yeni geçici klasör (`inken-share/<an>`);
+  /// bir günden eskiler silinir.
+  static Directory _shareFolder() {
+    final root = Directory('${Directory.systemTemp.path}/inken-share');
+    _cleanOldPrints(root);
+    return Directory('${root.path}/${DateTime.now().microsecondsSinceEpoch}')
+      ..createSync(recursive: true);
+  }
+
+  // ---- bölge yakalama
+
+  /// Bölge yakalama örtüsü açık mı?
+  bool _capturing = false;
+
+  /// Yakalanan görüntü hazırlanıyor (çubuk pasif).
+  bool _captureBusy = false;
+
+  /// Bölge yakalamayı başlatır: seçim, açık panel ve bildirim kapanır.
+  void _startCapture() {
+    final session = _session;
+    if (session == null || _capturing) return;
+    session.clearSelection();
+    ref.read(toolOptionsProvider.notifier).close();
+    // Alttaki bildirim yakalama çubuğunu örtmesin.
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    setState(() => _capturing = true);
+  }
+
+  void _closeCapture() {
+    if (!_capturing) return;
+    setState(() => _capturing = false);
+  }
+
+  /// Yakalanan alanın dosya adı: `Belge - sayfa 3.png`.
+  String _captureName(int page) => safeFileName(
+    AppLocalizations.of(context)
+        .captureFileName(withoutPdfExtension(widget.document.name), page + 1),
+    extension: 'png',
+  );
+
+  /// [sel]'i çizimleri gömülü olarak PNG'ye çevirir; uzun kenar en çok
+  /// [maxPixels].
+  Future<PageImage> _renderCapture(
+    InkSession session,
+    CaptureSelection sel, {
+    int maxPixels = maxCapturePixels,
+  }) async {
+    final document = session.document;
+    if (sel.page >= document.pages.length) {
+      throw StateError('Sayfa ${sel.page + 1} yok');
+    }
+    final imager = await ref.read(openDocumentProvider.notifier).openPageImages(
+      document,
+      [sel.page],
+      images: await _imagesFor(session, pageSubset(document, [sel.page])),
+    );
+    try {
+      final size = captureSize(sel.region, maxPixels: maxPixels);
+      return await imager.render(0, sel.region, scale: size.scale);
+    } finally {
+      await imager.dispose();
+    }
+  }
+
+  /// Yakalama çubuğundaki komut. İş bitince (iptal edilmediyse) örtü kapanır.
+  Future<void> _captureAction(
+    CaptureAction action,
+    CaptureSelection sel,
+  ) async {
+    final session = _session;
+    if (session == null || _captureBusy) return;
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _captureBusy = true);
+    var done = false;
+    try {
+      done = switch (action) {
+        CaptureAction.newPage => await _captureToNewPage(session, sel),
+        CaptureAction.copy => await _copyImage(
+          await _renderCapture(session, sel),
+        ),
+        CaptureAction.save => await _saveImage(
+          await _renderCapture(session, sel),
+          _captureName(sel.page),
+        ),
+        CaptureAction.share => await _shareImage(
+          await _renderCapture(session, sel),
+          _captureName(sel.page),
+        ),
+      };
+    } on ShareUnsupported {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.shareUnsupported)));
+    } on Object catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.captureFailed(e.toString()))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _captureBusy = false;
+          if (done) _capturing = false;
+        });
+      }
+    }
+  }
+
+  /// Görseli sistem panosuna koyar.
+  Future<bool> _copyImage(PageImage image) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await ref.read(clipboardServiceProvider).writeImage(image.png);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(ok ? l10n.captureCopied : l10n.captureCopyUnsupported),
+        ),
+      );
+    return ok;
+  }
+
+  /// Görseli kullanıcının seçtiği yere PNG olarak kaydeder; vazgeçilirse
+  /// `false`.
+  Future<bool> _saveImage(PageImage image, String name) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final target = await _pickTarget(
+      suggestedName: name,
+      allowed: (t) => !samePath(t, widget.document.path),
+      rejected: l10n.exportOntoOpenFile,
+      format: SaveFormat.png,
+    );
+    if (target == null) return false;
+    await ref.read(documentIoProvider).write(target.location, image.png);
+    messenger.showSnackBar(SnackBar(content: Text(l10n.savedTo(target.name))));
+    return true;
+  }
+
+  /// Görseli (PNG) sistemin paylaşma yoluna verir.
+  Future<bool> _shareImage(PageImage image, String name) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final sharer = ref.read(shareServiceProvider);
+    if (!sharer.supported) throw const ShareUnsupported();
+    final file = File('${_shareFolder().path}/$name');
+    await file.writeAsBytes(image.png, flush: true);
+    final outcome = await sharer.shareFile(
+      file.path,
+      name: name,
+      mime: 'image/png',
+    );
+    _reportShare(messenger, l10n, outcome);
+    return true;
+  }
+
+  /// Yakalanan alanı, yakalandığı sayfanın arkasına eklenen boş sayfanın
+  /// üstüne görsel olarak koyar (kitaptaki soru aynı boyda, altı boş);
+  /// sayfa son seçilen zemin ve renkte, kaynak sayfanın boyutunda. Sayfa
+  /// görseliyle birlikte tek geri alma adımıdır; yeni sayfaya gidilir.
+  Future<bool> _captureToNewPage(
+    InkSession session,
+    CaptureSelection sel,
+  ) async {
+    if (!session.canChangePages) return false;
+    final image = await _renderCapture(session, sel, maxPixels: maxImageSide);
+    final prepared = await prepareImage(image.png);
+    if (prepared == null) throw StateError('Görsel hazırlanamadı');
+    if (!mounted ||
+        !identical(session, _session) ||
+        !session.canChangePages ||
+        sel.page >= session.document.pages.length) {
+      prepared.image.dispose();
+      return false;
+    }
+    session.images.add(prepared.id, prepared.png, prepared.image);
+    final document = session.document;
+    final page = newPageLike(
+      document,
+      sel.page,
+      _lastTemplate,
+      color: _newColor,
+    );
+    final place = placeCapture(
+      regionWidth: regionWidth(sel.region),
+      regionHeight: regionHeight(sel.region),
+      pageWidth: page.width,
+      pageHeight: page.height,
+    );
+    final at = sel.page + 1;
+    _targetPage = at;
+    session.insertPage(
+      at,
+      page.copyWith(
+        items: [
+          ImageItem(
+            id: newItemId(),
+            imageId: prepared.id,
+            x: place.x,
+            y: place.y,
+            width: place.width,
+            height: place.height,
+          ),
+        ],
+      ),
+    );
+    return true;
+  }
+
+  /// Geçerli sayfanın tamamını görsel (PNG) olarak paylaşır.
+  Future<void> _sharePageImage() async {
+    final session = _session;
+    if (session == null || _captureBusy) return;
+    final page = _currentIndex(session);
+    final layer = session.document.pages[page];
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _captureBusy = true);
+    try {
+      await _shareImage(
+        await _renderCapture(session, (page: page, region: wholePage(layer))),
+        _captureName(page),
+      );
+    } on ShareUnsupported {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.shareUnsupported)));
+    } on Object catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.captureFailed(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _captureBusy = false);
     }
   }
 
@@ -1482,6 +1727,13 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
         session == null || _sharing || !ref.read(shareServiceProvider).supported
         ? null
         : _share,
+    sharePageImage:
+        session == null ||
+            _captureBusy ||
+            !ref.read(shareServiceProvider).supported
+        ? null
+        : _sharePageImage,
+    capture: session == null ? null : _startCapture,
   );
 
   /// Masaüstünde menü çubuğunun altındaki, tablette üst çubuğun ortasındaki
@@ -1802,6 +2054,11 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                           _actions(session).share,
                         ),
                         item(
+                          LucideIcons.fileImage,
+                          l10n.sharePageImage,
+                          _actions(session).sharePageImage,
+                        ),
+                        item(
                           LucideIcons.fileText,
                           l10n.documentProperties,
                           session == null ? null : _showProperties,
@@ -1818,6 +2075,11 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
                           LucideIcons.imagePlus,
                           l10n.insertImage,
                           session == null ? null : _insertImageFile,
+                        ),
+                        item(
+                          LucideIcons.camera,
+                          l10n.captureRegion,
+                          session == null ? null : _startCapture,
                         ),
                         item(
                           LucideIcons.squareDashedMousePointer,
@@ -2120,6 +2382,22 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
               ),
             ),
           ],
+          // Bölge yakalama: belge alanının en üstünde, bütün girdiyi alır.
+          if (_capturing && session != null)
+            Positioned.fill(
+              child: CaptureLayer(
+                geometry: _gate,
+                pageSize: (page) {
+                  final pages = session.document.pages;
+                  if (page < 0 || page >= pages.length) return null;
+                  return Size(pages[page].width, pages[page].height);
+                },
+                busy: _captureBusy,
+                canAddPage: session.canChangePages,
+                onAction: _captureAction,
+                onClose: _closeCapture,
+              ),
+            ),
         ],
       ),
     );
@@ -2300,6 +2578,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage> {
     AppShortcut.cut: _cut,
     AppShortcut.selectAll: _selectAll,
     AppShortcut.find: _openSearch,
+    AppShortcut.capture: _startCapture,
     AppShortcut.documentProperties: _showProperties,
     AppShortcut.toolPen: () => _selectTool(Tool.pen),
     AppShortcut.toolHighlighter: () => _selectTool(Tool.highlighter),

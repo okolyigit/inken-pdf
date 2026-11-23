@@ -2689,6 +2689,84 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Sonraki sayfa'**
   String get printNextPage;
+
+  /// No description provided for @captureRegion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölge yakala'**
+  String get captureRegion;
+
+  /// No description provided for @captureHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakalamak istediğin alanı çerçeve içine al; sayfanın tamamı için sayfaya dokun.'**
+  String get captureHint;
+
+  /// No description provided for @captureBar.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakalama'**
+  String get captureBar;
+
+  /// No description provided for @captureSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet…'**
+  String get captureSave;
+
+  /// No description provided for @captureShare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş…'**
+  String get captureShare;
+
+  /// No description provided for @captureToNewPage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni sayfaya al'**
+  String get captureToNewPage;
+
+  /// No description provided for @captureToNewPageHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakalanan alanı arkasına eklenen boş sayfanın üstüne koyar; altında çözebilirsin.'**
+  String get captureToNewPageHint;
+
+  /// No description provided for @captureCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görsel panoya kopyalandı'**
+  String get captureCopied;
+
+  /// No description provided for @captureCopyUnsupported.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sistemde panoya görsel kopyalanamıyor; kaydedip paylaşabilirsin.'**
+  String get captureCopyUnsupported;
+
+  /// No description provided for @captureFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görüntü alınamadı: {error}'**
+  String captureFailed(String error);
+
+  /// No description provided for @captureFileName.
+  ///
+  /// In tr, this message translates to:
+  /// **'{base} - sayfa {page}.png'**
+  String captureFileName(String base, int page);
+
+  /// No description provided for @pngFileType.
+  ///
+  /// In tr, this message translates to:
+  /// **'PNG görseli'**
+  String get pngFileType;
+
+  /// No description provided for @sharePageImage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayfayı görsel olarak paylaş…'**
+  String get sharePageImage;
 }
 
 class _AppLocalizationsDelegate

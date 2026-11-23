@@ -431,5 +431,18 @@
   "printDecrease": "Decrease",
   "printIncrease": "Increase",
   "printPrevPage": "Previous page",
-  "printNextPage": "Next page"
+  "printNextPage": "Next page",
+  "captureRegion": "Capture area",
+  "captureHint": "Drag a frame around the area to capture, or tap a page to capture all of it.",
+  "captureBar": "Capture",
+  "captureSave": "Save…",
+  "captureShare": "Share…",
+  "captureToNewPage": "Put on a new page",
+  "captureToNewPageHint": "Places the captured area at the top of a new blank page added after it, with room to work below.",
+  "captureCopied": "Image copied to the clipboard",
+  "captureCopyUnsupported": "Images can't be copied to the clipboard on this system; save or share it instead.",
+  "captureFailed": "Couldn't capture the image: {error}",
+  "captureFileName": "{base} - page {page}.png",
+  "pngFileType": "PNG image",
+  "sharePageImage": "Share page as image…"
 }
