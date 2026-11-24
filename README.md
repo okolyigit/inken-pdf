@@ -71,7 +71,7 @@ Inken PDF her gün kullanacağın PDF okuyucu olarak tasarlandı. Hızlı açıl
 
 ## Kurulum
 
-Windows'ta en kolayı [Microsoft Store](https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB). Diğer sistemler için [son sürüm sayfasından](https://github.com/okolyigit/inken-pdf/releases/latest) sistemine uygun dosyayı indir.
+Windows'ta en kolayı [Microsoft Store](https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB). Diğer sistemler için [son sürüm sayfasından](https://github.com/okolyigit/inken-pdf/releases/latest) sistemine uygun dosyayı indir. Sürümlerde nelerin değiştiği: [CHANGELOG.md](CHANGELOG.md).
 
 | Sistem | Dosya | Kurulum |
 |---|---|---|
@@ -148,7 +148,7 @@ Your annotations are saved **inside the PDF**, so they show up in any PDF reader
 
 <a href="https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft"></a>
 
-On Windows, the easiest way is the [Microsoft Store](https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB). For other systems, download the file from the [latest release](https://github.com/okolyigit/inken-pdf/releases/latest).
+On Windows, the easiest way is the [Microsoft Store](https://apps.microsoft.com/detail/9NLL8RX7FT34?cid=DevShareMCLPCB). For other systems, download the file from the [latest release](https://github.com/okolyigit/inken-pdf/releases/latest). What changed in each version: [CHANGELOG.md](CHANGELOG.md) (in Turkish).
 
 | System | File | How |
 |---|---|---|
